@@ -1,3 +1,16 @@
+# Données locales : aucun visage ni jeu public dans le dépôt
+datasets/
+captures/
+*.mp4
+
+# Python
+__pycache__/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+
 target/
 pom.xml.tag
 pom.xml.releaseBackup
