@@ -19,6 +19,10 @@ captures/
 # Python
 __pycache__/
 .venv/
+.venv-*/
+
+# Third-party files downloaded before conversion
+training/downloads/
 
 # IDE
 .idea/
