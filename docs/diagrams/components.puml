@@ -1,0 +1,46 @@
+@startuml components
+' This Source Code Form is subject to the terms of the Mozilla Public
+' License, v. 2.0. If a copy of the MPL was not distributed with this
+' file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+title Face liveness and PAD in the Registration Client: components
+
+node "Biometric device (L0/L1)" {
+  [Vendor device service\nor mock-sbi] as sbi
+}
+
+package "Registration Client 1.2.0.2 (Java 11, JavaFX)" {
+  [SBI providers\n0.9.2 / 0.9.5 / 1.0] as providers
+  [Streamer\npreview and frame listener] as streamer
+  [Frame source adapter] as adapter
+  [Capture and authentication\ncontrollers] as controllers
+  [Liveness configuration provider] as config
+  [Audit service] as audit
+
+  package "liveness-engine (JAR)" {
+    [Liveness session\nstate machine] as session
+    [Face detector\nand quality checks] as detector
+    [Passive scorer\nMiniFASNet x2] as passive
+    [Challenge generator\nand action detectors] as active
+    [ONNX Runtime, CPU] as ort
+  }
+}
+
+sbi --> providers : STREAM (multipart JPEG)
+providers --> streamer : frame stream
+streamer --> adapter : JPEG bytes
+adapter --> session : frames, device events
+config --> session : policy per workflow
+session --> detector
+session --> passive
+session --> active
+detector --> ort
+passive --> ort
+active --> ort
+session --> controllers : state, feedback, result
+controllers --> providers : RCAPTURE only after PASSED
+session --> audit : events without image
+@enduml
