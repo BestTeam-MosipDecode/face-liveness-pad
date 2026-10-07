@@ -6,7 +6,7 @@ Dernière mise à jour : 7 octobre 2026.
 
 ## Étape en cours
 
-Phase 1, issue n° 3 (export ONNX) : faite sur la branche `feature/onnx-export`, commits locaux, en attente d'accord pour le push et la Pull Request. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
+Phase 1, issue n° 4 (détecteur de visage et points de repère) : faite sur la branche `feature/face-models`, commits locaux, en attente d'accord pour le push et la Pull Request. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
 
 ## Terminé
 
@@ -26,8 +26,9 @@ Phase 0
 
 Phase 1
 
-- [x] Issue n° 3, export ONNX des deux MiniFASNet (7 octobre). Reste à faire : push, Pull Request, fusion.
-- [ ] Issues n° 2, 4, 5, 6, 7, 8 (voir GitHub)
+- [x] Issue n° 3, export ONNX des deux MiniFASNet (7 octobre). Pull Request n° 39 fusionnée par Elisée, issue fermée.
+- [x] Issue n° 4, détecteur de visage et points de repère (8 octobre). Reste à faire : push, Pull Request, fusion.
+- [ ] Issues n° 2, 5, 6, 7, 8 (voir GitHub)
 
 Sources de vérité lues le 6 octobre : sujet officiel anglais (12 pages), critères d'évaluation, consignes de soumission, plan. La traduction française du sujet n'est pas dans le workspace, ce qui ne bloque rien (l'anglais fait foi).
 
@@ -53,8 +54,8 @@ Relevé sur la machine d'Elisée. Racine du workspace : `C:\wamp64\www\mosip_dec
 
 | Dépôt | Branche locale | Remotes | État |
 | --- | --- | --- | --- |
-| `face-liveness-pad/` | `feature/onnx-export`, créée depuis `main` après la fusion de la Pull Request n° 1, non poussée | `origin` = BestTeam-MosipDecode/face-liveness-pad | propre après les commits de l'export ONNX. Identité Git : `Magloire04`, adresse noreply GitHub. Pas de signature GPG configurée. |
-| `registration-client/` | `feature/face-liveness` (22fe01f99b), créée depuis `master`, non poussée | `origin` = fork de l'équipe, `upstream` = mosip/registration-client | propre. |
+| `face-liveness-pad/` | `feature/face-models`, créée depuis `main` après la fusion de la Pull Request n° 39, non poussée | `origin` = BestTeam-MosipDecode/face-liveness-pad | propre après les commits de l'issue n° 4. Identité Git : `Magloire04`, adresse noreply GitHub. Pas de signature GPG configurée. |
+| `registration-client/` | `feature/face-liveness` (22fe01f99b), identique à `master`, poussée le 8 octobre avec l'accord d'Elisée | `origin` = fork de l'équipe, `upstream` = mosip/registration-client | propre. |
 | `Silent-Face-Anti-Spoofing/` | `master` (b6d5f04) | `origin` = minivision-ai | arbre de travail modifié : `LICENSE`, `.gitignore`, `train.py`, `datasets/README.md` supprimés (suppressions indexées), `requirements.txt` modifié, `webcam_test.py`, `venv/` et `images/sample/pie*.jpg` non suivis. |
 
 ## Build du Registration Client (étape 0.4)
@@ -145,6 +146,22 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 - Change : la cible est le Registration Client de bureau (1.2.0.2, Java 11) et non Inji Wallet ni le mobile. L'intégration passe par les dispositifs SBI, trois parcours (résident, opérateur, superviseur), une configuration par parcours et une interface JavaFX.
 - Réduit par le calendrier : pas de jeux de données publics, Android en conception seulement.
 
+## Détecteur de visage et points de repère (issue n° 4)
+
+Choix validé par Elisée le 8 octobre : YuNet pour la détection, MediaPipe Face Mesh V2 pour les points de repère. Le détail (comparaison, contrats des modèles, mesures) est dans `training/README.md`. À retenir :
+
+- Comparaison du 7 octobre : PFLD et PIPNet écartés (poids sans licence établie), détecteur de Silent-Face écarté (origine non documentée), conversions ONNX tierces de Face Mesh gardées en repli.
+- Téléchargements autorisés par Elisée le 8 octobre, rangés dans `training/downloads/` (ignoré par Git). YuNet : empreinte identique à celle du pointeur Git LFS d'OpenCV Zoo. Lot MediaPipe : empreinte MD5 identique à celle annoncée par le serveur.
+- Environnement séparé `training/.venv-convert` : TensorFlow 2.21.0, tf2onnx 1.17.0, onnx 1.23.2, ONNX Runtime 1.23.2.
+- YuNet copié tel quel (232 589 octets). Face Mesh V2 converti en ONNX (4 822 155 octets) : écart maximal avec TFLite de 6,3e-04 pixel sur les points et 2,0e-04 sur l'indicateur de présence. Conversion reproductible à l'octet près.
+- Erreur corrigée en cours de route : le modèle TFLite a deux sorties d'une seule valeur, et la première version du script prenait la mauvaise. Vérification sur visages et sur images sans visage : la bonne est `Identity_1`.
+- Sur les trois images d'exemple : un visage trouvé par YuNet à chaque fois (score 0,93), présence Face Mesh à 1,000, centres des yeux de Face Mesh à 5 à 11 % de l'écart entre les yeux des points de YuNet.
+- Les boîtes de YuNet sont plus hautes que larges. Avec la boîte brute, les scores MiniFASNet bougent (0,23, 0,003, 1,000 contre 0,07, 0,18, 0,99 avec la boîte de référence). Avec une boîte carrée de même surface : 0,03, 0,02, 0,996, mêmes décisions et meilleure séparation. Recommandation pour le moteur, à confirmer sur les captures de l'équipe (issue n° 7).
+- La région de Face Mesh n'est pas tournée pour mettre les yeux à l'horizontale. La tête doit rester droite. À vérifier sur les captures.
+- Temps par image en Python sur la machine d'Elisée : 22 à 40 ms pour YuNet, 14 à 15 ms pour Face Mesh, 11 à 15 ms pour les deux MiniFASNet.
+- Taille totale des quatre modèles : 10,4 Mo, à embarquer dans le JAR du moteur.
+- Le code Python de référence de la détection (`training/liveness/yunet.py`) et des points de repère (`training/liveness/face_mesh.py`) couvre une partie de l'issue n° 2 de PrinceSpecial. À lui signaler.
+
 ## Export ONNX (phase 1, issue n° 3)
 
 Le détail est dans `training/README.md`. À retenir :
@@ -223,6 +240,10 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - 7 octobre. Création des étiquettes et des issues autorisée par Elisée. Le brouillon local a été supprimé : les issues GitHub font foi.
 - 7 octobre. Les vecteurs dorés n'utilisent aucune image de visage, alors que la règle 4.2 aurait permis les images d'exemple de Silent-Face. Des entrées synthétiques suffisent pour tester la parité numérique.
 - 7 octobre. Les définitions de réseau de Silent-Face ne sont pas copiées dans le dépôt. Le script d'export les importe depuis le clone local.
+- 8 octobre. Pull Request n° 39 fusionnée par Elisée. Push de `feature/face-liveness` dans le fork `registration-client` autorisé et fait.
+- 8 octobre. Détecteur YuNet et points de repère MediaPipe Face Mesh V2 validés par Elisée.
+- 8 octobre. `models.json` est partagé par les scripts d'export : chacun ne remplace que ses propres entrées. Version du lot de modèles : 1.1.0. `golden.json` enregistre désormais l'empreinte des modèles utilisés au lieu d'un numéro de version.
+- 8 octobre. Pas de vecteurs dorés pour YuNet et Face Mesh dans cette étape : Java exécutera les mêmes fichiers ONNX avec ONNX Runtime. Le risque d'écart porte sur le prétraitement et le décodage, à tester dans les issues n° 11 et n° 12 contre `training/liveness/`.
 
 ## Blocages
 
@@ -249,5 +270,6 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - Q4 (close, 7 octobre) : membres, comptes GitHub et répartition reçus (voir Équipe).
 - Q10 (close, 7 octobre) : issues et étiquettes créées, phase 1 répartie.
 - Q11 (close, 7 octobre) : Pull Request n° 1 fusionnée par Elisée.
-- Q12 (ouverte) : push de `feature/onnx-export` et Pull Request ?
+- Q12 (close, 8 octobre) : Pull Request n° 39 fusionnée.
+- Q13 (ouverte) : push de `feature/face-models` et Pull Request ?
 - Q6 étendue (étape 2.1) : moteur compilé pour Java 11, nom de paquet `io.mosip.registration.liveness`.
