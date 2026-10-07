@@ -1,0 +1,13 @@
+# Python 3.10
+# The three pinned versions are the ones used to produce the reference outputs in README.md.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.14.0
+numpy==2.2.6
+opencv-python==4.10.0.84
+
+# Not pinned yet: fixed when the export and evaluation scripts are written.
+onnx
+onnxruntime
+scikit-learn
+pandas
+matplotlib
