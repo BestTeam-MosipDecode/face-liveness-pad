@@ -1,6 +1,9 @@
 {
   "description": "Golden vectors for the parity tests of the Java engine. All inputs are synthetic.",
-  "modelSetVersion": "1.0.0",
+  "modelSha256": {
+    "minifasnet_v2": "eb0feb2c6896cf52755d71b38888ea1ef56ceb266d9583ba64de30ea66f7717b",
+    "minifasnet_v1se": "17246cc267b4b3d23e49966f2062650dc4e6fe3f1a3c7ecc3ae7b0f67ad1aec4"
+  },
   "tolerances": {
     "logits": 0.001,
     "patch": 0

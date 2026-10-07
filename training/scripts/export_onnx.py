@@ -35,10 +35,12 @@ import torch
 REPO_ROOT = Path(__file__).resolve().parents[2]
 MODELS_DIR = REPO_ROOT / "liveness-engine" / "src" / "main" / "resources" / "models"
 GOLDEN_DIR = REPO_ROOT / "liveness-engine" / "src" / "test" / "resources" / "golden"
+sys.path.insert(0, str(REPO_ROOT / "training"))
+
+from liveness.manifest import update_manifest  # noqa: E402
 
 OPSET = 13
 INPUT_SIZE = 80
-MODEL_SET_VERSION = "1.0.0"
 PYTORCH_TOLERANCE = 1e-4
 SEED = 20261007
 SOURCE_URL = "https://github.com/minivision-ai/Silent-Face-Anti-Spoofing"
@@ -204,18 +206,13 @@ def main():
             "changes": "Converted from PyTorch weights to ONNX. Weights unchanged.",
         })
 
-    manifest = {
-        "schemaVersion": 1,
-        "modelSetVersion": MODEL_SET_VERSION,
-        "exportedWith": {"torch": torch.__version__, "onnx": onnx.__version__,
-                         "onnxruntime": ort.__version__, "numpy": np.__version__},
-        "models": manifest_models,
-    }
-    (MODELS_DIR / "models.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    update_manifest(MODELS_DIR, manifest_models,
+                    {"torch": torch.__version__, "onnx": onnx.__version__,
+                     "onnxruntime": ort.__version__, "numpy": np.__version__})
 
     golden = {
         "description": "Golden vectors for the parity tests of the Java engine. All inputs are synthetic.",
-        "modelSetVersion": MODEL_SET_VERSION,
+        "modelSha256": {entry["name"]: entry["sha256"] for entry in manifest_models},
         "tolerances": {"logits": 1e-3, "patch": 0},
         "network": {
             "inputLayout": "uint8, 19200 bytes, order c, y, x with c = 0 (B), 1 (G), 2 (R). "
