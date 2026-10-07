@@ -6,7 +6,7 @@ Dernière mise à jour : 7 octobre 2026.
 
 ## Étape en cours
 
-Issue n° 34 (documents de conception), deuxième partie : `docs/workflows.md` et les diagrammes de séquence, sur la branche `feature/sequence-diagrams`, poussée avec l'accord d'Elisée, Pull Request ouverte. Première partie (`docs/decision-flow.md`) fusionnée avec la Pull Request n° 42. Phase 1 : issues n° 3 et n° 4 fusionnées dans `main` le 7 octobre. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.  La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
+Issue n° 34 (documents de conception), troisième partie : `docs/security-privacy.md`, branche `feature/security-privacy` poussée avec l'accord d'Elisée, Pull Request ouverte. Parties déjà fusionnées : `docs/decision-flow.md` (Pull Request n° 42) et `docs/workflows.md` avec les diagrammes de séquence (Pull Request n° 43). Reste `docs/iso-30107-alignment.md`. Phase 1 : issues n° 3 et n° 4 fusionnées dans `main` le 7 octobre. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.  La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
 
 ## Terminé
 
@@ -145,6 +145,15 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 - Reste valable : le classifieur MiniFASNet, la fusion des scores, le clignement par rapport d'aspect de l'œil, le plan de mesures ISO/IEC 30107-3, le traitement entièrement local.
 - Change : la cible est le Registration Client de bureau (1.2.0.2, Java 11) et non Inji Wallet ni le mobile. L'intégration passe par les dispositifs SBI, trois parcours (résident, opérateur, superviseur), une configuration par parcours et une interface JavaFX.
 - Réduit par le calendrier : pas de jeux de données publics, Android en conception seulement.
+
+## Sécurité et vie privée (issue n° 34, troisième partie)
+
+`docs/security-privacy.md`, rédigé le 7 octobre sur la branche `feature/security-privacy`, partie de `feature/sequence-diagrams` (Pull Request n° 43 non fusionnée au moment du travail). Deux constats dans le code du client :
+
+- au démarrage, `ClientIntegrityValidator` ne vérifie la signature que des JAR `registration-client*` et `registration-services*`, et pas du tout quand `environment=LOCAL`. Un JAR `liveness-engine` séparé ne serait pas vérifié : étendre le contrôle ou intégrer le moteur dans un JAR vérifié, à décider avec l'issue n° 26 ;
+- la réponse `RCAPTURE` est signée par le dispositif et vérifiée par le client (`validateJWTResponse`), le flux vidéo ne l'est pas. Les attaques par injection d'un flux falsifié restent hors de portée de la détection d'attaque par présentation, comme prévu par le plan (phase 6, point 6).
+
+Limites écrites telles quelles : données d'entraînement du classifieur non publiées, masques 3D non mesurables par l'équipe, caméras couleur uniquement, petit jeu de calibrage.
 
 ## Parcours et diagrammes de séquence (issue n° 34, deuxième partie)
 
