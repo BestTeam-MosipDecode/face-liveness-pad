@@ -6,6 +6,7 @@
 | [architecture.md](architecture.md) | Components, frame flow, integration points, online and offline behaviour | First version |
 | [PROGRESS.md](PROGRESS.md) | Internal work log of the team, in French | Updated at each step |
 | [decision-flow.md](decision-flow.md) | Session states, frame processing, passive and active rules, captured image check, attempts, feedback codes, audit events, parameters | First version |
+| [workflows.md](workflows.md) | Sequence diagrams of resident capture and of operator and supervisor authentication, changes at each step | First version |
 | `configuration.md` | Configuration keys, defaults and examples | Planned |
 | `engine-api.md` | Java API of the liveness engine | Planned |
 | `mock-sbi.md` | Use of the simulated device | Planned |

@@ -6,7 +6,7 @@ Dernière mise à jour : 7 octobre 2026.
 
 ## Étape en cours
 
-Issue n° 34 (documents de conception), première partie : `docs/decision-flow.md` et ses deux diagrammes, sur la branche `feature/decision-flow`, poussée avec l'accord d'Elisée, Pull Request ouverte. Phase 1 : issues n° 3 et n° 4 fusionnées dans `main` le 7 octobre. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.  La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
+Issue n° 34 (documents de conception), deuxième partie : `docs/workflows.md` et les diagrammes de séquence, sur la branche `feature/sequence-diagrams`, poussée avec l'accord d'Elisée, Pull Request ouverte. Première partie (`docs/decision-flow.md`) fusionnée avec la Pull Request n° 42. Phase 1 : issues n° 3 et n° 4 fusionnées dans `main` le 7 octobre. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.  La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
 
 ## Terminé
 
@@ -145,6 +145,17 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 - Reste valable : le classifieur MiniFASNet, la fusion des scores, le clignement par rapport d'aspect de l'œil, le plan de mesures ISO/IEC 30107-3, le traitement entièrement local.
 - Change : la cible est le Registration Client de bureau (1.2.0.2, Java 11) et non Inji Wallet ni le mobile. L'intégration passe par les dispositifs SBI, trois parcours (résident, opérateur, superviseur), une configuration par parcours et une interface JavaFX.
 - Réduit par le calendrier : pas de jeux de données publics, Android en conception seulement.
+
+## Parcours et diagrammes de séquence (issue n° 34, deuxième partie)
+
+`docs/workflows.md`, rédigé le 7 octobre, avec deux diagrammes de séquence : capture du visage du résident, authentification de l'opérateur et du superviseur. Référence des issues d'intégration n° 20 à 26. Relevé dans le code 1.2.0.2 :
+
+- résident : `GenericBiometricsController` envoie aujourd'hui la demande de capture en même temps que l'ouverture du flux (lignes 480 à 492). Avec la vivacité, la capture attend l'état `PASSED` ;
+- authentification : `captureAndValidateFace(...)` (`BaseController`, ligne 1713) capture puis compare localement. Le contrôle de l'image capturée se place entre les deux. La connexion par visage passe par `SessionContext.create(...)`, côté services : il faudra y placer un point d'accroche (issue n° 23) ;
+- après `PASSED`, la capture part sans clic, comme le demande le sujet ;
+- le compteur de tentatives existant du client (`ATTEMPTS`) n'est pas celui de la vivacité.
+
+Point d'ergonomie pour l'issue n° 24 : l'écran fait face à l'opérateur, pas au résident. Décision d'Elisée du 7 octobre : prévoir les deux, un affichage de la consigne en grand lisible depuis la place du résident (par défaut), et la lecture à voix haute par l'opérateur si le résident ne voit pas l'écran.
 
 ## Logique de décision (issue n° 34, première partie)
 

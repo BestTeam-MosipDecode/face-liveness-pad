@@ -1,0 +1,91 @@
+@startuml sequence-resident
+' This Source Code Form is subject to the terms of the Mozilla Public
+' License, v. 2.0. If a copy of the MPL was not distributed with this
+' file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+autonumber
+
+title Resident face capture with liveness
+
+actor Operator
+actor Resident
+participant "Biometrics screen\n(GenericBiometricsController)" as UI
+participant "Streamer" as Streamer
+participant "Liveness session\n(liveness-engine)" as Session
+participant "BioService and\nSBI provider" as Bio
+participant "Face device\n(L0/L1 or mock-sbi)" as Device
+participant "Audit" as Audit
+
+Operator -> UI : start face capture
+UI -> Bio : find the face device
+UI -> Bio : getStream(FACE)
+Bio -> Device : STREAM
+Device --> Bio : multipart JPEG stream
+UI -> Session : new session (RESIDENT policy)
+Session -> Audit : LIVENESS_SESSION_STARTED
+UI -> Streamer : startStream(stream, preview, frame listener)
+note over UI, Bio
+  Today the capture request is sent at the same time as the stream.
+  With liveness, it waits for the PASSED state.
+end note
+
+loop every frame of the stream
+  Device --> Streamer : JPEG frame
+  Streamer -> UI : update the preview
+  Streamer -> Session : submit the frame
+  Session --> UI : state, feedback code, progress
+  UI -> Resident : message on screen ("Checking face liveness...")
+end
+
+opt passive score between the two thresholds
+  Session -> Audit : LIVENESS_ACTIVE_TRIGGERED
+  loop each challenge drawn at random
+    Session --> UI : HOLD_STILL, then CHALLENGE (for example BLINK)
+    UI -> Resident : "Please blink"
+    Resident -> Device : performs the action
+    Session --> UI : ACTION_DETECTED
+    Session -> Audit : LIVENESS_CHALLENGE_PASSED
+  end
+end
+
+alt liveness established
+  Session --> UI : PASSED
+  UI -> Bio : rCapture(FACE)
+  Bio -> Device : RCAPTURE
+  Device --> Bio : signed face image
+  Bio --> UI : captured biometrics
+  UI -> Session : check the captured image
+  alt captured image accepted
+    Session --> UI : SUCCESS
+    Session -> Audit : LIVENESS_PASSED
+    UI -> UI : existing checks (quality, local de-duplication),\nstore the face in the registration
+    UI -> Resident : "Face captured successfully"
+  else captured image rejected
+    Session --> UI : FAILED (reason in the audit only)
+    Session -> Audit : LIVENESS_FAILED
+  end
+else liveness not established
+  Session --> UI : FAILED
+  Session -> Audit : LIVENESS_FAILED
+end
+
+alt failed, attempts left
+  UI -> Resident : "We could not verify face liveness. Please try again."\n"Attempt 1 of 3. You can try again."
+  Operator -> UI : try again
+  UI -> Session : retry()
+else failed, attempts exhausted
+  Session -> Audit : LIVENESS_MAX_ATTEMPTS
+  UI -> Operator : "Please follow the exception process."
+  Operator -> UI : continue under exception
+  UI -> Bio : rCapture(FACE), without liveness decision
+  UI -> UI : mark the registration as a face liveness exception
+  note right of UI
+    At submission, a supervisor must authenticate,
+    as for any biometric exception.
+  end note
+end
+
+UI -> Streamer : stop
+@enduml
