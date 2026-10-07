@@ -12,7 +12,9 @@ The goal is to place a liveness and presentation attack detection (PAD) gate bet
 
 ## 2. Components
 
-The PlantUML source of the component diagram is in [diagrams/components.puml](diagrams/components.puml).
+![Components](diagrams/components.svg)
+
+Source: [diagrams/components.puml](diagrams/components.puml)
 
 | Component | Existing or new | Role |
 | --- | --- | --- |
@@ -50,7 +52,7 @@ Session states: `INIT`, `PASSIVE_CHECK`, `ACTIVE_CHALLENGE`, `PASSED`, `FAILED`.
 5. **Check of the captured image.** The image returned by `RCAPTURE` must contain one face, outside the attack zone, consistent in position and size with the last face followed in the stream. This closes the gap between the frames that were verified and the image that is stored or matched.
 6. **Retry.** After a failure a new attempt is possible until the configured maximum, then the configured behaviour applies.
 
-The passive classifier and its preprocessing are described in [../training/README.md](../training/README.md).
+The passive classifier and its preprocessing are described in [../training/README.md](../training/README.md). The complete rules, with thresholds, action detection, feedback codes and audit events, are in [decision-flow.md](decision-flow.md).
 
 ## 5. Workflows and integration points
 
