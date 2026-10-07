@@ -6,7 +6,7 @@ Dernière mise à jour : 7 octobre 2026.
 
 ## Étape en cours
 
-Phase 1 : issues n° 3 et n° 4 fusionnées dans `main` le 7 octobre (Pull Requests n° 39 et n° 40). Suite : renfort sur les lots de Tobi3h et de SilverioMen selon la décision d'Elisée. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.  La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
+Issue n° 34 (documents de conception), première partie : `docs/decision-flow.md` et ses deux diagrammes, sur la branche `feature/decision-flow`, commits locaux, en attente d'accord pour le push et la Pull Request. Phase 1 : issues n° 3 et n° 4 fusionnées dans `main` le 7 octobre. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.  La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
 
 ## Terminé
 
@@ -146,6 +146,21 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 - Change : la cible est le Registration Client de bureau (1.2.0.2, Java 11) et non Inji Wallet ni le mobile. L'intégration passe par les dispositifs SBI, trois parcours (résident, opérateur, superviseur), une configuration par parcours et une interface JavaFX.
 - Réduit par le calendrier : pas de jeux de données publics, Android en conception seulement.
 
+## Logique de décision (issue n° 34, première partie)
+
+`docs/decision-flow.md`, rédigé le 7 octobre à la demande d'Elisée, sert de référence aux issues n° 11 à 15 du moteur. Il précise ce que le plan laissait ouvert :
+
+- recadrage par la boîte carrée de YuNet, score d'une image = probabilité moyenne de la classe « réel » des deux MiniFASNet, score agrégé = médiane sur la fenêtre ;
+- suivi du visage d'une image à l'autre (recouvrement d'au moins 0,3) : une rupture vide la fenêtre en passif, termine la tentative en actif ;
+- limite de rotation de la tête levée pendant l'actif, mais pas de score passif sur ces images ;
+- phase « Ne bougez plus » avant chaque challenge pour mesurer la ligne de base, puis règles de détection des quatre actions (valeurs de départ à calibrer, issue n° 5) ;
+- contrôle de l'image `RCAPTURE` en cinq points, avec une nouvelle opération dans l'API (issue n° 10) ;
+- table des codes de retour vers les clés de message du plan, et des transitions vers les événements d'audit.
+
+Propositions à valider par Elisée (voir Questions) : deux nouvelles clés, `passive.timeout_ms` (20 000) et `active.baseline_ms` (600) ; une tentative est comptée pour tout échec après la première image analysée, erreurs de dispositif comprises, pour qu'un débranchement ne remette pas le compteur à zéro.
+
+Les diagrammes sont rendus en SVG avec le PlantUML 1.2026.2 de l'extension de l'IDE, pour être lisibles directement sur GitHub. Le diagramme de composants de `architecture.md` l'est aussi.
+
 ## Détecteur de visage et points de repère (issue n° 4)
 
 Choix validé par Elisée le 7 octobre : YuNet pour la détection, MediaPipe Face Mesh V2 pour les points de repère. Le détail (comparaison, contrats des modèles, mesures) est dans `training/README.md`. À retenir :
@@ -272,4 +287,6 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - Q11 (close, 7 octobre) : Pull Request n° 1 fusionnée par Elisée.
 - Q12 (close, 7 octobre) : Pull Request n° 39 fusionnée.
 - Q13 (close, 7 octobre) : Pull Request n° 40 ouverte avec l'accord d'Elisée, puis fusionnée par Elisée.
+- Q14 (ouverte) : les deux clés proposées dans `decision-flow.md` (`passive.timeout_ms`, `active.baseline_ms`) et la règle de comptage des tentatives sont-elles validées ?
+- Q7 (ouverte, rappel) : après épuisement des tentatives, le résident est-il seulement bloqué, ou orienté vers la procédure d'exception ?
 - Q6 étendue (étape 2.1) : moteur compilé pour Java 11, nom de paquet `io.mosip.registration.liveness`.
