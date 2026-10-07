@@ -6,7 +6,7 @@ Dernière mise à jour : 7 octobre 2026.
 
 ## Étape en cours
 
-Issue n° 34 (documents de conception), deuxième partie : `docs/workflows.md` et les diagrammes de séquence, sur la branche `feature/sequence-diagrams`, poussée avec l'accord d'Elisée, Pull Request ouverte. Première partie (`docs/decision-flow.md`) fusionnée avec la Pull Request n° 42. Phase 1 : issues n° 3 et n° 4 fusionnées dans `main` le 7 octobre. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.  La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
+Issue n° 34 (documents de conception), troisième partie : `docs/security-privacy.md`, branche `feature/security-privacy` poussée avec l'accord d'Elisée, Pull Request ouverte. Parties déjà fusionnées : `docs/decision-flow.md` (Pull Request n° 42) et `docs/workflows.md` avec les diagrammes de séquence (Pull Request n° 43). Reste `docs/iso-30107-alignment.md`. Phase 1 : issues n° 3 et n° 4 fusionnées dans `main` le 7 octobre. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.  La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
 
 ## Terminé
 
