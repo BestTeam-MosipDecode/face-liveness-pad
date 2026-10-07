@@ -159,7 +159,7 @@ The golden inputs are synthetic. No face image is stored in the repository.
 
 ## Face detector and landmark model
 
-Chosen on 8 October 2026 after a comparison of licences, formats, sizes and published accuracy (issue #4):
+Chosen on 7 October 2026 after a comparison of licences, formats, sizes and published accuracy (issue #4):
 
 | Role | Model | Source | Licence | Packaged file |
 | --- | --- | --- | --- | --- |
@@ -193,7 +193,7 @@ training\.venv-convert\Scripts\python.exe training\scripts\prepare_face_models.p
 
 The conversion keeps two outputs of the TFLite model: the landmarks (`Identity`, renamed `landmarks`) and the face presence logit (`Identity_1`, renamed `face_flag`). The presence logit is between +12.8 and +15.7 on the three sample faces, and between -14.2 and -7.6 on noise and on uniform images. The third output, `Identity_2`, is not used.
 
-Results of the conversion of 8 October 2026:
+Results of the conversion of 7 October 2026:
 
 - largest difference with the TFLite interpreter over 19 inputs: 6.3e-04 pixel on the landmarks, 2.0e-04 on the presence logit, for limits of 1e-2 and 1e-3;
 - running the conversion twice produces identical files. Intermediate tensors are renamed in a fixed order for that purpose.
@@ -219,7 +219,7 @@ The landmark region is not rotated to level the eyes, unlike MediaPipe. The head
 training\.venv\Scripts\python.exe training\scripts\check_face_models.py --silent-face-dir ..\Silent-Face-Anti-Spoofing
 ```
 
-Results of 8 October 2026 (real-class score: mean probability of class 1 over the two MiniFASNet models):
+Results of 7 October 2026 (real-class score: mean probability of class 1 over the two MiniFASNet models):
 
 | Image | YuNet score | Overlap with the reference box: YuNet box / square box | Real-class score: reference box / YuNet box / square box |
 | --- | --- | --- | --- |
