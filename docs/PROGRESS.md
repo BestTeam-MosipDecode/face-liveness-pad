@@ -6,7 +6,7 @@ Dernière mise à jour : 7 octobre 2026.
 
 ## Étape en cours
 
-Phase 1, issue n° 4 (détecteur de visage et points de repère) : faite sur la branche `feature/face-models`, poussée, Pull Request n° 40 ouverte le 8 octobre, en attente de fusion. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
+Phase 1 : issues n° 3 et n° 4 fusionnées dans `main` le 7 octobre (Pull Requests n° 39 et n° 40). Suite : renfort sur les lots de Tobi3h et de SilverioMen selon la décision d'Elisée. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.  La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
 
 ## Terminé
 
@@ -27,7 +27,7 @@ Phase 0
 Phase 1
 
 - [x] Issue n° 3, export ONNX des deux MiniFASNet (7 octobre). Pull Request n° 39 fusionnée par Elisée, issue fermée.
-- [x] Issue n° 4, détecteur de visage et points de repère (8 octobre). Pull Request n° 40 ouverte, reste à fusionner.
+- [x] Issue n° 4, détecteur de visage et points de repère (7 octobre). Pull Request n° 40 fusionnée par Elisée, issue fermée.
 - [ ] Issues n° 2, 5, 6, 7, 8 (voir GitHub)
 
 Sources de vérité lues le 6 octobre : sujet officiel anglais (12 pages), critères d'évaluation, consignes de soumission, plan. La traduction française du sujet n'est pas dans le workspace, ce qui ne bloque rien (l'anglais fait foi).
@@ -54,8 +54,8 @@ Relevé sur la machine d'Elisée. Racine du workspace : `C:\wamp64\www\mosip_dec
 
 | Dépôt | Branche locale | Remotes | État |
 | --- | --- | --- | --- |
-| `face-liveness-pad/` | `feature/face-models`, créée depuis `main` après la fusion de la Pull Request n° 39, poussée, Pull Request n° 40 ouverte | `origin` = BestTeam-MosipDecode/face-liveness-pad | propre après les commits de l'issue n° 4. Identité Git : `Magloire04`, adresse noreply GitHub. Pas de signature GPG configurée. |
-| `registration-client/` | `feature/face-liveness` (22fe01f99b), identique à `master`, poussée le 8 octobre avec l'accord d'Elisée | `origin` = fork de l'équipe, `upstream` = mosip/registration-client | propre. |
+| `face-liveness-pad/` | `main`, à jour après la fusion de la Pull Request n° 40 | `origin` = BestTeam-MosipDecode/face-liveness-pad | propre. Identité Git : `Magloire04`, adresse noreply GitHub. Pas de signature GPG configurée. |
+| `registration-client/` | `feature/face-liveness` (22fe01f99b), identique à `master`, poussée le 7 octobre avec l'accord d'Elisée | `origin` = fork de l'équipe, `upstream` = mosip/registration-client | propre. |
 | `Silent-Face-Anti-Spoofing/` | `master` (b6d5f04) | `origin` = minivision-ai | arbre de travail modifié : `LICENSE`, `.gitignore`, `train.py`, `datasets/README.md` supprimés (suppressions indexées), `requirements.txt` modifié, `webcam_test.py`, `venv/` et `images/sample/pie*.jpg` non suivis. |
 
 ## Build du Registration Client (étape 0.4)
@@ -148,10 +148,10 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 
 ## Détecteur de visage et points de repère (issue n° 4)
 
-Choix validé par Elisée le 8 octobre : YuNet pour la détection, MediaPipe Face Mesh V2 pour les points de repère. Le détail (comparaison, contrats des modèles, mesures) est dans `training/README.md`. À retenir :
+Choix validé par Elisée le 7 octobre : YuNet pour la détection, MediaPipe Face Mesh V2 pour les points de repère. Le détail (comparaison, contrats des modèles, mesures) est dans `training/README.md`. À retenir :
 
 - Comparaison du 7 octobre : PFLD et PIPNet écartés (poids sans licence établie), détecteur de Silent-Face écarté (origine non documentée), conversions ONNX tierces de Face Mesh gardées en repli.
-- Téléchargements autorisés par Elisée le 8 octobre, rangés dans `training/downloads/` (ignoré par Git). YuNet : empreinte identique à celle du pointeur Git LFS d'OpenCV Zoo. Lot MediaPipe : empreinte MD5 identique à celle annoncée par le serveur.
+- Téléchargements autorisés par Elisée le 7 octobre, rangés dans `training/downloads/` (ignoré par Git). YuNet : empreinte identique à celle du pointeur Git LFS d'OpenCV Zoo. Lot MediaPipe : empreinte MD5 identique à celle annoncée par le serveur.
 - Environnement séparé `training/.venv-convert` : TensorFlow 2.21.0, tf2onnx 1.17.0, onnx 1.23.2, ONNX Runtime 1.23.2.
 - YuNet copié tel quel (232 589 octets). Face Mesh V2 converti en ONNX (4 822 155 octets) : écart maximal avec TFLite de 6,3e-04 pixel sur les points et 2,0e-04 sur l'indicateur de présence. Conversion reproductible à l'octet près.
 - Erreur corrigée en cours de route : le modèle TFLite a deux sorties d'une seule valeur, et la première version du script prenait la mauvaise. Vérification sur visages et sur images sans visage : la bonne est `Identity_1`.
@@ -230,7 +230,7 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - 6 octobre. Ce fichier est créé sur `main` sans commit. Il sera committé avec l'arborescence à l'étape 0.5, sur `feature/repo-structure`.
 - 7 octobre. Base du Registration Client : version 1.2.0.2, branche `master`. Réponse des mentors à l'AMA du 7 octobre, rapportée par Elisée. C'est aussi la version annoncée par Collab.
 - 7 octobre. Conséquence du choix précédent : le client tourne sur Java 11, donc le moteur `liveness-engine` doit être compilé pour Java 11. Les sections 5.3 et 7.1 du plan supposaient Java 21 (les `record` de l'API deviennent des classes ordinaires). À faire valider par Elisée à l'étape 2.1.
-- 7 octobre. JDK 11.0.32 et Maven 3.9.9 conservés pour le projet. Les versions 21.0.3 et 3.9.6 ne sont pas installées : l'exigence vient du README de `develop` et ne concerne pas la 1.2.0.2. Confirmé par Elisée le 8 octobre : on ne les installe pas.
+- 7 octobre. JDK 11.0.32 et Maven 3.9.9 conservés pour le projet. Les versions 21.0.3 et 3.9.6 ne sont pas installées : l'exigence vient du README de `develop` et ne concerne pas la 1.2.0.2. Confirmé par Elisée le 7 octobre : on ne les installe pas.
 - 7 octobre. Les capacités de la machine (disque, mémoire) ne sont plus suivies comme point de risque, à la demande d'Elisée.
 - 7 octobre. Calendrier resserré et périmètre réduit validés par Elisée. Le moteur en Java 11 fait partie de ce calendrier.
 - 7 octobre. Coordonnées Maven provisoires du moteur : `io.mosip.registration:liveness-engine:0.1.0-SNAPSHOT`. Le groupe et le nom de paquet restent à confirmer (Q6).
@@ -240,10 +240,10 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - 7 octobre. Création des étiquettes et des issues autorisée par Elisée. Le brouillon local a été supprimé : les issues GitHub font foi.
 - 7 octobre. Les vecteurs dorés n'utilisent aucune image de visage, alors que la règle 4.2 aurait permis les images d'exemple de Silent-Face. Des entrées synthétiques suffisent pour tester la parité numérique.
 - 7 octobre. Les définitions de réseau de Silent-Face ne sont pas copiées dans le dépôt. Le script d'export les importe depuis le clone local.
-- 8 octobre. Pull Request n° 39 fusionnée par Elisée. Push de `feature/face-liveness` dans le fork `registration-client` autorisé et fait.
-- 8 octobre. Détecteur YuNet et points de repère MediaPipe Face Mesh V2 validés par Elisée.
-- 8 octobre. `models.json` est partagé par les scripts d'export : chacun ne remplace que ses propres entrées. Version du lot de modèles : 1.1.0. `golden.json` enregistre désormais l'empreinte des modèles utilisés au lieu d'un numéro de version.
-- 8 octobre. Pas de vecteurs dorés pour YuNet et Face Mesh dans cette étape : Java exécutera les mêmes fichiers ONNX avec ONNX Runtime. Le risque d'écart porte sur le prétraitement et le décodage, à tester dans les issues n° 11 et n° 12 contre `training/liveness/`.
+- 7 octobre. Pull Request n° 39 fusionnée par Elisée. Push de `feature/face-liveness` dans le fork `registration-client` autorisé et fait.
+- 7 octobre. Détecteur YuNet et points de repère MediaPipe Face Mesh V2 validés par Elisée.
+- 7 octobre. `models.json` est partagé par les scripts d'export : chacun ne remplace que ses propres entrées. Version du lot de modèles : 1.1.0. `golden.json` enregistre désormais l'empreinte des modèles utilisés au lieu d'un numéro de version.
+- 7 octobre. Pas de vecteurs dorés pour YuNet et Face Mesh dans cette étape : Java exécutera les mêmes fichiers ONNX avec ONNX Runtime. Le risque d'écart porte sur le prétraitement et le décodage, à tester dans les issues n° 11 et n° 12 contre `training/liveness/`.
 
 ## Blocages
 
@@ -266,10 +266,10 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - Q2 (close, 7 octobre) : date limite = 26 octobre 2026, 19 h 29 à Cotonou.
 - Q9 (close, 7 octobre) : calendrier resserré et périmètre réduit validés.
 - Q3 (ouverte, étape 0.4) : accès Collab demandé, sans réponse. À la réception : nom d'hôte de l'environnement, identifiants, configuration WireGuard, tous hors dépôt.
-- Q0 (close, 8 octobre) : JDK 21.0.3 et Maven 3.9.6 non installés, ils ne servent pas à la 1.2.0.2.
+- Q0 (close, 7 octobre) : JDK 21.0.3 et Maven 3.9.6 non installés, ils ne servent pas à la 1.2.0.2.
 - Q4 (close, 7 octobre) : membres, comptes GitHub et répartition reçus (voir Équipe).
 - Q10 (close, 7 octobre) : issues et étiquettes créées, phase 1 répartie.
 - Q11 (close, 7 octobre) : Pull Request n° 1 fusionnée par Elisée.
-- Q12 (close, 8 octobre) : Pull Request n° 39 fusionnée.
-- Q13 (close, 8 octobre) : `feature/face-models` poussée et Pull Request n° 40 ouverte, avec l'accord d'Elisée.
+- Q12 (close, 7 octobre) : Pull Request n° 39 fusionnée.
+- Q13 (close, 7 octobre) : Pull Request n° 40 ouverte avec l'accord d'Elisée, puis fusionnée par Elisée.
 - Q6 étendue (étape 2.1) : moteur compilé pour Java 11, nom de paquet `io.mosip.registration.liveness`.

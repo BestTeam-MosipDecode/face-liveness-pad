@@ -1,6 +1,6 @@
 # Separate environment for training/scripts/prepare_face_models.py only (training/.venv-convert).
 # TensorFlow is needed to read and convert the MediaPipe TFLite model. Python 3.10.
-# Versions used for the conversion of 8 October 2026:
+# Versions used for the conversion of 7 October 2026:
 tensorflow==2.21.0
 tf2onnx==1.17.0
 onnx==1.23.2
