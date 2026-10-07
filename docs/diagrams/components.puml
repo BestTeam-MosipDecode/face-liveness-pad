@@ -22,9 +22,9 @@ package "Registration Client 1.2.0.2 (Java 11, JavaFX)" {
 
   package "liveness-engine (JAR)" {
     [Liveness session\nstate machine] as session
-    [Face detector\nand quality checks] as detector
+    [Face detector (YuNet)\nand quality checks] as detector
     [Passive scorer\nMiniFASNet x2] as passive
-    [Challenge generator\nand action detectors] as active
+    [Challenge generator,\nlandmarks (Face Mesh V2)\nand action detectors] as active
     [ONNX Runtime, CPU] as ort
   }
 }
