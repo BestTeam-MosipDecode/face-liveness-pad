@@ -5,7 +5,7 @@
 | [dev-setup-windows.md](dev-setup-windows.md) | Build and run the Registration Client on Windows | First version |
 | [architecture.md](architecture.md) | Components, frame flow, integration points, online and offline behaviour | First version |
 | [PROGRESS.md](PROGRESS.md) | Internal work log of the team, in French | Updated at each step |
-| `decision-flow.md` | Passive to active decision flow, state diagram | Planned |
+| [decision-flow.md](decision-flow.md) | Session states, frame processing, passive and active rules, captured image check, attempts, feedback codes, audit events, parameters | First version |
 | `configuration.md` | Configuration keys, defaults and examples | Planned |
 | `engine-api.md` | Java API of the liveness engine | Planned |
 | `mock-sbi.md` | Use of the simulated device | Planned |

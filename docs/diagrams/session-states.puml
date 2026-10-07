@@ -1,0 +1,48 @@
+@startuml session-states
+' This Source Code Form is subject to the terms of the Mozilla Public
+' License, v. 2.0. If a copy of the MPL was not distributed with this
+' file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+hide empty description
+skinparam shadowing false
+skinparam state {
+  BackgroundColor #F8F9FA
+  BorderColor #495057
+}
+
+title Liveness session: states and transitions
+
+[*] --> INIT : new session\n(workflow, policy)
+INIT --> PASSIVE_CHECK : first frame
+
+state PASSIVE_CHECK : guidance on frames with no face,\nseveral faces or low quality
+state PASSIVE_CHECK : s = median of the frame scores\nover the window
+
+PASSIVE_CHECK --> PASSED : s >= pass threshold
+PASSIVE_CHECK --> ACTIVE_CHALLENGE : attack < s < pass\nand active check enabled
+PASSIVE_CHECK --> FAILED : s <= attack threshold (PAD_ATTACK_DETECTED)\nor attack < s < pass, active check disabled (LIVENESS_BELOW_THRESHOLD)\nor passive timeout (NO_FACE, MULTIPLE_FACES, LOW_QUALITY)
+
+state ACTIVE_CHALLENGE {
+  [*] --> HOLD_STILL
+  HOLD_STILL : baseline of the measures
+  HOLD_STILL --> WAITING_ACTION : baseline ready,\ninstruction shown
+  WAITING_ACTION : passive score and face\ncontinuity still checked
+  WAITING_ACTION --> HOLD_STILL : action detected,\nchallenges left
+  WAITING_ACTION --> [*] : action detected,\nlast challenge
+}
+
+ACTIVE_CHALLENGE --> PASSED : all challenges passed\nand mean score > attack threshold
+ACTIVE_CHALLENGE --> FAILED : CHALLENGE_TIMEOUT, CHALLENGE_FAILED,\nFACE_CONTINUITY_LOST, PAD_ATTACK_DETECTED
+
+PASSED --> [*] : captured image accepted
+PASSED --> FAILED : captured image rejected (INVALID_FRAME,\nFACE_CONTINUITY_LOST, LOW_QUALITY, PAD_ATTACK_DETECTED)
+FAILED --> INIT : retry()\nattempts used < max attempts
+FAILED --> [*] : attempts exhausted\n(MAX_ATTEMPTS_EXCEEDED)
+
+note as devices
+  From any state, a device or engine error
+  ends the attempt in FAILED:
+  DEVICE_UNAVAILABLE, DEVICE_CONNECTION_FAILED,
+  CAMERA_UNAVAILABLE, ENGINE_ERROR.
+end note
+@enduml

@@ -1,0 +1,57 @@
+@startuml frame-processing
+' This Source Code Form is subject to the terms of the Mozilla Public
+' License, v. 2.0. If a copy of the MPL was not distributed with this
+' file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+skinparam shadowing false
+
+title Processing of one frame by the liveness session
+
+start
+:frame received from the device stream;
+if (an analysis is running, or the last analysed\nframe is less than frame.sampling_ms old?) then (yes)
+  :skip the frame;
+  stop
+endif
+:decode the JPEG image;
+if (decoding failed?) then (yes)
+  :INVALID_FRAME, recorded for diagnostics only;
+  stop
+endif
+:detect faces with YuNet;
+if (no face?) then (yes)
+  :guidance NO_FACE;
+  note right: in the active check, a face missing\nfor too long ends the attempt\n(FACE_CONTINUITY_LOST)
+  stop
+elseif (more than one face?) then (yes)
+  if (active check?) then (yes)
+    :FAILED, FACE_CONTINUITY_LOST;
+  else (no)
+    :guidance MULTIPLE_FACES;
+  endif
+  stop
+endif
+if (box consistent with the tracked face?) then (no)
+  if (active check?) then (yes)
+    :FAILED, FACE_CONTINUITY_LOST;
+    stop
+  else (no)
+    :start a new track,\nclear the score window;
+  endif
+endif
+:quality checks: size, position,\nlighting, sharpness, yaw;
+note right: the yaw limit does not apply\nin the active check
+if (quality insufficient?) then (yes)
+  :guidance LOW_QUALITY, with a tip;
+  stop
+endif
+if (face frontal enough for the classifier?) then (yes)
+  :frame score: mean real-class probability\nof the two MiniFASNet models on the square box;
+endif
+if (active check?) then (yes)
+  :landmarks with Face Mesh V2,\neye, mouth and yaw measures;
+endif
+:update the session state;
+:return state, feedback code and progress;
+stop
+@enduml
