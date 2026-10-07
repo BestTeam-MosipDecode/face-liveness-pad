@@ -1,0 +1,444 @@
+{
+  "description": "Golden vectors for the parity tests of the Java engine. All inputs are synthetic.",
+  "modelSetVersion": "1.0.0",
+  "tolerances": {
+    "logits": 0.001,
+    "patch": 0
+  },
+  "network": {
+    "inputLayout": "uint8, 19200 bytes, order c, y, x with c = 0 (B), 1 (G), 2 (R). Convert to float32 without scaling.",
+    "expected": "logits and softmax computed with PyTorch",
+    "cases": [
+      {
+        "case": "noise",
+        "file": "network/noise.bin",
+        "outputs": {
+          "minifasnet_v2": {
+            "logits": [
+              -2.892388105392456,
+              4.041358947753906,
+              -1.1516070365905762
+            ],
+            "softmax": [
+              0.0009680218063294888,
+              0.9935125708580017,
+              0.005519463215023279
+            ]
+          },
+          "minifasnet_v1se": {
+            "logits": [
+              -1.2800394296646118,
+              4.306552410125732,
+              -3.0284883975982666
+            ],
+            "softmax": [
+              0.0037313608918339014,
+              0.9956191182136536,
+              0.0006494196131825447
+            ]
+          }
+        }
+      },
+      {
+        "case": "gradient",
+        "file": "network/gradient.bin",
+        "outputs": {
+          "minifasnet_v2": {
+            "logits": [
+              -2.677302360534668,
+              -0.6102242469787598,
+              3.287944793701172
+            ],
+            "softmax": [
+              0.002509089419618249,
+              0.019826075062155724,
+              0.9776648879051208
+            ]
+          },
+          "minifasnet_v1se": {
+            "logits": [
+              -2.8768930435180664,
+              2.4712204933166504,
+              0.4046980142593384
+            ],
+            "softmax": [
+              0.004204693716019392,
+              0.8838744163513184,
+              0.11192090064287186
+            ]
+          }
+        }
+      },
+      {
+        "case": "gray128",
+        "file": "network/gray128.bin",
+        "outputs": {
+          "minifasnet_v2": {
+            "logits": [
+              -1.8928790092468262,
+              0.40729573369026184,
+              1.4855566024780273
+            ],
+            "softmax": [
+              0.024813413619995117,
+              0.24753674864768982,
+              0.7276498675346375
+            ]
+          },
+          "minifasnet_v1se": {
+            "logits": [
+              -1.2029097080230713,
+              0.8919714689254761,
+              0.3106583058834076
+            ],
+            "softmax": [
+              0.0731668770313263,
+              0.5944424867630005,
+              0.33239060640335083
+            ]
+          }
+        }
+      },
+      {
+        "case": "blocks",
+        "file": "network/blocks.bin",
+        "outputs": {
+          "minifasnet_v2": {
+            "logits": [
+              -3.411129951477051,
+              -0.1601848155260086,
+              3.571617364883423
+            ],
+            "softmax": [
+              0.0009052312234416604,
+              0.023368291556835175,
+              0.9757264256477356
+            ]
+          },
+          "minifasnet_v1se": {
+            "logits": [
+              -3.5554757118225098,
+              -0.18310119211673737,
+              3.739053249359131
+            ],
+            "softmax": [
+              0.0006656146142631769,
+              0.019401105120778084,
+              0.9799332618713379
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "preprocess": {
+    "syntheticImage": {
+      "formula": "v(x, y, c) = (7*x + 13*y + 31*c + 5*((x*y) mod 23) + 64*((floor(x/9) + floor(y/11)) mod 2)) mod 256",
+      "layout": "pixel (x, y), channel c = 0 (B), 1 (G), 2 (R)"
+    },
+    "patchLayout": "uint8, 19200 bytes, order y, x, c with c = 0 (B), 1 (G), 2 (R)",
+    "expected": "crop box and patch computed with the reference crop, logits with PyTorch on the model that uses this scale",
+    "cases": [
+      {
+        "case": "portrait_large_face",
+        "width": 480,
+        "height": 640,
+        "faceBox": [
+          178,
+          136,
+          223,
+          225
+        ],
+        "scale": 2.7,
+        "cropBox": [
+          0,
+          6,
+          479,
+          490
+        ],
+        "file": "preprocess/portrait_large_face_scale2.7.bin",
+        "model": "minifasnet_v2",
+        "logits": [
+          0.20940253138542175,
+          -1.1809370517730713,
+          0.972040057182312
+        ]
+      },
+      {
+        "case": "portrait_large_face",
+        "width": 480,
+        "height": 640,
+        "faceBox": [
+          178,
+          136,
+          223,
+          225
+        ],
+        "scale": 4.0,
+        "cropBox": [
+          0,
+          6,
+          479,
+          490
+        ],
+        "file": "preprocess/portrait_large_face_scale4.0.bin",
+        "model": "minifasnet_v1se",
+        "logits": [
+          -0.3757377862930298,
+          1.1196563243865967,
+          -0.7445499897003174
+        ]
+      },
+      {
+        "case": "portrait_small_face",
+        "width": 480,
+        "height": 640,
+        "faceBox": [
+          200,
+          260,
+          90,
+          100
+        ],
+        "scale": 2.7,
+        "cropBox": [
+          123,
+          175,
+          366,
+          445
+        ],
+        "file": "preprocess/portrait_small_face_scale2.7.bin",
+        "model": "minifasnet_v2",
+        "logits": [
+          -1.311218500137329,
+          1.1676855087280273,
+          0.1421934813261032
+        ]
+      },
+      {
+        "case": "portrait_small_face",
+        "width": 480,
+        "height": 640,
+        "faceBox": [
+          200,
+          260,
+          90,
+          100
+        ],
+        "scale": 4.0,
+        "cropBox": [
+          65,
+          110,
+          425,
+          510
+        ],
+        "file": "preprocess/portrait_small_face_scale4.0.bin",
+        "model": "minifasnet_v1se",
+        "logits": [
+          -1.5716793537139893,
+          2.0745835304260254,
+          -0.5036683678627014
+        ]
+      },
+      {
+        "case": "portrait_top_left",
+        "width": 480,
+        "height": 640,
+        "faceBox": [
+          10,
+          20,
+          100,
+          110
+        ],
+        "scale": 2.7,
+        "cropBox": [
+          0,
+          0,
+          270,
+          297
+        ],
+        "file": "preprocess/portrait_top_left_scale2.7.bin",
+        "model": "minifasnet_v2",
+        "logits": [
+          -1.5422941446304321,
+          1.5451431274414062,
+          -0.0041953399777412415
+        ]
+      },
+      {
+        "case": "portrait_bottom_right",
+        "width": 480,
+        "height": 640,
+        "faceBox": [
+          370,
+          520,
+          100,
+          110
+        ],
+        "scale": 4.0,
+        "cropBox": [
+          79,
+          199,
+          479,
+          639
+        ],
+        "file": "preprocess/portrait_bottom_right_scale4.0.bin",
+        "model": "minifasnet_v1se",
+        "logits": [
+          -1.3769851922988892,
+          2.7754197120666504,
+          -1.3995423316955566
+        ]
+      },
+      {
+        "case": "landscape_center",
+        "width": 640,
+        "height": 480,
+        "faceBox": [
+          250,
+          150,
+          140,
+          160
+        ],
+        "scale": 2.7,
+        "cropBox": [
+          131,
+          14,
+          509,
+          446
+        ],
+        "file": "preprocess/landscape_center_scale2.7.bin",
+        "model": "minifasnet_v2",
+        "logits": [
+          -2.492025375366211,
+          2.1685500144958496,
+          0.3222384452819824
+        ]
+      },
+      {
+        "case": "landscape_center",
+        "width": 640,
+        "height": 480,
+        "faceBox": [
+          250,
+          150,
+          140,
+          160
+        ],
+        "scale": 4.0,
+        "cropBox": [
+          110,
+          0,
+          529,
+          479
+        ],
+        "file": "preprocess/landscape_center_scale4.0.bin",
+        "model": "minifasnet_v1se",
+        "logits": [
+          -0.9655137062072754,
+          2.3745086193084717,
+          -1.41006338596344
+        ]
+      },
+      {
+        "case": "landscape_small_face",
+        "width": 640,
+        "height": 480,
+        "faceBox": [
+          300,
+          200,
+          60,
+          70
+        ],
+        "scale": 2.7,
+        "cropBox": [
+          249,
+          140,
+          411,
+          329
+        ],
+        "file": "preprocess/landscape_small_face_scale2.7.bin",
+        "model": "minifasnet_v2",
+        "logits": [
+          -0.38643765449523926,
+          0.6794997453689575,
+          -0.2940688133239746
+        ]
+      },
+      {
+        "case": "landscape_small_face",
+        "width": 640,
+        "height": 480,
+        "faceBox": [
+          300,
+          200,
+          60,
+          70
+        ],
+        "scale": 4.0,
+        "cropBox": [
+          210,
+          95,
+          450,
+          375
+        ],
+        "file": "preprocess/landscape_small_face_scale4.0.bin",
+        "model": "minifasnet_v1se",
+        "logits": [
+          -1.5558310747146606,
+          3.0390172004699707,
+          -1.4844110012054443
+        ]
+      },
+      {
+        "case": "hd_frame",
+        "width": 1280,
+        "height": 720,
+        "faceBox": [
+          560,
+          220,
+          180,
+          200
+        ],
+        "scale": 2.7,
+        "cropBox": [
+          407,
+          50,
+          893,
+          590
+        ],
+        "file": "preprocess/hd_frame_scale2.7.bin",
+        "model": "minifasnet_v2",
+        "logits": [
+          -0.25267988443374634,
+          -1.2802456617355347,
+          1.5335196256637573
+        ]
+      },
+      {
+        "case": "hd_frame",
+        "width": 1280,
+        "height": 720,
+        "faceBox": [
+          560,
+          220,
+          180,
+          200
+        ],
+        "scale": 4.0,
+        "cropBox": [
+          326,
+          0,
+          973,
+          719
+        ],
+        "file": "preprocess/hd_frame_scale4.0.bin",
+        "model": "minifasnet_v1se",
+        "logits": [
+          -0.9887826442718506,
+          3.9712376594543457,
+          -2.984314441680908
+        ]
+      }
+    ]
+  }
+}
