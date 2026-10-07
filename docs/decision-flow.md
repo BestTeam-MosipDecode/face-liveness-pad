@@ -2,7 +2,7 @@
 
 Status on 7 October 2026: design, first version. This document specifies how a liveness session reaches its decision. It is the reference for the engine issues: preprocessing (#11), detection, quality and passive score (#12), challenges (#13), session state machine (#14) and tests (#15). Thresholds and limits marked "to calibrate" will be set from the team captures (#5 and #7).
 
-Values in this document follow the configuration keys of the project plan, with the prefix `mosip.registration.face.liveness.`. Keys that this document adds are listed in section 10 as proposals.
+Values in this document follow the configuration keys of the project plan, with the prefix `mosip.registration.face.liveness.`. This document adds two keys and a capture check operation to the engine API. The coordinator approved them on 7 October 2026, together with the attempt counting rule of section 7 and the exception process for residents of section 7.1.
 
 ## 1. Overview
 
@@ -99,7 +99,7 @@ The median makes the decision robust to a single badly scored frame. With the de
 
 The two thresholds are provisional. They will be calibrated on the team captures (#7) and validated by the coordinator before they are written as defaults.
 
-If no decision is reached within `passive.timeout_ms` after the first frame (proposed key, default 20 000 ms), the attempt fails with the guidance code given most often during that time: `NO_FACE`, `MULTIPLE_FACES` or `LOW_QUALITY`.
+If no decision is reached within `passive.timeout_ms` after the first frame (added key, default 20 000 ms), the attempt fails with the guidance code given most often during that time: `NO_FACE`, `MULTIPLE_FACES` or `LOW_QUALITY`.
 
 ## 5. Active check
 
@@ -111,7 +111,7 @@ The sequence cannot be known in advance, so a replayed video cannot perform the 
 
 ### 5.2 Phases of one challenge
 
-1. **Hold still.** The screen shows "Hold still". The session collects at least 3 good frames over `active.baseline_ms` (proposed key, default 600 ms) and takes the median of each measure as the baseline.
+1. **Hold still.** The screen shows "Hold still". The session collects at least 3 good frames over `active.baseline_ms` (added key, default 600 ms) and takes the median of each measure as the baseline.
 2. **Instruction.** The screen shows the instruction, for example "Please blink". The deadline is set to the display time plus `active.challenge_timeout_ms` (default 8 000 ms).
 3. **Detection.** The action must be observed after the instruction is shown and before the deadline. While it is not, the screen shows "Please continue". When it is, the screen shows "Action detected" and the next challenge starts at step 1.
 
@@ -170,8 +170,30 @@ Whether the stream keeps running during `RCAPTURE` depends on the device. This i
 - An attempt ends in `FAILED` or in `PASSED` with an accepted captured image.
 - `retry()` starts a new attempt from `INIT` while the number of attempts used is below `max_attempts` (default 3). The new attempt draws a new challenge sequence and starts with an empty score window.
 - Every failure after the first analysed frame counts as an attempt, whatever its reason, device errors included. Otherwise, unplugging the device during a challenge would reset the counter. A device that is unavailable before the first frame does not use an attempt.
-- When the attempts are exhausted, `on_max_attempts` applies. With `BLOCK` (default), the session ends with `MAX_ATTEMPTS_EXCEEDED`, and the screen directs the user to the recovery process. The behaviour for residents (block only, or switch to the exception process) is still to be decided by the coordinator.
+- When the attempts are exhausted, the session ends with `MAX_ATTEMPTS_EXCEEDED` and `on_max_attempts` decides what follows (section 7.1).
 - When liveness is disabled (`enabled=false`), the client keeps its original behaviour and creates no session.
+
+### 7.1 After the last attempt
+
+| Value of `on_max_attempts` | Behaviour | Default for |
+| --- | --- | --- |
+| `BLOCK` | No face is accepted. The authentication fails, and the client's existing behaviour after a failed face authentication applies, for example another authentication mode if the configuration offers one | `OPERATOR`, `SUPERVISOR` |
+| `EXCEPTION` | The resident is directed to the MOSIP exception process (below) | `RESIDENT` |
+
+Configuration: `mosip.registration.face.liveness.on_max_attempts=BLOCK` and `mosip.registration.face.liveness.resident.on_max_attempts=EXCEPTION`. `EXCEPTION` is not accepted for the authentication workflows: a person whose liveness cannot be established must never be authenticated.
+
+In Registration Client 1.2.0.2, the face cannot be marked as a biometric exception: the exception screen covers fingerprints and iris only, and the exception photo is taken when those are missing. The client does have an exception path, used whenever a registration carries a biometric exception: after the operator, a second user with the supervisor role must authenticate before the packet is created (`AuthenticationController`, reviewer authentication, which refuses the operator's own account). The packet then carries the exceptions to the server for review.
+
+The exception process for liveness reuses that path:
+
+1. The screen shows `LIVENESS_MAX_ATTEMPTS` ("Please follow the exception process") and offers the operator to continue under exception.
+2. The operator captures the face once more. The image goes through the normal capture, without a liveness decision.
+3. The registration is marked as a face liveness exception, recorded in the audit trail (`LIVENESS_MAX_ATTEMPTS`, with the workflow and the number of attempts) and in the packet.
+4. At submission, the supervisor authentication required for exceptions is triggered, as for a fingerprint or iris exception. The supervisor's own face authentication goes through liveness like any other.
+
+How the mark travels in the packet (a field of the packet metadata, or another mechanism) is to be confirmed with the mentors, since it is read on the server side. The client changes belong to #22 and #24.
+
+The message `LIVENESS_MAX_ATTEMPTS` refers to the exception process, which does not apply to authentication. The authentication screens need a second key, for example `LIVENESS_MAX_ATTEMPTS_AUTH`: "Face verification could not be completed. Use another sign-in method or contact your supervisor." / « La vérification du visage n'a pas pu aboutir. Utilisez un autre mode de connexion ou contactez votre superviseur. » (#24).
 
 ## 8. Feedback and messages
 
@@ -196,7 +218,8 @@ After each analysed frame, the session returns its state, a feedback code and a 
 | Failure with `CHALLENGE_TIMEOUT` or `CHALLENGE_FAILED` | `FAILED` | `LIVENESS_FAILED` and `LIVENESS_TIP_FOLLOW_ACTION` |
 | Other liveness failures | `FAILED` | `LIVENESS_FAILED`, with the tip of the last guidance |
 | Retry possible | `FAILED` | adds `LIVENESS_RETRY_AVAILABLE` with the attempt number and the maximum |
-| Attempts exhausted | `MAX_ATTEMPTS_EXCEEDED` | `LIVENESS_MAX_ATTEMPTS` |
+| Attempts exhausted, resident | `MAX_ATTEMPTS_EXCEEDED` | `LIVENESS_MAX_ATTEMPTS` |
+| Attempts exhausted, operator or supervisor | `MAX_ATTEMPTS_EXCEEDED` | `LIVENESS_MAX_ATTEMPTS_AUTH` (section 7.1) |
 | Device error | `DEVICE_ERROR` | `LIVENESS_DEVICE_UNAVAILABLE` |
 
 A detected attack always shows the generic message, identical to the one of an engine error. The screen never tells the user that an attack was suspected. Scores, measures and model data appear on screen only when `diagnostic.enabled` is true.
@@ -235,12 +258,12 @@ Every event carries the workflow, the attempt number, the duration and the model
 | `active.challenge_types` | `BLINK,SMILE,TURN_LEFT,TURN_RIGHT` | Section 5.1 |
 | `active.challenge_timeout_ms` | `8000` | Section 5.2 |
 | `max_attempts` | `3` | Section 7 |
-| `on_max_attempts` | `BLOCK` | Section 7 |
+| `on_max_attempts` | `BLOCK`, and `EXCEPTION` for residents | Section 7.1 |
 | `diagnostic.enabled` | `false` | Sections 8, 9 |
 
 Any key can be overridden for one workflow by inserting the workflow name after the prefix, for example `mosip.registration.face.liveness.supervisor.active.min_challenges=3`.
 
-### 10.2 Keys proposed by this document
+### 10.2 Keys added by this document
 
 | Key | Default | Purpose |
 | --- | --- | --- |
@@ -265,9 +288,6 @@ These values are fixed in the engine for now. They can become configuration keys
 
 ## 11. Points to confirm
 
-1. The two proposed keys of section 10.2.
-2. The attempt counting rule of section 7: device errors after the first frame use an attempt.
-3. The capture check operation in the engine API (#10).
-4. On frames of the simulated device (#16, #17): that they are not mirrored, the direction of the head-turn measure, and whether the stream keeps running during `RCAPTURE`.
-5. Lighting, sharpness and yaw bounds, action factors and passive thresholds, from the team captures (#5, #7).
-6. The behaviour for residents when attempts are exhausted.
+1. With the mentors: how the face liveness exception travels in the packet to the server (section 7.1).
+2. On frames of the simulated device (#16, #17): that they are not mirrored, the direction of the head-turn measure, and whether the stream keeps running during `RCAPTURE`.
+3. Lighting, sharpness and yaw bounds, action factors and passive thresholds, from the team captures (#5, #7).

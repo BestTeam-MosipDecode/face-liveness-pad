@@ -37,7 +37,7 @@ ACTIVE_CHALLENGE --> FAILED : CHALLENGE_TIMEOUT, CHALLENGE_FAILED,\nFACE_CONTINU
 PASSED --> [*] : captured image accepted
 PASSED --> FAILED : captured image rejected (INVALID_FRAME,\nFACE_CONTINUITY_LOST, LOW_QUALITY, PAD_ATTACK_DETECTED)
 FAILED --> INIT : retry()\nattempts used < max attempts
-FAILED --> [*] : attempts exhausted\n(MAX_ATTEMPTS_EXCEEDED)
+FAILED --> [*] : attempts exhausted (MAX_ATTEMPTS_EXCEEDED):\nblock, or exception process for residents
 
 note as devices
   From any state, a device or engine error
