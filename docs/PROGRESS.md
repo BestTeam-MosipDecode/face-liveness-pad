@@ -6,7 +6,7 @@ Dernière mise à jour : 7 octobre 2026.
 
 ## Étape en cours
 
-0.7 Issues GitHub et répartition. Les étapes 0.5 et 0.8 sont committées en local sur `feature/repo-structure`, en attente d'accord pour le push et la Pull Request. L'étape 0.4 reste ouverte : la fin attend l'accès à l'environnement Collab.
+0.7 Issues GitHub et répartition. Le brouillon des 37 issues est dans `docs/issues-draft.md`, non committé. Leur création sur GitHub attend l'accord d'Elisée. L'étape 0.4 reste ouverte : la fin attend l'accès à l'environnement Collab.
 
 ## Terminé
 
@@ -19,7 +19,7 @@ Phase 0
   - [x] Build de la 1.2.0.2 avec JDK 11.0.32 et Maven 3.9.9 (7 octobre)
   - [x] `docs/dev-setup-windows.md`, première version (7 octobre). Sections 1 à 3 vérifiées, sections 4 à 7 à vérifier avec Collab.
   - [ ] Démarrage du client, connexion d'un opérateur, capture du visage avec un dispositif simulé (bloqué, voir Blocages)
-- [x] 0.5 Structurer `face-liveness-pad/` (7 octobre). Branche `feature/repo-structure`, commits locaux. Reste à faire : push et Pull Request, après accord.
+- [x] 0.5 Structurer `face-liveness-pad/` (7 octobre). Branche `feature/repo-structure` poussée et Pull Request n° 1 ouverte vers `main` le 7 octobre, avec l'accord d'Elisée. Reste à faire : relecture et fusion.
 - [x] 0.6 Analyse de Silent-Face-Anti-Spoofing (7 octobre, faite avant 0.5). Spécification de prétraitement dans `training/README.md`, vérifiée par exécution sur les trois images d'exemple.
 - [ ] 0.7 Issues GitHub et répartition
 - [x] 0.8 Architecture réalignée sur le sujet 04 (7 octobre) : `docs/architecture.md` et `docs/diagrams/components.puml`, première version.
@@ -48,7 +48,7 @@ Relevé sur la machine d'Elisée. Racine du workspace : `C:\wamp64\www\mosip_dec
 
 | Dépôt | Branche locale | Remotes | État |
 | --- | --- | --- | --- |
-| `face-liveness-pad/` | `feature/repo-structure`, créée depuis `main` (485d978), non poussée | `origin` = BestTeam-MosipDecode/face-liveness-pad | propre après les commits de l'étape 0.5. Identité Git : `Magloire04`, adresse noreply GitHub. Pas de signature GPG configurée. |
+| `face-liveness-pad/` | `feature/repo-structure`, créée depuis `main` (485d978), poussée, Pull Request n° 1 ouverte | `origin` = BestTeam-MosipDecode/face-liveness-pad | propre après les commits de l'étape 0.5. Identité Git : `Magloire04`, adresse noreply GitHub. Pas de signature GPG configurée. |
 | `registration-client/` | `feature/face-liveness` (22fe01f99b), créée depuis `master`, non poussée | `origin` = fork de l'équipe, `upstream` = mosip/registration-client | propre. |
 | `Silent-Face-Anti-Spoofing/` | `master` (b6d5f04) | `origin` = minivision-ai | arbre de travail modifié : `LICENSE`, `.gitignore`, `train.py`, `datasets/README.md` supprimés (suppressions indexées), `requirements.txt` modifié, `webcam_test.py`, `venv/` et `images/sample/pie*.jpg` non suivis. |
 
@@ -119,12 +119,16 @@ Les numéros de ligne de la section 4.1 du plan viennent de `develop`. À revér
 
 Best_Team, Cotonou. Les quatre comptes GitHub existent (vérifié le 7 octobre).
 
-| Membre | Compte GitHub |
-| --- | --- |
-| Elisée Atonde (coordination) | `Magloire04` |
-| Temitayo Gbolahan | `PrinceSpecial` |
-| Silverio Mensah | `SilverioMen` |
-| Tobi Obassandjo | `Tobi3h` |
+| Membre | Compte GitHub | Lot |
+| --- | --- | --- |
+| Elisée Atonde (coordination) | `Magloire04` | Documentation |
+| Temitayo Gbolahan | `PrinceSpecial` | Tests |
+| Silverio Mensah | `SilverioMen` | Dispositif simulé |
+| Tobi Obassandjo | `Tobi3h` | Moteur Java et intégration dans le Registration Client |
+
+Répartition donnée par Elisée le 7 octobre. `PrinceSpecial` et `Magloire04` viennent en renfort sur les lots de `Tobi3h` et de `SilverioMen` quand c'est nécessaire.
+
+La phase 1 (modèles en Python) n'a pas de responsable dans cette répartition. Le brouillon des issues propose `PrinceSpecial` et `Magloire04`, à confirmer.
 
 ## Ce qui reste valable du premier document de solution
 
@@ -194,6 +198,7 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - 7 octobre. Coordonnées Maven provisoires du moteur : `io.mosip.registration:liveness-engine:0.1.0-SNAPSHOT`. Le groupe et le nom de paquet restent à confirmer (Q6).
 - 7 octobre. Les graphiques de résultats versionnés portent un nom en `chart_*.png`. Toute autre image sous un dossier `results/` est ignorée par Git.
 - 7 octobre. `docs/architecture.md` est committé sur la même branche que l'arborescence, pour n'ouvrir qu'une Pull Request.
+- 7 octobre. Push de `feature/repo-structure` et ouverture de la Pull Request n° 1 autorisés par Elisée. Pas de fusion sans nouvel accord.
 
 ## Blocages
 
@@ -217,5 +222,7 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - Q9 (close, 7 octobre) : calendrier resserré et périmètre réduit validés.
 - Q3 (ouverte, étape 0.4) : accès Collab demandé, sans réponse. À la réception : nom d'hôte de l'environnement, identifiants, configuration WireGuard, tous hors dépôt.
 - Q0 (à confirmer) : faut-il quand même installer JDK 21.0.3 et Maven 3.9.6 à côté de l'existant ? Ils ne servent pas à la 1.2.0.2.
-- Q4 (en partie close, 7 octobre) : membres et comptes GitHub reçus (voir Équipe). Reste ouverte pour l'étape 0.7 : la répartition des lots entre les membres.
+- Q4 (close, 7 octobre) : membres, comptes GitHub et répartition reçus (voir Équipe).
+- Q10 (ouverte, étape 0.7) : création des issues et des étiquettes sur GitHub d'après `docs/issues-draft.md` ? Qui porte les issues de la phase 1 ?
+- Q11 (ouverte) : qui relit et fusionne la Pull Request n° 1 ?
 - Q6 étendue (étape 2.1) : moteur compilé pour Java 11, nom de paquet `io.mosip.registration.liveness`.
