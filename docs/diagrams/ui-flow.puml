@@ -1,0 +1,46 @@
+@startuml ui-flow
+' This Source Code Form is subject to the terms of the Mozilla Public
+' License, v. 2.0. If a copy of the MPL was not distributed with this
+' file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+hide empty description
+skinparam shadowing false
+skinparam state {
+  BackgroundColor #F8F9FA
+  BorderColor #495057
+}
+
+title Face liveness screens: user flow of the resident capture
+
+state "Device unavailable\n(r10)" as R10
+state "Checking face liveness\n(r01)" as R01
+state "Guidance: lighting, position,\nno face, several faces (r02)" as R02
+state "Hold still\n(r03)" as R03
+state "Challenge instruction\n(r04, r05, second screen r12)" as R04
+state "Face captured\n(r06)" as R06
+state "Not verified, try again\n(r07, or r08 after an attack)" as R07
+state "Exception process\n(r09)" as R09
+
+[*] --> R01 : face selected,\ndevice found
+[*] --> R10 : no face device
+R10 --> R01 : Try again,\ndevice found
+R01 --> R02 : frame cannot be used
+R02 --> R01 : frame usable again
+R01 --> R06 : liveness verified,\nimage captured
+R01 --> R03 : score ambiguous
+R03 --> R04 : baseline ready
+R04 --> R03 : action detected,\nnext challenge
+R04 --> R06 : last action detected,\nimage captured
+R01 --> R07 : not verified
+R04 --> R07 : not verified
+R07 --> R01 : Try again
+R07 --> R09 : last attempt failed
+R09 --> [*] : Continue under exception
+R06 --> [*] : Next
+
+note bottom of R07
+  An attack and an ordinary failure
+  show the same kind of screen.
+  The reason goes to the audit only.
+end note
+@enduml
