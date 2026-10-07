@@ -1,0 +1,124 @@
+{
+  "schemaVersion": 1,
+  "modelSetVersion": "1.0.0",
+  "exportedWith": {
+    "torch": "2.14.0+cpu",
+    "onnx": "1.23.2",
+    "onnxruntime": "1.23.2",
+    "numpy": "2.2.6"
+  },
+  "models": [
+    {
+      "name": "minifasnet_v2",
+      "file": "minifasnet_v2_2.7_80x80.onnx",
+      "sha256": "eb0feb2c6896cf52755d71b38888ea1ef56ceb266d9583ba64de30ea66f7717b",
+      "sizeBytes": 1743495,
+      "role": "passive-liveness-classifier",
+      "cropScale": 2.7,
+      "opset": 13,
+      "input": {
+        "name": "input",
+        "type": "float32",
+        "shape": [
+          1,
+          3,
+          80,
+          80
+        ],
+        "layout": "NCHW",
+        "channelOrder": "BGR",
+        "valueRange": [
+          0,
+          255
+        ],
+        "normalization": "none"
+      },
+      "output": {
+        "name": "logits",
+        "type": "float32",
+        "shape": [
+          1,
+          3
+        ],
+        "activation": "none, apply softmax",
+        "classes": [
+          "fake",
+          "real",
+          "fake"
+        ],
+        "realClassIndex": 1
+      },
+      "parity": {
+        "reference": "PyTorch",
+        "largestLogitDifference": 1.2874603271484375e-05,
+        "inputsChecked": 20
+      },
+      "source": {
+        "project": "Silent-Face-Anti-Spoofing",
+        "url": "https://github.com/minivision-ai/Silent-Face-Anti-Spoofing",
+        "commit": "b6d5f04ad78778917853b25c778acef6d5626d15",
+        "file": "resources/anti_spoof_models/2.7_80x80_MiniFASNetV2.pth",
+        "sha256": "a5eb02e1843f19b5386b953cc4c9f011c3f985d0ee2bb9819eea9a142099bec0"
+      },
+      "license": "Apache-2.0",
+      "copyright": "Copyright 2020 Minivision",
+      "changes": "Converted from PyTorch weights to ONNX. Weights unchanged."
+    },
+    {
+      "name": "minifasnet_v1se",
+      "file": "minifasnet_v1se_4.0_80x80.onnx",
+      "sha256": "17246cc267b4b3d23e49966f2062650dc4e6fe3f1a3c7ecc3ae7b0f67ad1aec4",
+      "sizeBytes": 1742663,
+      "role": "passive-liveness-classifier",
+      "cropScale": 4.0,
+      "opset": 13,
+      "input": {
+        "name": "input",
+        "type": "float32",
+        "shape": [
+          1,
+          3,
+          80,
+          80
+        ],
+        "layout": "NCHW",
+        "channelOrder": "BGR",
+        "valueRange": [
+          0,
+          255
+        ],
+        "normalization": "none"
+      },
+      "output": {
+        "name": "logits",
+        "type": "float32",
+        "shape": [
+          1,
+          3
+        ],
+        "activation": "none, apply softmax",
+        "classes": [
+          "fake",
+          "real",
+          "fake"
+        ],
+        "realClassIndex": 1
+      },
+      "parity": {
+        "reference": "PyTorch",
+        "largestLogitDifference": 6.9141387939453125e-06,
+        "inputsChecked": 20
+      },
+      "source": {
+        "project": "Silent-Face-Anti-Spoofing",
+        "url": "https://github.com/minivision-ai/Silent-Face-Anti-Spoofing",
+        "commit": "b6d5f04ad78778917853b25c778acef6d5626d15",
+        "file": "resources/anti_spoof_models/4_0_0_80x80_MiniFASNetV1SE.pth",
+        "sha256": "84ee1d37d96894d5e82de5a57df044ef80a58be2b218b5ed7cdfd875ec2f5990"
+      },
+      "license": "Apache-2.0",
+      "copyright": "Copyright 2020 Minivision",
+      "changes": "Converted from PyTorch weights to ONNX. Weights unchanged."
+    }
+  ]
+}
