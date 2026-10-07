@@ -72,10 +72,10 @@ Liveness runs inside the client process, the face comparison for authentication 
 
 ## 4. Who reads the instructions
 
-In a registration centre, the screen usually faces the operator, not the resident. The active challenges ask the resident to act within a few seconds. Two options, to choose in #24:
+In a registration centre, the screen usually faces the operator, not the resident. The active challenges ask the resident to act within a few seconds. Both of the following are provided (decision of 7 October 2026, to implement in #24):
 
-- the operator reads the instruction aloud. The challenge timeout (`active.challenge_timeout_ms`, 8 seconds) leaves time for it;
-- the client shows the instruction in a large font that can be read from the resident's seat, or on a second screen turned towards the resident when the centre has one.
+- the client shows the instruction in a large font, readable from the resident's seat, or on a second screen turned towards the resident when the centre has one. This is the default;
+- the operator also sees the instruction and reads it aloud when the resident cannot see the screen. The challenge timeout (`active.challenge_timeout_ms`, 8 seconds) leaves time for it.
 
 For operator and supervisor authentication, the person in front of the camera also reads the screen, so the question does not arise.
 
@@ -83,4 +83,3 @@ For operator and supervisor authentication, the person in front of the camera al
 
 1. With the simulated device: the stream keeps running while `RCAPTURE` is in progress, so that the session can follow the face until the capture (#16, #17).
 2. For the login: where to place the captured image check, in `SessionContext.create(...)` or in `LoginController` (#23).
-3. How the instructions reach the resident (#24).
