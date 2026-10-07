@@ -1,13 +1,141 @@
 {
   "schemaVersion": 1,
-  "modelSetVersion": "1.0.0",
-  "exportedWith": {
-    "torch": "2.14.0+cpu",
-    "onnx": "1.23.2",
-    "onnxruntime": "1.23.2",
-    "numpy": "2.2.6"
-  },
+  "modelSetVersion": "1.1.0",
   "models": [
+    {
+      "name": "yunet",
+      "file": "face_detection_yunet_2023mar.onnx",
+      "sha256": "8f2383e4dd3cfbb4553ea8718107fc0423210dc964f9f4280604804ed2552fa4",
+      "sizeBytes": 232589,
+      "role": "face-detector",
+      "opset": 11,
+      "input": {
+        "name": "input",
+        "type": "float32",
+        "shape": [
+          1,
+          3,
+          640,
+          640
+        ],
+        "layout": "NCHW",
+        "channelOrder": "BGR",
+        "valueRange": [
+          0,
+          255
+        ],
+        "normalization": "none",
+        "preprocessing": "resize to fit 640 x 640 keeping the aspect ratio, bilinear, pad right and bottom with zeros"
+      },
+      "output": {
+        "names": [
+          "cls_8",
+          "cls_16",
+          "cls_32",
+          "obj_8",
+          "obj_16",
+          "obj_32",
+          "bbox_8",
+          "bbox_16",
+          "bbox_32",
+          "kps_8",
+          "kps_16",
+          "kps_32"
+        ],
+        "decoding": "see training/liveness/yunet.py (FaceDetectorYN of OpenCV)",
+        "keypoints": [
+          "right_eye",
+          "left_eye",
+          "nose_tip",
+          "right_mouth_corner",
+          "left_mouth_corner"
+        ]
+      },
+      "source": {
+        "project": "OpenCV Zoo, face_detection_yunet",
+        "url": "https://huggingface.co/opencv/face_detection_yunet/resolve/3cc26e7f1014a5ee5d74a42acee58bafc9d0a310/face_detection_yunet_2023mar.onnx",
+        "sha256": "8f2383e4dd3cfbb4553ea8718107fc0423210dc964f9f4280604804ed2552fa4"
+      },
+      "license": "MIT",
+      "copyright": "Copyright (c) 2020 Shiqi Yu",
+      "changes": "None. Published file copied as is.",
+      "exportedWith": {
+        "tensorflow": "2.21.0",
+        "tf2onnx": "1.17.0",
+        "onnx": "1.23.2",
+        "onnxruntime": "1.23.2",
+        "numpy": "2.2.6"
+      }
+    },
+    {
+      "name": "face_mesh_v2",
+      "file": "face_mesh_v2_256.onnx",
+      "sha256": "6478f5a2f6a30af9f6d653034c9ed8e7ba302f1ef2d7eaa27ab55ca0ba5d4bb2",
+      "sizeBytes": 4822155,
+      "role": "face-landmarks",
+      "opset": 13,
+      "input": {
+        "name": "input",
+        "type": "float32",
+        "shape": [
+          1,
+          256,
+          256,
+          3
+        ],
+        "layout": "NHWC",
+        "channelOrder": "RGB",
+        "valueRange": [
+          0,
+          1
+        ],
+        "normalization": "divide by 255",
+        "preprocessing": "square region centred on the face box, side 1.5 times its longer edge, outside of the image filled with black, bilinear resize to 256 x 256"
+      },
+      "output": {
+        "landmarks": {
+          "shape": [
+            1,
+            1,
+            1,
+            1434
+          ],
+          "content": "478 points x, y, z in pixels of the 256 x 256 input"
+        },
+        "face_flag": {
+          "shape": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "content": "face presence logit, apply a sigmoid"
+        }
+      },
+      "parity": {
+        "reference": "TFLite interpreter",
+        "largestLandmarkDifference": 0.00063323974609375,
+        "largestFlagDifference": 0.00019550323486328125,
+        "inputsChecked": 19
+      },
+      "source": {
+        "project": "MediaPipe Face Landmarker, float16, version 1",
+        "url": "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task",
+        "sha256": "64184e229b263107bc2b804c6625db1341ff2bb731874b0bcc2fe6544e0bc9ff",
+        "member": "face_landmarks_detector.tflite",
+        "memberSha256": "c7d54204ce0448474c7f3fa9af494787c0965cbdd6f20fc72867e43046bd43d5"
+      },
+      "license": "Apache-2.0",
+      "copyright": "Copyright Google LLC",
+      "changes": "Converted from TFLite to ONNX with tf2onnx. Float16 weights stored as float32. Inputs, outputs and intermediate tensors renamed, batch size fixed to 1. Output Identity_2 removed.",
+      "exportedWith": {
+        "tensorflow": "2.21.0",
+        "tf2onnx": "1.17.0",
+        "onnx": "1.23.2",
+        "onnxruntime": "1.23.2",
+        "numpy": "2.2.6"
+      }
+    },
     {
       "name": "minifasnet_v2",
       "file": "minifasnet_v2_2.7_80x80.onnx",
@@ -62,7 +190,13 @@
       },
       "license": "Apache-2.0",
       "copyright": "Copyright 2020 Minivision",
-      "changes": "Converted from PyTorch weights to ONNX. Weights unchanged."
+      "changes": "Converted from PyTorch weights to ONNX. Weights unchanged.",
+      "exportedWith": {
+        "torch": "2.14.0+cpu",
+        "onnx": "1.23.2",
+        "onnxruntime": "1.23.2",
+        "numpy": "2.2.6"
+      }
     },
     {
       "name": "minifasnet_v1se",
@@ -118,7 +252,13 @@
       },
       "license": "Apache-2.0",
       "copyright": "Copyright 2020 Minivision",
-      "changes": "Converted from PyTorch weights to ONNX. Weights unchanged."
+      "changes": "Converted from PyTorch weights to ONNX. Weights unchanged.",
+      "exportedWith": {
+        "torch": "2.14.0+cpu",
+        "onnx": "1.23.2",
+        "onnxruntime": "1.23.2",
+        "numpy": "2.2.6"
+      }
     }
   ]
 }
