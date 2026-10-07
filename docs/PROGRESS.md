@@ -6,7 +6,7 @@ Dernière mise à jour : 7 octobre 2026.
 
 ## Étape en cours
 
-Issue n° 34 (documents de conception), première partie : `docs/decision-flow.md` et ses deux diagrammes, sur la branche `feature/decision-flow`, commits locaux, en attente d'accord pour le push et la Pull Request. Phase 1 : issues n° 3 et n° 4 fusionnées dans `main` le 7 octobre. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.  La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
+Issue n° 34 (documents de conception), première partie : `docs/decision-flow.md` et ses deux diagrammes, sur la branche `feature/decision-flow`, poussée avec l'accord d'Elisée, Pull Request ouverte. Phase 1 : issues n° 3 et n° 4 fusionnées dans `main` le 7 octobre. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.  La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
 
 ## Terminé
 
@@ -157,7 +157,9 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 - contrôle de l'image `RCAPTURE` en cinq points, avec une nouvelle opération dans l'API (issue n° 10) ;
 - table des codes de retour vers les clés de message du plan, et des transitions vers les événements d'audit.
 
-Propositions à valider par Elisée (voir Questions) : deux nouvelles clés, `passive.timeout_ms` (20 000) et `active.baseline_ms` (600) ; une tentative est comptée pour tout échec après la première image analysée, erreurs de dispositif comprises, pour qu'un débranchement ne remette pas le compteur à zéro.
+Validé par Elisée le 7 octobre : deux nouvelles clés, `passive.timeout_ms` (20 000) et `active.baseline_ms` (600) ; une opération de contrôle de l'image capturée dans l'API ; une tentative est comptée pour tout échec après la première image analysée, erreurs de dispositif comprises, pour qu'un débranchement ne remette pas le compteur à zéro.
+
+Résident après la dernière tentative (décision d'Elisée, 7 octobre) : orientation vers la procédure d'exception de MOSIP. Dans la 1.2.0.2, le visage ne peut pas être déclaré en exception biométrique (seuls les doigts et l'iris le peuvent). Le document s'appuie donc sur le circuit existant des exceptions : nouvelle capture sans décision de vivacité, marque d'exception dans l'audit et dans le paquet, authentification obligatoire d'un superviseur à la soumission, comme pour une exception de doigts ou d'iris. Opérateur et superviseur : blocage, jamais d'exception. Reste à demander aux mentors comment la marque doit voyager dans le paquet jusqu'au serveur.
 
 Les diagrammes sont rendus en SVG avec le PlantUML 1.2026.2 de l'extension de l'IDE, pour être lisibles directement sur GitHub. Le diagramme de composants de `architecture.md` l'est aussi.
 
@@ -287,6 +289,7 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - Q11 (close, 7 octobre) : Pull Request n° 1 fusionnée par Elisée.
 - Q12 (close, 7 octobre) : Pull Request n° 39 fusionnée.
 - Q13 (close, 7 octobre) : Pull Request n° 40 ouverte avec l'accord d'Elisée, puis fusionnée par Elisée.
-- Q14 (ouverte) : les deux clés proposées dans `decision-flow.md` (`passive.timeout_ms`, `active.baseline_ms`) et la règle de comptage des tentatives sont-elles validées ?
-- Q7 (ouverte, rappel) : après épuisement des tentatives, le résident est-il seulement bloqué, ou orienté vers la procédure d'exception ?
+- Q14 (close, 7 octobre) : clés `passive.timeout_ms` et `active.baseline_ms`, opération de contrôle de l'image capturée et règle de comptage des tentatives validées.
+- Q7 (close, 7 octobre) : résident orienté vers la procédure d'exception de MOSIP après la dernière tentative.
+- Q15 (ouverte, AMA du 14 octobre) : comment une exception de vivacité du visage doit-elle être portée dans le paquet pour le traitement côté serveur ?
 - Q6 étendue (étape 2.1) : moteur compilé pour Java 11, nom de paquet `io.mosip.registration.liveness`.
