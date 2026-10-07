@@ -6,7 +6,7 @@ Dernière mise à jour : 7 octobre 2026.
 
 ## Étape en cours
 
-Issue n° 34 (documents de conception), quatrième partie : `docs/iso-30107-alignment.md`, sur la branche `feature/iso-alignment`, commits locaux, en attente d'accord pour le push et la Pull Request. Parties fusionnées : `decision-flow.md` (n° 42), `workflows.md` (n° 43), `security-privacy.md` (n° 44). La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
+Issue n° 35 (maquettes d'écran et parcours) : 16 écrans dans `docs/ui/`, sur la branche `feature/ui-mockups`, commits locaux, en attente d'accord pour le push et la Pull Request. Issue n° 34 : les quatre documents sont fusionnés (Pull Requests n° 42 à 45) ; elle reste ouverte pour les résultats. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
 
 ## Terminé
 
@@ -145,6 +145,16 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 - Reste valable : le classifieur MiniFASNet, la fusion des scores, le clignement par rapport d'aspect de l'œil, le plan de mesures ISO/IEC 30107-3, le traitement entièrement local.
 - Change : la cible est le Registration Client de bureau (1.2.0.2, Java 11) et non Inji Wallet ni le mobile. L'intégration passe par les dispositifs SBI, trois parcours (résident, opérateur, superviseur), une configuration par parcours et une interface JavaFX.
 - Réduit par le calendrier : pas de jeux de données publics, Android en conception seulement.
+
+## Maquettes d'écran (issue n° 35)
+
+`docs/ui/`, réalisé le 7 octobre : 12 écrans de capture du résident et 4 écrans d'authentification, un diagramme de parcours, une page de présentation. Les écrans sont écrits en HTML (`mockups.html`) et rendus en PNG par Chrome sans interface (`render_mockups.py`), avec un profil temporaire. Aucun visage réel : une silhouette dessinée.
+
+- Style repris du Registration Client (`application.css`) : Roboto, bleus `#005BAA` et `#004887`, gris et bordures du client.
+- Élément fort : la consigne du challenge dans un bandeau bleu foncé en 44 px, et en 76 px sur un second écran tourné vers le résident (choix d'Elisée du 7 octobre).
+- Contrastes mesurés : tous les textes au-dessus de 4,5:1. Le rouge `#FF0000` et le vert `#45A30A` du client n'atteignent que 4,0:1 et 3,2:1 en texte : gardés pour l'ovale et les bordures, nuances plus foncées pour le texte.
+- Deux écrans en français (authentification de l'opérateur, second écran du résident).
+- Corrigé pendant la revue des rendus : anneau de progression déformé, libellés anglais sur l'écran français, icône de caméra débordante, message « contactez votre superviseur » affiché à un superviseur.
 
 ## Alignement ISO/IEC 30107 (issue n° 34, quatrième partie)
 
