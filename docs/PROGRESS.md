@@ -6,7 +6,7 @@ Dernière mise à jour : 7 octobre 2026.
 
 ## Étape en cours
 
-Phase 1, issue n° 4 (détecteur de visage et points de repère) : faite sur la branche `feature/face-models`, commits locaux, en attente d'accord pour le push et la Pull Request. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
+Phase 1, issue n° 4 (détecteur de visage et points de repère) : faite sur la branche `feature/face-models`, poussée, Pull Request n° 40 ouverte le 8 octobre, en attente de fusion. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
 
 ## Terminé
 
@@ -27,7 +27,7 @@ Phase 0
 Phase 1
 
 - [x] Issue n° 3, export ONNX des deux MiniFASNet (7 octobre). Pull Request n° 39 fusionnée par Elisée, issue fermée.
-- [x] Issue n° 4, détecteur de visage et points de repère (8 octobre). Reste à faire : push, Pull Request, fusion.
+- [x] Issue n° 4, détecteur de visage et points de repère (8 octobre). Pull Request n° 40 ouverte, reste à fusionner.
 - [ ] Issues n° 2, 5, 6, 7, 8 (voir GitHub)
 
 Sources de vérité lues le 6 octobre : sujet officiel anglais (12 pages), critères d'évaluation, consignes de soumission, plan. La traduction française du sujet n'est pas dans le workspace, ce qui ne bloque rien (l'anglais fait foi).
@@ -54,7 +54,7 @@ Relevé sur la machine d'Elisée. Racine du workspace : `C:\wamp64\www\mosip_dec
 
 | Dépôt | Branche locale | Remotes | État |
 | --- | --- | --- | --- |
-| `face-liveness-pad/` | `feature/face-models`, créée depuis `main` après la fusion de la Pull Request n° 39, non poussée | `origin` = BestTeam-MosipDecode/face-liveness-pad | propre après les commits de l'issue n° 4. Identité Git : `Magloire04`, adresse noreply GitHub. Pas de signature GPG configurée. |
+| `face-liveness-pad/` | `feature/face-models`, créée depuis `main` après la fusion de la Pull Request n° 39, poussée, Pull Request n° 40 ouverte | `origin` = BestTeam-MosipDecode/face-liveness-pad | propre après les commits de l'issue n° 4. Identité Git : `Magloire04`, adresse noreply GitHub. Pas de signature GPG configurée. |
 | `registration-client/` | `feature/face-liveness` (22fe01f99b), identique à `master`, poussée le 8 octobre avec l'accord d'Elisée | `origin` = fork de l'équipe, `upstream` = mosip/registration-client | propre. |
 | `Silent-Face-Anti-Spoofing/` | `master` (b6d5f04) | `origin` = minivision-ai | arbre de travail modifié : `LICENSE`, `.gitignore`, `train.py`, `datasets/README.md` supprimés (suppressions indexées), `requirements.txt` modifié, `webcam_test.py`, `venv/` et `images/sample/pie*.jpg` non suivis. |
 
@@ -230,7 +230,7 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - 6 octobre. Ce fichier est créé sur `main` sans commit. Il sera committé avec l'arborescence à l'étape 0.5, sur `feature/repo-structure`.
 - 7 octobre. Base du Registration Client : version 1.2.0.2, branche `master`. Réponse des mentors à l'AMA du 7 octobre, rapportée par Elisée. C'est aussi la version annoncée par Collab.
 - 7 octobre. Conséquence du choix précédent : le client tourne sur Java 11, donc le moteur `liveness-engine` doit être compilé pour Java 11. Les sections 5.3 et 7.1 du plan supposaient Java 21 (les `record` de l'API deviennent des classes ordinaires). À faire valider par Elisée à l'étape 2.1.
-- 7 octobre. JDK 11.0.32 et Maven 3.9.9 conservés pour le projet. Les versions 21.0.3 et 3.9.6 ne sont pas installées : l'exigence vient du README de `develop` et ne concerne pas la 1.2.0.2. En attente de confirmation d'Elisée (voir Questions).
+- 7 octobre. JDK 11.0.32 et Maven 3.9.9 conservés pour le projet. Les versions 21.0.3 et 3.9.6 ne sont pas installées : l'exigence vient du README de `develop` et ne concerne pas la 1.2.0.2. Confirmé par Elisée le 8 octobre : on ne les installe pas.
 - 7 octobre. Les capacités de la machine (disque, mémoire) ne sont plus suivies comme point de risque, à la demande d'Elisée.
 - 7 octobre. Calendrier resserré et périmètre réduit validés par Elisée. Le moteur en Java 11 fait partie de ce calendrier.
 - 7 octobre. Coordonnées Maven provisoires du moteur : `io.mosip.registration:liveness-engine:0.1.0-SNAPSHOT`. Le groupe et le nom de paquet restent à confirmer (Q6).
@@ -266,10 +266,10 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - Q2 (close, 7 octobre) : date limite = 26 octobre 2026, 19 h 29 à Cotonou.
 - Q9 (close, 7 octobre) : calendrier resserré et périmètre réduit validés.
 - Q3 (ouverte, étape 0.4) : accès Collab demandé, sans réponse. À la réception : nom d'hôte de l'environnement, identifiants, configuration WireGuard, tous hors dépôt.
-- Q0 (à confirmer) : faut-il quand même installer JDK 21.0.3 et Maven 3.9.6 à côté de l'existant ? Ils ne servent pas à la 1.2.0.2.
+- Q0 (close, 8 octobre) : JDK 21.0.3 et Maven 3.9.6 non installés, ils ne servent pas à la 1.2.0.2.
 - Q4 (close, 7 octobre) : membres, comptes GitHub et répartition reçus (voir Équipe).
 - Q10 (close, 7 octobre) : issues et étiquettes créées, phase 1 répartie.
 - Q11 (close, 7 octobre) : Pull Request n° 1 fusionnée par Elisée.
 - Q12 (close, 8 octobre) : Pull Request n° 39 fusionnée.
-- Q13 (ouverte) : push de `feature/face-models` et Pull Request ?
+- Q13 (close, 8 octobre) : `feature/face-models` poussée et Pull Request n° 40 ouverte, avec l'accord d'Elisée.
 - Q6 étendue (étape 2.1) : moteur compilé pour Java 11, nom de paquet `io.mosip.registration.liveness`.
