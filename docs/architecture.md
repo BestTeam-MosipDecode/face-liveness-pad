@@ -66,6 +66,8 @@ The passive classifier and its preprocessing are described in [../training/READM
 
 Other modalities (fingerprints, iris) and the exception photo keep their current behaviour. With liveness disabled by configuration, the client behaves as it does today.
 
+The sequence diagrams of the three workflows, and the change at each step, are in [workflows.md](workflows.md).
+
 ## 6. Configuration
 
 Liveness keys use the prefix `mosip.registration.face.liveness.` and follow the existing mechanism: values are synchronised from the server configuration when the client is online, stored locally, and read through `ApplicationContext`. They sit next to the existing face keys such as `mosip.registration.face_threshold` and `mosip.registration.num_of_face_retries`.

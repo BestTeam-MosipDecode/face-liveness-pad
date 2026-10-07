@@ -1,0 +1,85 @@
+@startuml sequence-authentication
+' This Source Code Form is subject to the terms of the Mozilla Public
+' License, v. 2.0. If a copy of the MPL was not distributed with this
+' file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+autonumber
+
+title Operator and supervisor face authentication with liveness
+
+actor "Operator or\nsupervisor" as User
+participant "Authentication screen\n(Login, Authentication or\nEOD authentication controller)" as UI
+participant "Streamer" as Streamer
+participant "Liveness session\n(liveness-engine)" as Session
+participant "BioService and\nSBI provider" as Bio
+participant "Face device" as Device
+participant "Local authentication\n(AuthenticationService)" as Auth
+participant "Audit" as Audit
+
+User -> UI : enter the user ID, choose face
+UI -> Bio : getStream(FACE)
+Bio -> Device : STREAM
+Device --> Bio : multipart JPEG stream
+UI -> Session : new session (OPERATOR or SUPERVISOR policy)
+note right of UI
+  OPERATOR: login, operator authentication of a packet.
+  SUPERVISOR: reviewer authentication of a packet
+  with exceptions, end of day approval.
+end note
+Session -> Audit : LIVENESS_SESSION_STARTED
+UI -> Streamer : startStream(stream, preview, frame listener)
+
+loop every frame, with challenges when the passive score is ambiguous
+  Device --> Streamer : JPEG frame
+  Streamer -> Session : submit the frame
+  Session --> UI : state, feedback code, progress
+  UI -> User : message on screen
+end
+
+alt liveness established
+  Session --> UI : PASSED
+  UI -> Bio : captureModalityForAuth(FACE)
+  Bio -> Device : RCAPTURE
+  Device --> Bio : signed face image
+  Bio --> UI : captured biometrics
+  UI -> Session : check the captured image
+  alt captured image accepted
+    Session -> Audit : LIVENESS_PASSED
+    UI -> Auth : authValidator(userId, FACE, biometrics)
+    note right of Auth
+      Local match against the templates
+      stored on the machine: works offline.
+    end note
+    Auth --> UI : match or no match
+    alt match
+      UI -> UI : packet authentication: add the operator\nor supervisor biometrics to the packet
+      UI -> User : authentication completed
+    else no match
+      UI -> User : existing message of the client for a failed face match
+    end
+  else captured image rejected
+    Session --> UI : FAILED
+    Session -> Audit : LIVENESS_FAILED
+  end
+else liveness not established
+  Session --> UI : FAILED
+  Session -> Audit : LIVENESS_FAILED
+end
+
+alt failed, attempts left
+  UI -> User : "We could not verify face liveness. Please try again."
+  User -> UI : try again
+  UI -> Session : retry()
+else failed, attempts exhausted
+  Session -> Audit : LIVENESS_MAX_ATTEMPTS
+  UI -> User : "Face verification could not be completed.\nUse another sign-in method or contact your supervisor."
+  note right of UI
+    Never an exception for authentication:
+    no face is accepted.
+  end note
+end
+
+UI -> Streamer : stop
+@enduml
