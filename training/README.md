@@ -108,3 +108,51 @@ Sample images, identified by their SHA-256:
 | `image_T1.jpg` | `f4455149f488f76205fdee5499ec5261d08ef6279a1cff7b778ea85405331e94` |
 
 These images are not copied into this repository. They stay in the local clone of the reference project.
+
+## Environment
+
+```powershell
+python -m venv training\.venv
+training\.venv\Scripts\python.exe -m pip install -r training\requirements.txt
+```
+
+Python 3.10. The virtual environment is ignored by Git.
+
+## ONNX export
+
+`scripts/export_onnx.py` converts the two classifiers to ONNX for the Java engine. It reads the network definitions and the weights from a local clone of the reference project, given on the command line:
+
+```powershell
+training\.venv\Scripts\python.exe training\scripts\export_onnx.py --silent-face-dir ..\Silent-Face-Anti-Spoofing
+```
+
+It writes:
+
+| Output | Location |
+| --- | --- |
+| `minifasnet_v2_2.7_80x80.onnx` and `minifasnet_v1se_4.0_80x80.onnx` | `liveness-engine/src/main/resources/models/` |
+| `models.json`: checksums, input and output contract, source and licence of each model | same folder |
+| Golden vectors for the Java parity tests | `liveness-engine/src/test/resources/golden/` |
+
+The export uses opset 13 and the TorchScript-based exporter (`dynamo=False`). Input `input` is `float32`, `1 x 3 x 80 x 80`. Output `logits` is `float32`, `1 x 3`, before softmax. The script stops with an error if the largest logit difference between PyTorch and ONNX Runtime reaches 1e-4.
+
+Results of the export of 7 October 2026 (PyTorch 2.14.0, onnx 1.23.2, ONNX Runtime 1.23.2):
+
+| Model | Size (bytes) | Largest logit difference with PyTorch, 20 inputs |
+| --- | --- | --- |
+| `minifasnet_v2_2.7_80x80.onnx` | 1 743 495 | 1.3e-05 |
+| `minifasnet_v1se_4.0_80x80.onnx` | 1 742 663 | 6.9e-06 |
+
+Run twice, the export produces identical files. On the three sample images, the ONNX models give the scores of the reference outputs above (0.731634, 0.817156, 0.993568).
+
+## Checking the committed models and vectors
+
+`scripts/verify_golden.py` needs no clone of the reference project. It checks the model checksums, runs the network cases through ONNX Runtime, rebuilds the synthetic images, applies the crop of `liveness/crop.py` and compares each 80x80 patch byte for byte with the expected one.
+
+```powershell
+training\.venv\Scripts\python.exe training\scripts\verify_golden.py
+```
+
+Result on 7 October 2026: 4 network cases and 12 preprocessing cases pass, with no crop box or patch mismatch.
+
+The golden inputs are synthetic. No face image is stored in the repository.
