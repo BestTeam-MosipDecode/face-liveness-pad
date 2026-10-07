@@ -1,0 +1,5 @@
+# Models and test vectors are binary: never convert their line endings.
+*.onnx binary
+*.bin binary
+*.png binary
+*.jpg binary

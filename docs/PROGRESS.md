@@ -6,7 +6,7 @@ Dernière mise à jour : 7 octobre 2026.
 
 ## Étape en cours
 
-0.7 Issues GitHub et répartition. Le brouillon des 37 issues est dans `docs/issues-draft.md`, non committé. Leur création sur GitHub attend l'accord d'Elisée. L'étape 0.4 reste ouverte : la fin attend l'accès à l'environnement Collab.
+Phase 1, issue n° 3 (export ONNX) : faite sur la branche `feature/onnx-export`, commits locaux, en attente d'accord pour le push et la Pull Request. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
 
 ## Terminé
 
@@ -19,10 +19,15 @@ Phase 0
   - [x] Build de la 1.2.0.2 avec JDK 11.0.32 et Maven 3.9.9 (7 octobre)
   - [x] `docs/dev-setup-windows.md`, première version (7 octobre). Sections 1 à 3 vérifiées, sections 4 à 7 à vérifier avec Collab.
   - [ ] Démarrage du client, connexion d'un opérateur, capture du visage avec un dispositif simulé (bloqué, voir Blocages)
-- [x] 0.5 Structurer `face-liveness-pad/` (7 octobre). Branche `feature/repo-structure` poussée et Pull Request n° 1 ouverte vers `main` le 7 octobre, avec l'accord d'Elisée. Reste à faire : relecture et fusion.
+- [x] 0.5 Structurer `face-liveness-pad/` (7 octobre). Pull Request n° 1 fusionnée dans `main` par Elisée le 7 octobre.
 - [x] 0.6 Analyse de Silent-Face-Anti-Spoofing (7 octobre, faite avant 0.5). Spécification de prétraitement dans `training/README.md`, vérifiée par exécution sur les trois images d'exemple.
-- [ ] 0.7 Issues GitHub et répartition
+- [x] 0.7 Issues GitHub et répartition (7 octobre). 12 étiquettes et 37 issues créées sur GitHub, n° 2 à 38, avec responsables et échéances.
 - [x] 0.8 Architecture réalignée sur le sujet 04 (7 octobre) : `docs/architecture.md` et `docs/diagrams/components.puml`, première version.
+
+Phase 1
+
+- [x] Issue n° 3, export ONNX des deux MiniFASNet (7 octobre). Reste à faire : push, Pull Request, fusion.
+- [ ] Issues n° 2, 4, 5, 6, 7, 8 (voir GitHub)
 
 Sources de vérité lues le 6 octobre : sujet officiel anglais (12 pages), critères d'évaluation, consignes de soumission, plan. La traduction française du sujet n'est pas dans le workspace, ce qui ne bloque rien (l'anglais fait foi).
 
@@ -48,7 +53,7 @@ Relevé sur la machine d'Elisée. Racine du workspace : `C:\wamp64\www\mosip_dec
 
 | Dépôt | Branche locale | Remotes | État |
 | --- | --- | --- | --- |
-| `face-liveness-pad/` | `feature/repo-structure`, créée depuis `main` (485d978), poussée, Pull Request n° 1 ouverte | `origin` = BestTeam-MosipDecode/face-liveness-pad | propre après les commits de l'étape 0.5. Identité Git : `Magloire04`, adresse noreply GitHub. Pas de signature GPG configurée. |
+| `face-liveness-pad/` | `feature/onnx-export`, créée depuis `main` après la fusion de la Pull Request n° 1, non poussée | `origin` = BestTeam-MosipDecode/face-liveness-pad | propre après les commits de l'export ONNX. Identité Git : `Magloire04`, adresse noreply GitHub. Pas de signature GPG configurée. |
 | `registration-client/` | `feature/face-liveness` (22fe01f99b), créée depuis `master`, non poussée | `origin` = fork de l'équipe, `upstream` = mosip/registration-client | propre. |
 | `Silent-Face-Anti-Spoofing/` | `master` (b6d5f04) | `origin` = minivision-ai | arbre de travail modifié : `LICENSE`, `.gitignore`, `train.py`, `datasets/README.md` supprimés (suppressions indexées), `requirements.txt` modifié, `webcam_test.py`, `venv/` et `images/sample/pie*.jpg` non suivis. |
 
@@ -128,7 +133,9 @@ Best_Team, Cotonou. Les quatre comptes GitHub existent (vérifié le 7 octobre).
 
 Répartition donnée par Elisée le 7 octobre. `PrinceSpecial` et `Magloire04` viennent en renfort sur les lots de `Tobi3h` et de `SilverioMen` quand c'est nécessaire.
 
-La phase 1 (modèles en Python) n'a pas de responsable dans cette répartition. Le brouillon des issues propose `PrinceSpecial` et `Magloire04`, à confirmer.
+Phase 1 (modèles en Python), validée par Elisée le 7 octobre : `PrinceSpecial` pour le pipeline de référence, les détecteurs d'actions, le protocole de capture et l'évaluation (issues n° 2, 5, 6, 7), `Magloire04` pour l'export ONNX et le choix du détecteur de visage (issues n° 3 et 4).
+
+Sur GitHub, l'issue n correspond à la ligne n - 1 du brouillon initial, la Pull Request n° 1 ayant pris le premier numéro.
 
 ## Ce qui reste valable du premier document de solution
 
@@ -137,6 +144,20 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 - Reste valable : le classifieur MiniFASNet, la fusion des scores, le clignement par rapport d'aspect de l'œil, le plan de mesures ISO/IEC 30107-3, le traitement entièrement local.
 - Change : la cible est le Registration Client de bureau (1.2.0.2, Java 11) et non Inji Wallet ni le mobile. L'intégration passe par les dispositifs SBI, trois parcours (résident, opérateur, superviseur), une configuration par parcours et une interface JavaFX.
 - Réduit par le calendrier : pas de jeux de données publics, Android en conception seulement.
+
+## Export ONNX (phase 1, issue n° 3)
+
+Le détail est dans `training/README.md`. À retenir :
+
+- Environnement `training/.venv` (Python 3.10.8) : PyTorch 2.14.0 CPU, NumPy 2.2.6, OpenCV 4.10.0, onnx 1.23.2, ONNX Runtime 1.23.2. Installation autorisée par Elisée le 7 octobre. Les paquets d'évaluation (scikit-learn, pandas, matplotlib) ne sont pas encore installés.
+- Modèles : `minifasnet_v2_2.7_80x80.onnx` (1 743 495 octets) et `minifasnet_v1se_4.0_80x80.onnx` (1 742 663 octets), opset 13, entrée `input`, sortie `logits` avant softmax.
+- Parité PyTorch / ONNX Runtime sur 20 entrées : écart maximal de 1,3e-05 et 6,9e-06 sur les logits, pour un seuil de 1e-4.
+- Les modèles ONNX redonnent les scores de référence sur les trois images d'exemple : 0,73, 0,82 et 0,99.
+- Export reproductible : deux lancements donnent des fichiers identiques.
+- Vecteurs dorés : 4 entrées réseau et 12 cas de prétraitement, tous synthétiques. Les images sources des cas de prétraitement ne sont pas stockées : une formule entière les reconstruit, en Python comme en Java.
+- `training/scripts/verify_golden.py` revérifie le tout sans le clone de Silent-Face. Le recadrage réécrit d'après la spécification (`training/liveness/crop.py`) redonne les 12 patchs de référence à l'octet près.
+- Le texte de la licence Apache 2.0 de Silent-Face est copié à côté des modèles, qui sont redistribués dans le JAR.
+- Point ouvert pour l'issue n° 11 : le décodage JPEG de Java et celui d'OpenCV peuvent différer d'un ou deux niveaux par pixel. Les vecteurs dorés partent d'images sans compression pour isoler le recadrage et le redimensionnement. L'effet du décodage JPEG sur le score reste à mesurer.
 
 ## Silent-Face-Anti-Spoofing (étape 0.6)
 
@@ -199,6 +220,9 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - 7 octobre. Les graphiques de résultats versionnés portent un nom en `chart_*.png`. Toute autre image sous un dossier `results/` est ignorée par Git.
 - 7 octobre. `docs/architecture.md` est committé sur la même branche que l'arborescence, pour n'ouvrir qu'une Pull Request.
 - 7 octobre. Push de `feature/repo-structure` et ouverture de la Pull Request n° 1 autorisés par Elisée. Pas de fusion sans nouvel accord.
+- 7 octobre. Création des étiquettes et des issues autorisée par Elisée. Le brouillon local a été supprimé : les issues GitHub font foi.
+- 7 octobre. Les vecteurs dorés n'utilisent aucune image de visage, alors que la règle 4.2 aurait permis les images d'exemple de Silent-Face. Des entrées synthétiques suffisent pour tester la parité numérique.
+- 7 octobre. Les définitions de réseau de Silent-Face ne sont pas copiées dans le dépôt. Le script d'export les importe depuis le clone local.
 
 ## Blocages
 
@@ -223,6 +247,7 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - Q3 (ouverte, étape 0.4) : accès Collab demandé, sans réponse. À la réception : nom d'hôte de l'environnement, identifiants, configuration WireGuard, tous hors dépôt.
 - Q0 (à confirmer) : faut-il quand même installer JDK 21.0.3 et Maven 3.9.6 à côté de l'existant ? Ils ne servent pas à la 1.2.0.2.
 - Q4 (close, 7 octobre) : membres, comptes GitHub et répartition reçus (voir Équipe).
-- Q10 (ouverte, étape 0.7) : création des issues et des étiquettes sur GitHub d'après `docs/issues-draft.md` ? Qui porte les issues de la phase 1 ?
-- Q11 (ouverte) : qui relit et fusionne la Pull Request n° 1 ?
+- Q10 (close, 7 octobre) : issues et étiquettes créées, phase 1 répartie.
+- Q11 (close, 7 octobre) : Pull Request n° 1 fusionnée par Elisée.
+- Q12 (ouverte) : push de `feature/onnx-export` et Pull Request ?
 - Q6 étendue (étape 2.1) : moteur compilé pour Java 11, nom de paquet `io.mosip.registration.liveness`.

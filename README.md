@@ -19,8 +19,8 @@ Work in progress. Target: Registration Client 1.2.0.2 (desktop, Java 11).
 
 | Component | Folder | Status |
 | --- | --- | --- |
-| Reference pipeline in Python | `training/` | Reference classifier analysed, preprocessing specified |
-| Liveness engine in Java | `liveness-engine/` | Maven skeleton |
+| Reference pipeline in Python | `training/` | Preprocessing specified, classifiers exported to ONNX with parity checks |
+| Liveness engine in Java | `liveness-engine/` | Maven skeleton, ONNX models and golden vectors packaged |
 | Simulated L0/L1 device | `mock-sbi/` | Not started |
 | Registration Client integration | fork of `mosip/registration-client` | Not started |
 | Documentation | `docs/` | Developer setup guide, first version |
