@@ -6,7 +6,7 @@ Dernière mise à jour : 7 octobre 2026.
 
 ## Étape en cours
 
-Issue n° 34 (documents de conception), troisième partie : `docs/security-privacy.md`, branche `feature/security-privacy` poussée avec l'accord d'Elisée, Pull Request ouverte. Parties déjà fusionnées : `docs/decision-flow.md` (Pull Request n° 42) et `docs/workflows.md` avec les diagrammes de séquence (Pull Request n° 43). Reste `docs/iso-30107-alignment.md`. Phase 1 : issues n° 3 et n° 4 fusionnées dans `main` le 7 octobre. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.  La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
+Issue n° 34 (documents de conception), quatrième partie : `docs/iso-30107-alignment.md`, sur la branche `feature/iso-alignment`, commits locaux, en attente d'accord pour le push et la Pull Request. Parties fusionnées : `decision-flow.md` (n° 42), `workflows.md` (n° 43), `security-privacy.md` (n° 44). La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
 
 ## Terminé
 
@@ -145,6 +145,15 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 - Reste valable : le classifieur MiniFASNet, la fusion des scores, le clignement par rapport d'aspect de l'œil, le plan de mesures ISO/IEC 30107-3, le traitement entièrement local.
 - Change : la cible est le Registration Client de bureau (1.2.0.2, Java 11) et non Inji Wallet ni le mobile. L'intégration passe par les dispositifs SBI, trois parcours (résident, opérateur, superviseur), une configuration par parcours et une interface JavaFX.
 - Réduit par le calendrier : pas de jeux de données publics, Android en conception seulement.
+
+## Alignement ISO/IEC 30107 (issue n° 34, quatrième partie)
+
+`docs/iso-30107-alignment.md`, rédigé le 7 octobre. Numéros et titres de clause vérifiés sur les extraits officiels gratuits des deux normes (sommaire, avant-propos, introduction, premières clauses), téléchargés depuis le site de l'éditeur VDE et gardés hors du dépôt. Aucun texte des normes n'est reproduit.
+
+- Partie 1 : vocabulaire, types de PAD, challenge-réponse (5.2.2) et vivacité sans challenge (5.2.3), place de la PAD dans le système (5.4), obstacles aux attaques (6).
+- Partie 3 : deux niveaux d'évaluation, sous-système PAD (7.3) et système complet (7.5) ; métriques de la clause 13 (APCER par espèce et son maximum, BPCER, taux de non-réponse, temps).
+- Écart avec le plan : l'ACER, prévu par le plan, est déconseillé par la norme depuis 2017 (il moyenne les espèces d'attaque et masque la plus faible). Il ne sera publié qu'à côté de l'APCER par espèce, comme chiffre de comparaison avec la littérature.
+- Limites écrites : pas de format standard du résultat PAD (ISO/IEC 30107-2), attaques de dissimulation et présentations non conformes non testées, petit jeu d'évaluation, pas de testeur indépendant.
 
 ## Sécurité et vie privée (issue n° 34, troisième partie)
 
