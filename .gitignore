@@ -1,7 +1,20 @@
-# Données locales : aucun visage ni jeu public dans le dépôt
+# Local data: no face image and no public dataset in the repository
 datasets/
 captures/
 *.mp4
+
+# Evaluation outputs: metrics and named charts only, never face images
+**/results/**/*.jpg
+**/results/**/*.jpeg
+**/results/**/*.png
+!**/results/**/chart_*.png
+
+# Model export leftovers
+*.onnx.tmp
+
+# Local configuration and credentials
+*.local.properties
+.env
 
 # Python
 __pycache__/
