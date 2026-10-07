@@ -146,6 +146,15 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 - Change : la cible est le Registration Client de bureau (1.2.0.2, Java 11) et non Inji Wallet ni le mobile. L'intégration passe par les dispositifs SBI, trois parcours (résident, opérateur, superviseur), une configuration par parcours et une interface JavaFX.
 - Réduit par le calendrier : pas de jeux de données publics, Android en conception seulement.
 
+## Sécurité et vie privée (issue n° 34, troisième partie)
+
+`docs/security-privacy.md`, rédigé le 7 octobre sur la branche `feature/security-privacy`, partie de `feature/sequence-diagrams` (Pull Request n° 43 non fusionnée au moment du travail). Deux constats dans le code du client :
+
+- au démarrage, `ClientIntegrityValidator` ne vérifie la signature que des JAR `registration-client*` et `registration-services*`, et pas du tout quand `environment=LOCAL`. Un JAR `liveness-engine` séparé ne serait pas vérifié : étendre le contrôle ou intégrer le moteur dans un JAR vérifié, à décider avec l'issue n° 26 ;
+- la réponse `RCAPTURE` est signée par le dispositif et vérifiée par le client (`validateJWTResponse`), le flux vidéo ne l'est pas. Les attaques par injection d'un flux falsifié restent hors de portée de la détection d'attaque par présentation, comme prévu par le plan (phase 6, point 6).
+
+Limites écrites telles quelles : données d'entraînement du classifieur non publiées, masques 3D non mesurables par l'équipe, caméras couleur uniquement, petit jeu de calibrage.
+
 ## Parcours et diagrammes de séquence (issue n° 34, deuxième partie)
 
 `docs/workflows.md`, rédigé le 7 octobre, avec deux diagrammes de séquence : capture du visage du résident, authentification de l'opérateur et du superviseur. Référence des issues d'intégration n° 20 à 26. Relevé dans le code 1.2.0.2 :
