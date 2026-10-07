@@ -156,3 +156,85 @@ training\.venv\Scripts\python.exe training\scripts\verify_golden.py
 Result on 7 October 2026: 4 network cases and 12 preprocessing cases pass, with no crop box or patch mismatch.
 
 The golden inputs are synthetic. No face image is stored in the repository.
+
+## Face detector and landmark model
+
+Chosen on 8 October 2026 after a comparison of licences, formats, sizes and published accuracy (issue #4):
+
+| Role | Model | Source | Licence | Packaged file |
+| --- | --- | --- | --- | --- |
+| Face detection, 5 keypoints | YuNet, `face_detection_yunet_2023mar.onnx` | OpenCV Zoo | MIT | copied as published, 232 589 bytes |
+| 478 landmarks, irises included | MediaPipe Face Mesh V2, `face_landmarks_detector.tflite` from `face_landmarker.task` (float16, version 1) | Google MediaPipe | Apache-2.0 | `face_mesh_v2_256.onnx`, converted, 4 822 155 bytes |
+
+Rejected: PFLD and PIPNet landmark models (no established licence for the pretrained weights), the RetinaFace detector shipped with Silent-Face-Anti-Spoofing (origin of the weights not documented), and third-party ONNX conversions of Face Mesh (indirect origin, kept as a fallback).
+
+The model card of Face Mesh V2 reports its error by region and by skin tone (Fitzpatrick types 1 to 6). The mean absolute error stays between 2.49 % and 2.90 % across skin tones in tracking mode, and between 2.16 % and 2.47 % for the five African regions listed (Northern, Eastern, Middle, Southern and Western Africa).
+
+### Preparation
+
+The two files are downloaded by hand into `training/downloads/`, which Git ignores, then packaged by `scripts/prepare_face_models.py`. The script refuses any file whose SHA-256 differs from the pinned value. It needs a separate environment, because TensorFlow is only used to read the TFLite model:
+
+```powershell
+python -m venv training\.venv-convert
+training\.venv-convert\Scripts\python.exe -m pip install -r training\requirements-convert.txt
+training\.venv-convert\Scripts\python.exe training\scripts\prepare_face_models.py `
+    --yunet training\downloads\yunet\face_detection_yunet_2023mar.onnx `
+    --yunet-license training\downloads\yunet\LICENSE `
+    --face-landmarker training\downloads\mediapipe\face_landmarker.task `
+    --mediapipe-license training\downloads\licenses\mediapipe-LICENSE
+```
+
+| File | Download from | SHA-256 |
+| --- | --- | --- |
+| YuNet model | <https://huggingface.co/opencv/face_detection_yunet/resolve/3cc26e7f1014a5ee5d74a42acee58bafc9d0a310/face_detection_yunet_2023mar.onnx> | `8f2383e4dd3cfbb4553ea8718107fc0423210dc964f9f4280604804ed2552fa4`, same as the Git LFS pointer in OpenCV Zoo |
+| YuNet licence | same revision, `LICENSE` | `c83b8120c50ccbd4c4f96edf53141bdd566ebb8f8e9227e415326aa1b1aba958` |
+| Face Landmarker bundle | <https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task> | `64184e229b263107bc2b804c6625db1341ff2bb731874b0bcc2fe6544e0bc9ff` |
+| MediaPipe licence | <https://raw.githubusercontent.com/google-ai-edge/mediapipe/master/LICENSE> | `8707eef0533987efc5b155d64761eeb6e20793f50b9bd1a68dad1cf4719d0ed8` |
+
+The conversion keeps two outputs of the TFLite model: the landmarks (`Identity`, renamed `landmarks`) and the face presence logit (`Identity_1`, renamed `face_flag`). The presence logit is between +12.8 and +15.7 on the three sample faces, and between -14.2 and -7.6 on noise and on uniform images. The third output, `Identity_2`, is not used.
+
+Results of the conversion of 8 October 2026:
+
+- largest difference with the TFLite interpreter over 19 inputs: 6.3e-04 pixel on the landmarks, 2.0e-04 on the presence logit, for limits of 1e-2 and 1e-3;
+- running the conversion twice produces identical files. Intermediate tensors are renamed in a fixed order for that purpose.
+
+### Model contracts
+
+| | YuNet | Face Mesh V2 |
+| --- | --- | --- |
+| Input | `input`, `float32`, 1 x 3 x 640 x 640, B, G, R, 0 to 255 | `input`, `float32`, 1 x 256 x 256 x 3, R, G, B, 0 to 1 |
+| Preprocessing | resize to fit 640 x 640 keeping the aspect ratio, pad right and bottom with zeros | square region centred on the face box, side 1.5 times its longer edge, black outside the image, resize to 256 x 256 |
+| Output | 12 tensors (`cls`, `obj`, `bbox`, `kps` for strides 8, 16, 32), decoded as in OpenCV `FaceDetectorYN`, then non-maximum suppression | `landmarks`: 478 points x, y, z in pixels of the 256 x 256 input. `face_flag`: logit, apply a sigmoid |
+| Reference code | `liveness/yunet.py` | `liveness/face_mesh.py` |
+
+Default YuNet thresholds, as in OpenCV: score 0.9, overlap 0.3 for the suppression. The training scheme of YuNet covers faces of about 10 to 300 pixels in its 640 x 640 input.
+
+The landmark region is not rotated to level the eyes, unlike MediaPipe. The head roll therefore has to stay small. This is acceptable for a person facing a registration camera, and is to be checked on the team captures.
+
+### Check on the sample images
+
+`scripts/check_face_models.py` runs the detector, the landmark model and the classifiers on the three sample images of the reference project. It prints numbers and writes nothing.
+
+```powershell
+training\.venv\Scripts\python.exe training\scripts\check_face_models.py --silent-face-dir ..\Silent-Face-Anti-Spoofing
+```
+
+Results of 8 October 2026 (real-class score: mean probability of class 1 over the two MiniFASNet models):
+
+| Image | YuNet score | Overlap with the reference box: YuNet box / square box | Real-class score: reference box / YuNet box / square box |
+| --- | --- | --- | --- |
+| `image_F1.jpg` (photo) | 0.932 | 0.75 / 0.81 | 0.072 / 0.229 / 0.028 |
+| `image_F2.jpg` (photo) | 0.932 | 0.77 / 0.86 | 0.181 / 0.003 / 0.022 |
+| `image_T1.jpg` (live) | 0.930 | 0.70 / 0.78 | 0.994 / 1.000 / 0.996 |
+
+YuNet boxes are taller than wide, while the detector used to train MiniFASNet gives nearly square boxes. The square box of the same area and centre (`classifier_box` in `liveness/yunet.py`) comes closer to the reference box and keeps the three decisions. It is the recommended input of the classifier crop, to be confirmed on the team captures (issue #7).
+
+| Image | Face presence | Eye aspect ratio, right / left | Mouth width ratio | Yaw ratio | Largest offset between Face Mesh eye centre and YuNet eye keypoint |
+| --- | --- | --- | --- | --- | --- |
+| `image_F1.jpg` | 1.000 | 0.474 / 0.316 | 0.284 | -0.022 | 11.3 % of the distance between the eyes |
+| `image_F2.jpg` | 1.000 | 0.383 / 0.369 | 0.325 | 0.414 | 4.6 % |
+| `image_T1.jpg` | 1.000 | 0.207 / 0.220 | 0.310 | 0.751 | 5.8 % |
+
+The yaw ratio is the horizontal position of the nose tip between the two cheek edges: about 0.5 when facing the camera. It is close to 0 on `image_F1.jpg`, where the head is strongly turned, and 0.75 on `image_T1.jpg`, where it is slightly turned the other way. The lower eye aspect ratio of `image_T1.jpg` matches a gaze directed downwards. These values only show that the measures behave sensibly. Thresholds for the challenges come from the team captures (issue #5).
+
+Time per image on the reference machine (Intel Core i7-8550U, Python, ONNX Runtime on CPU): 22 to 40 ms for YuNet including the resize and the decoding, 14 to 15 ms for Face Mesh, 11 to 15 ms for the two classifiers.
