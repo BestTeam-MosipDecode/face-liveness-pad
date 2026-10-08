@@ -6,7 +6,7 @@ Dernière mise à jour : 7 octobre 2026.
 
 ## Étape en cours
 
-Issue n° 21, part documentation (renfort de Tobi3h) : `docs/configuration.md` et `docs/messages.md`, sur la branche `feature/configuration`, partie de `feature/ui-mockups` (Pull Request n° 46 ouverte), commits locaux, en attente d'accord pour le push et la Pull Request. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
+Issue n° 21, part documentation (renfort de Tobi3h) : `docs/configuration.md` et `docs/messages.md`, sur la branche `feature/configuration`, poussée avec l'accord d'Elisée, Pull Request ouverte. Maquettes (issue n° 35) fusionnées avec la Pull Request n° 46. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
 
 ## Terminé
 
