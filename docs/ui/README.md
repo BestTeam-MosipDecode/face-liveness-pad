@@ -73,7 +73,7 @@ The client stylesheet uses `#FF0000` and `#45A30A` for errors and success. As te
 
 ### Languages
 
-Messages come from the message files of the client (`messages_en.properties`, `messages_fr.properties`, `messages_ar.properties`), with the keys of the project plan and the added key `LIVENESS_MAX_ATTEMPTS_AUTH`. a02 and r12 show the French texts. The layout leaves room for longer French sentences: the instruction band wraps on two lines without losing its size.
+Messages come from the message files of the client (`messages_en.properties`, `messages_fr.properties`, `messages_ar.properties`), with the keys of the project plan and the keys added for these screens. All texts and the lines to paste are in [../messages.md](../messages.md). a02 and r12 show the French texts. The layout leaves room for longer French sentences: the instruction band wraps on two lines without losing its size.
 
 ## Regenerating the images
 
