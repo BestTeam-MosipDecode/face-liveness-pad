@@ -52,7 +52,7 @@ Best_Team, Cotonou, Benin.
 
 | Member | GitHub |
 | --- | --- |
-| Elisée Atonde (coordination) | [@Magloire04](https://github.com/Magloire04) |
+| Elisée Atonde | [@Magloire04](https://github.com/Magloire04) |
 | Temitayo Gbolahan | [@PrinceSpecial](https://github.com/PrinceSpecial) |
 | Silverio Mensah | [@SilverioMen](https://github.com/SilverioMen) |
 | Tobi Obassandjo | [@Tobi3h](https://github.com/Tobi3h) |

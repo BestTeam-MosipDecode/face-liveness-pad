@@ -127,7 +127,7 @@ Best_Team, Cotonou. Les quatre comptes GitHub existent (vérifié le 7 octobre).
 
 | Membre | Compte GitHub | Lot |
 | --- | --- | --- |
-| Elisée Atonde (coordination) | `Magloire04` | Documentation |
+| Elisée Atonde | `Magloire04` | Documentation |
 | Temitayo Gbolahan | `PrinceSpecial` | Tests |
 | Silverio Mensah | `SilverioMen` | Dispositif simulé |
 | Tobi Obassandjo | `Tobi3h` | Moteur Java et intégration dans le Registration Client |
