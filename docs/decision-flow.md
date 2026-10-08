@@ -261,7 +261,7 @@ Every event carries the workflow, the attempt number, the duration and the model
 | `on_max_attempts` | `BLOCK`, and `EXCEPTION` for residents | Section 7.1 |
 | `diagnostic.enabled` | `false` | Sections 8, 9 |
 
-Any key can be overridden for one workflow by inserting the workflow name after the prefix, for example `mosip.registration.face.liveness.supervisor.active.min_challenges=3`.
+Any key can be overridden for one workflow by inserting the workflow name after the prefix, for example `mosip.registration.face.liveness.supervisor.active.min_challenges=3`. Allowed values, validation rules and a snippet for the MOSIP configuration are in [configuration.md](configuration.md).
 
 ### 10.2 Keys added by this document
 
