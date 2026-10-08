@@ -10,6 +10,7 @@
 | [ui/README.md](ui/README.md) | Screen mock-ups of the three workflows, user flow, design rules, contrast | First version |
 | [configuration.md](configuration.md) | Configuration keys, defaults, allowed values, validation, per-workflow overrides, snippet for `registration-default.properties` | First version |
 | [messages.md](messages.md) | Texts of the feature in English and French, lines ready for the message and label files | First version |
+| [android.md](android.md) | Android design note: how the client gets face images, options, reuse of the engine, work to do | First version |
 | `engine-api.md` | Java API of the liveness engine | Planned |
 | `mock-sbi.md` | Use of the simulated device | Planned |
 | [iso-30107-alignment.md](iso-30107-alignment.md) | Mapping to the clauses of ISO/IEC 30107-1 and 30107-3, test design, metrics, gaps | First version |
