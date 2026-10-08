@@ -8,7 +8,8 @@
 | [decision-flow.md](decision-flow.md) | Session states, frame processing, passive and active rules, captured image check, attempts, feedback codes, audit events, parameters | First version |
 | [workflows.md](workflows.md) | Sequence diagrams of resident capture and of operator and supervisor authentication, changes at each step | First version |
 | [ui/README.md](ui/README.md) | Screen mock-ups of the three workflows, user flow, design rules, contrast | First version |
-| `configuration.md` | Configuration keys, defaults and examples | Planned |
+| [configuration.md](configuration.md) | Configuration keys, defaults, allowed values, validation, per-workflow overrides, snippet for `registration-default.properties` | First version |
+| [messages.md](messages.md) | Texts of the feature in English and French, lines ready for the message and label files | First version |
 | `engine-api.md` | Java API of the liveness engine | Planned |
 | `mock-sbi.md` | Use of the simulated device | Planned |
 | [iso-30107-alignment.md](iso-30107-alignment.md) | Mapping to the clauses of ISO/IEC 30107-1 and 30107-3, test design, metrics, gaps | First version |

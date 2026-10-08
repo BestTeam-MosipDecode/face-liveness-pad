@@ -6,7 +6,7 @@ Dernière mise à jour : 7 octobre 2026.
 
 ## Étape en cours
 
-Issue n° 35 (maquettes d'écran et parcours) : 16 écrans dans `docs/ui/`, sur la branche `feature/ui-mockups`, commits locaux, en attente d'accord pour le push et la Pull Request. Issue n° 34 : les quatre documents sont fusionnés (Pull Requests n° 42 à 45) ; elle reste ouverte pour les résultats. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
+Issue n° 21, part documentation (renfort de Tobi3h) : `docs/configuration.md` et `docs/messages.md`, sur la branche `feature/configuration`, poussée avec l'accord d'Elisée, Pull Request ouverte. Maquettes (issue n° 35) fusionnées avec la Pull Request n° 46. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
 
 ## Terminé
 
@@ -145,6 +145,17 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 - Reste valable : le classifieur MiniFASNet, la fusion des scores, le clignement par rapport d'aspect de l'œil, le plan de mesures ISO/IEC 30107-3, le traitement entièrement local.
 - Change : la cible est le Registration Client de bureau (1.2.0.2, Java 11) et non Inji Wallet ni le mobile. L'intégration passe par les dispositifs SBI, trois parcours (résident, opérateur, superviseur), une configuration par parcours et une interface JavaFX.
 - Réduit par le calendrier : pas de jeux de données publics, Android en conception seulement.
+
+## Configuration et messages (issue n° 21, part documentation)
+
+Rédigés le 8 octobre. Relevé dans le client 1.2.0.2 : la configuration du serveur (`registration-default.properties` de `mosip-config`) est synchronisée dans la table locale `REG.GLOBAL_PARAM`, puis chargée dans `ApplicationContext` ; la table `REG.LOCAL_PREFERENCES` permet des surcharges locales, limitées aux clés autorisées par le serveur.
+
+- `configuration.md` : 17 clés avec type, valeur par défaut et valeurs admises ; règles de validation (une valeur invalide retombe sur la valeur par défaut du moteur, jamais sur une valeur plus faible) ; surcharges par parcours, `enabled` compris ; extrait prêt à coller au format de `mosip-config`.
+- Recommandation de sécurité : ne pas autoriser les clés de vivacité en surcharge locale, sinon on pourrait désactiver la vivacité sur un poste.
+- Les interrupteurs acceptent `Y`/`N` comme les clés existantes du client (`mosip.registration.face_enable_flag=Y`), en plus de `true`/`false`.
+- `messages.md` : 28 messages et 14 libellés en anglais et en français, avec les lignes prêtes à coller. Les fichiers français du client sont en ISO-8859-1 : les lignes utilisent des séquences d'échappement Unicode, vérifiées par décodage. L'arabe reçoit les clés avec le texte anglais en attendant une traduction.
+- Écart avec le plan : le message français de fin de tentatives dit « procédure d'exception » et non « procédure de recours », pour correspondre au bouton « Continuer sous exception ».
+- Activité de l'équipe au 8 octobre : aucune branche, Pull Request ou commentaire des autres membres sur GitHub. Échéances proches : issue n° 2 (PrinceSpecial) le 9 octobre, issue n° 9 (Tobi3h) le 10 octobre.
 
 ## Maquettes d'écran (issue n° 35)
 
