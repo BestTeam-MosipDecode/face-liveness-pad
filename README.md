@@ -23,7 +23,7 @@ Work in progress. Target: Registration Client 1.2.0.2 (desktop, Java 11).
 | Liveness engine in Java | `liveness-engine/` | Maven skeleton, four ONNX models and golden vectors packaged |
 | Simulated L0/L1 device | `mock-sbi/` | Not started |
 | Registration Client integration | fork of `mosip/registration-client` | Not started |
-| Documentation | `docs/` | Developer setup guide, first version |
+| Documentation | `docs/` | Setup guide, architecture, decision flow, workflows, security and privacy, ISO/IEC 30107 alignment, screen mock-ups |
 
 ## Repository structure
 
