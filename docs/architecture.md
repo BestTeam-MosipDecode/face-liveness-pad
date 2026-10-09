@@ -94,7 +94,7 @@ Liveness, PAD, challenge selection and action validation run inside the Registra
 | --- | --- | --- |
 | Engine language | Java 11, standalone Maven module | Must load in the JVM of Registration Client 1.2.0.2 |
 | Inference | ONNX Runtime for Java, CPU | One runtime for all models, which are exported from PyTorch |
-| Image processing | Plain Java (`ImageIO`, arrays) | No extra native dependency. The resize must reproduce the reference arithmetic |
+| Image processing | Plain Java on decoded pixel arrays. JPEG decoding in a platform adapter (`ImageIO` on the desktop) | No extra native dependency. The resize must reproduce the reference arithmetic. The core stays free of `java.awt` and `javax.imageio`, which do not exist on Android |
 | Passive classifier | MiniFASNetV2 and MiniFASNetV1SE, from Silent-Face-Anti-Spoofing (Apache-2.0) | Small pretrained models, about 1.8 MB each |
 | Face detector | YuNet `2023mar`, from OpenCV Zoo (MIT), 0.23 MB | Small and fast, gives five keypoints. Its box is turned into a square of the same area before the classifier crop, to match the boxes MiniFASNet was trained with |
 | Landmarks for the active check | MediaPipe Face Mesh V2 (Apache-2.0), converted to ONNX, 4.8 MB | 478 points with eye and mouth contours, needed for blink, smile and head turn. Its model card reports similar accuracy across regions and skin tones |
@@ -105,4 +105,4 @@ The comparison behind the detector and landmark choices, the model contracts and
 
 ## 10. Android
 
-The models are exported to ONNX and the engine API does not depend on desktop classes, which keeps a port to the Android Registration Client possible. No Android code is part of the current scope.
+No Android code is part of the current scope. The Android Registration Client receives no frame stream: the SBI application holds the camera and returns only the captured image. [android.md](android.md) compares the options, recommends running liveness in the client with the tablet camera before the capture, and lists the requirement this puts on the engine today: a core that works on decoded pixels, with no desktop imaging classes.

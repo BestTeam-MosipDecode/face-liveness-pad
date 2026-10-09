@@ -6,7 +6,7 @@ Dernière mise à jour : 7 octobre 2026.
 
 ## Étape en cours
 
-Issue n° 21, part documentation (renfort de Tobi3h) : `docs/configuration.md` et `docs/messages.md`, sur la branche `feature/configuration`, poussée avec l'accord d'Elisée, Pull Request ouverte. Maquettes (issue n° 35) fusionnées avec la Pull Request n° 46. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
+Issue n° 32 (note de conception Android) : `docs/android.md`, sur la branche `feature/android-note`, commits locaux, en attente d'accord pour le push et la Pull Request. Documentation de l'issue n° 21 fusionnée avec la Pull Request n° 47. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
 
 ## Terminé
 
@@ -145,6 +145,15 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 - Reste valable : le classifieur MiniFASNet, la fusion des scores, le clignement par rapport d'aspect de l'œil, le plan de mesures ISO/IEC 30107-3, le traitement entièrement local.
 - Change : la cible est le Registration Client de bureau (1.2.0.2, Java 11) et non Inji Wallet ni le mobile. L'intégration passe par les dispositifs SBI, trois parcours (résident, opérateur, superviseur), une configuration par parcours et une interface JavaFX.
 - Réduit par le calendrier : pas de jeux de données publics, Android en conception seulement.
+
+## Note de conception Android (issue n° 32)
+
+`docs/android.md`, rédigé le 8 octobre d'après le code de `mosip/android-registration-client` (branche `master`, licence MIT), lu dans un clone partiel hors dépôt. À retenir :
+
+- Le client Android est une application Flutter avec des modules natifs Java, reliés par des API Pigeon. Il appelle l'application SBI par trois intents Android (`io.sbi.device`, `.Info`, `.rCapture`) : c'est elle qui tient la caméra, et le client ne reçoit jamais de flux. Il ne déclare pas la permission `CAMERA`.
+- La conception du bureau, fondée sur le flux, ne se transpose pas telle quelle. Recommandation : vivacité dans le client avec la caméra de la tablette (CameraX) avant l'intent `rCapture`, puis contrôle de l'image capturée. Autres options écartées ou reportées : vivacité dans l'application SBI, intent de flux hors spécification.
+- Contrainte pour le moteur dès maintenant (issues n° 10 et 11) : `java.awt` et `javax.imageio` n'existent pas sur Android. Le cœur du moteur doit travailler sur des pixels déjà décodés, le décodage JPEG passant par un adaptateur de plateforme. ONNX Runtime a une version Android (`onnxruntime-android`) avec la même API Java, en 1.30.0 comme la version de bureau.
+- Contributeurs GitHub : la page du dépôt ne montre que Magloire04, car GitHub ne compte que les auteurs de commits présents sur `main`. Les trois autres membres apparaîtront avec leurs propres commits. Aucun commit ne sera créé à leur nom (règle 4.1.2).
 
 ## Configuration et messages (issue n° 21, part documentation)
 
@@ -314,7 +323,7 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 
 ## Blocages
 
-- Accès Collab. Elisée a envoyé le formulaire de demande. Pas de réponse de MOSIP au 7 octobre. Sans enregistrement de la machine, sans identifiants et sans accès WireGuard, le client ne peut pas se synchroniser avec le serveur. La fin de l'étape 0.4 attend cet accès. Les étapes 0.5, 0.6 et 0.8 n'en dépendent pas.
+- Accès Collab. Elisée a envoyé le formulaire de demande, puis un e-mail à `decode@mosip.io` le 7 octobre à 14 h 25. Réponse de MOSIP Decode (Pragya, Community Manager) le 7 octobre à 21 h 58 : la demande est transmise aux mentors du sujet 04, Varaniya et Jana, pour vérifier l'accès Collab et aider à la mise en route du client. En attente de leur retour au 8 octobre. Sans enregistrement de la machine, sans identifiants et sans accès WireGuard, le client ne peut pas se synchroniser avec le serveur. La fin de l'étape 0.4 attend cet accès. Les étapes 0.5, 0.6 et 0.8 n'en dépendent pas.
 
 ## Écarts relevés par rapport au plan
 
