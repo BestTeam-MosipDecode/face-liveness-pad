@@ -317,3 +317,18 @@ training\.venv\Scripts\python.exe -m unittest discover -s training\tests
 ```powershell
 training\.venv\Scripts\python.exe training\scripts\demo_active.py --rounds 5 --log measures.csv
 ```
+
+## Evaluation and thresholds
+
+`scripts/evaluate.py` scores the team captures (`captures/<subject>/<type>/<sequence>/`, see "Capture sessions") and proposes the passive thresholds:
+
+1. subjects are split into a calibration set and a test set, with no subject in both (`--test-subjects`, or a seeded half split);
+2. on the calibration set, the attack threshold is the largest value that keeps bona fide sequences rejected as attacks at or below `--target-bpcer` (default 1 %), and the pass threshold the smallest value that keeps attacks accepted at or below `--target-apcer` (default 0 %), on the median score of each sequence;
+3. on the test set, each sequence is replayed through the passive window (section 4 of `docs/decision-flow.md`), giving APCER per attack type and its maximum, BPCER, ACER, the share of sequences sent to the active check, the equal error rate and the mean time per frame;
+4. the DET curve is written to `training/results/chart_det.png` and the Markdown table is printed (`--markdown` writes it to a file) for `docs/test-results.md`.
+
+Frame scores are cached in `training/results/frame_scores.csv` (numbers only). Later runs read the cache; `--rescore` runs the models again.
+
+```powershell
+training\.venv\Scripts\python.exe training\scripts\evaluate.py --captures captures --markdown training\results\passive.md
+```
