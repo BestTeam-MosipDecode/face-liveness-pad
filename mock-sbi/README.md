@@ -2,14 +2,51 @@
 
 Simulated L0/L1 face device for development and automated tests. It speaks the MOSIP Secure Biometric Interface (SBI), so the Registration Client uses it like a real device.
 
-Status: not started.
+It is a fork of MockMDS from [mosip-mock-services](https://github.com/mosip/mosip-mock-services) `v1.2.0.2` (MPL 2.0), reduced to the face device. The study behind this choice is in [../docs/mock-sbi.md](../docs/mock-sbi.md).
 
-## Planned modes
+Status: `static` and `webcam` modes available. `replay` and failure simulation come with #18.
 
-| Mode | Source of the frames | Purpose |
+## Modes
+
+| Mode | Source of the frames | Captured image | Purpose |
+| --- | --- | --- | --- |
+| `static` | Fixed image of MockMDS | Prepared ISO record of MockMDS | Check that a frozen image is rejected |
+| `webcam` | Webcam of the workstation | ISO 19794-5 record built from the last streamed frame | Live demonstration and manual tests |
+| `replay` | Recorded video or image folder | Planned (#18) | Repeatable tests, including presentation attacks |
+
+The mode is set by `mosip.mock.sbi.face.source` in `application.properties`, next to the jar.
+
+| Key | Default | Role |
 | --- | --- | --- |
-| `webcam` | Webcam of the workstation | Live demonstration and manual tests |
-| `replay` | Recorded video or image folder | Repeatable tests, including presentation attacks |
-| `static` | Single fixed image | Check that a frozen image is rejected |
+| `mosip.mock.sbi.face.source` | `static` | `static` or `webcam` |
+| `mosip.mock.sbi.face.webcam.index` | `0` | Webcam number, `0` for the default camera |
+| `mosip.mock.sbi.face.webcam.width`, `...height` | `640`, `480` | Requested resolution. The camera may pick the closest one it supports |
+| `mosip.mock.sbi.face.webcam.jpeg.quality` | `90` | JPEG quality of the streamed frames, 0 to 100 |
 
-Recorded sequences that contain faces are kept outside the repository.
+## Quick start
+
+Requirements: JDK 11, Maven 3.9, Python 3.10.
+
+```
+python mock-sbi/scripts/fetch_assets.py
+cd mock-sbi
+mvn -DskipTests -Dgpg.skip clean install
+cd target
+```
+
+Set the mode in `target/application.properties`, then start the device from `target/`:
+
+- Windows: `run_reg.bat`
+- macOS and Linux: `java -cp "mock-mds-1.2.0.2.jar:lib/*" io.mosip.mock.sbi.test.TestMockSBI "mosip.mock.sbi.device.purpose=Registration" "mosip.mock.sbi.biometric.type=Face"`
+
+The device listens on the first free port from 4501. Check it from the repository root with:
+
+```
+python mock-sbi/scripts/check_device.py
+```
+
+`--save-frame <file>` writes the last streamed frame to a JPEG file, to see what the client receives. Choose a path outside the repository: in `webcam` mode, the frame shows your face.
+
+On macOS, the first use of the webcam asks for camera access for the terminal.
+
+The test keys and sample images fetched by `fetch_assets.py` are public MOSIP test material. They are kept out of Git and must never be used outside development and tests. Recorded sequences that contain faces are kept outside the repository too.
