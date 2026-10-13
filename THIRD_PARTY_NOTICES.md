@@ -44,4 +44,16 @@ The network definitions of the reference project (`src/model_lib/MiniFASNet.py`)
 
 The other members of the bundle (`face_detector.tflite`, `face_blendshapes.tflite`, geometry metadata) are not used and not redistributed.
 
+## MockMDS (mosip-mock-services)
+
+- Source: <https://github.com/mosip/mosip-mock-services>, tag `v1.2.0.2`, commit `5084570`, folder `MockMDS`
+- Licence: Mozilla Public License 2.0, MOSIP
+- Licence text: [LICENSE](LICENSE), the same licence as this repository
+
+| Element in this repository | Origin | Changes |
+| --- | --- | --- |
+| `mock-sbi/src/`, `mock-sbi/pom.xml`, `mock-sbi/application.properties`, `mock-sbi/run.sh`, `mock-sbi/run_reg.bat`, `mock-sbi/.gitignore`, `mock-sbi/Biometric Devices/Face/*.json` | Same paths under `MockMDS/` | Face frame sources added (`devicehelper/face/source/`, `util/FaceIsoBuilder.java`, changes in `SBIFaceHelper.java`), OpenCV 4.9.0 dependency, new configuration keys, run scripts fixed. The history of `mock-sbi/` shows each change against the imported copy |
+
+The test keys, certificates and sample face records of MockMDS are not stored here. `mock-sbi/scripts/fetch_assets.py` downloads them from the same tag and checks their SHA-256.
+
 The Apache License 2.0 is available at <https://www.apache.org/licenses/LICENSE-2.0>. The MIT License text is in the file listed above.
