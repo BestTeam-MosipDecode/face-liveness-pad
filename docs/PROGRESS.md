@@ -146,6 +146,14 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 - Change : la cible est le Registration Client de bureau (1.2.0.2, Java 11) et non Inji Wallet ni le mobile. L'intégration passe par les dispositifs SBI, trois parcours (résident, opérateur, superviseur), une configuration par parcours et une interface JavaFX.
 - Réduit par le calendrier : pas de jeux de données publics, Android en conception seulement.
 
+## Nettoyage de l'historique et vérification des commits (13 octobre)
+
+- 9 commits poussés sur `main` le 13 octobre entre 10 h 52 et 11 h 11 portaient une ligne `Co-Authored-By` ajoutée automatiquement par un outil, avec une adresse extérieure à l'équipe. GitHub l'affichait comme contributeur du dépôt. 5 descriptions de Pull Request (n° 51, 53, 54, 55, 56) se terminaient par une mention de génération.
+- Avec l'accord d'Elisée, l'historique de `main` a été réécrit à partir du commit `883b0aa` pour retirer ces lignes : mêmes fichiers, mêmes 88 commits, mêmes auteurs et dates. Push forcé lancé par Elisée, avec contrôle préalable que `main` n'avait pas bougé. Nouveau `main` : `9dfe633`. Les 5 descriptions ont été nettoyées.
+- Restent hors de portée : les anciens commits visibles dans l'onglet « Commits » des Pull Requests fusionnées, et l'historique des modifications des descriptions (supprimable à la main depuis le menu « edited »).
+- Prévention : vérification `Commit messages` sur chaque Pull Request (`.github/workflows/commit-messages.yml`), même contrôle avant commit sur les postes (`.githooks/commit-msg`, à activer avec `git config core.hooksPath .githooks`), règle de protection de `main` (Pull Request obligatoire, vérification obligatoire, ni push forcé ni suppression). Un co-auteur n'est accepté que s'il est membre de l'équipe.
+- Chaque membre doit remettre son clone à jour (`git fetch origin`, `git switch main`, `git reset --hard origin/main`).
+
 ## Note de conception Android (issue n° 32)
 
 `docs/android.md`, rédigé le 8 octobre d'après le code de `mosip/android-registration-client` (branche `master`, licence MIT), lu dans un clone partiel hors dépôt. À retenir :
