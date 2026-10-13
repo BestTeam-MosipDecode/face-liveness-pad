@@ -38,3 +38,17 @@ To make the module available to the Registration Client build:
 ```powershell
 mvn install
 ```
+
+## Active check
+
+Package `io.mosip.registration.liveness.active`, ported from `training/liveness/actions.py` (section 5 of `docs/decision-flow.md`):
+
+| Class | Role |
+| --- | --- |
+| `ChallengeGenerator` | Draws the challenges of an attempt among the enabled types, without immediate repetition, with an injectable `SecureRandom` |
+| `BlinkDetector`, `SmileDetector`, `HeadTurnDetector` | Judge one action against the baseline of the challenge; `ActionDetector.create` picks the detector of a challenge type |
+| `ChallengeRunner` | Runs the challenges of one attempt: baseline, instruction, timeout, feedback, passive score controls and face continuity |
+| `FrameObservation`, `FaceBox`, `FaceMeasures` | What the frame pipeline found in one analysed frame |
+| `ActiveSettings`, `ChallengeStatus` | Parameters, and the outcome, feedback code and progress after each frame |
+
+The package has no dependency on the frame pipeline: the session gives it the number of faces, the face box, the Face Mesh measures and the passive score of each analysed frame.
