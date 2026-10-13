@@ -292,3 +292,28 @@ On the sample images, the quality checks accept `image_T1.jpg` (yaw 0.7 degrees)
 ```powershell
 training\.venv\Scripts\python.exe training\scripts\demo_passive.py
 ```
+
+## Action detectors
+
+`liveness/actions.py` implements section 5 of `docs/decision-flow.md`: drawing of the challenges (no immediate repetition, operating system generator, seeded generator in the tests), the hold-still baseline (median of at least 3 frames over 600 ms) and the detectors of `BLINK`, `SMILE`, `TURN_LEFT` and `TURN_RIGHT`, each judged against the baseline.
+
+| Challenge | Measure | Detected when | Fails when |
+| --- | --- | --- | --- |
+| `BLINK` | Mean eye aspect ratio of both eyes | At most 0.6 x baseline, then at least 0.85 x baseline | none |
+| `SMILE` | Mouth width divided by face width | At least 1.10 x baseline on 2 consecutive frames | none |
+| `TURN_LEFT` | Nose tip between the cheek edges | Baseline + 0.15 or more, then back within 0.08 | Baseline - 0.15 or less |
+| `TURN_RIGHT` | Same | Baseline - 0.15 or less, then back within 0.08 | Baseline + 0.15 or more |
+
+The deadline of a challenge counts from the start of its hold-still phase. These factors are the starting values of the decision flow; the values measured on the team are recorded below once calibrated.
+
+Unit tests on synthetic measures, no camera needed:
+
+```powershell
+training\.venv\Scripts\python.exe -m unittest discover -s training\tests
+```
+
+`scripts/demo_active.py` runs rounds of random challenges on the webcam, with the face continuity and passive score controls of section 5.4. `--log` writes the measures of each analysed frame to a CSV file (numbers only) for the calibration:
+
+```powershell
+training\.venv\Scripts\python.exe training\scripts\demo_active.py --rounds 5 --log measures.csv
+```
