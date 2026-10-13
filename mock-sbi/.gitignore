@@ -30,3 +30,11 @@ build/
 ### VS Code ###
 .vscode/
 /bin/
+
+### Test keys and sample face files, fetched by scripts/fetch_assets.py ###
+*.p12
+*.cer
+*.iso
+*.jpeg
+*.jpg
+/Profile/
