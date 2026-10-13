@@ -46,6 +46,19 @@ No face image, video or public dataset is stored in this repository.
 
 The build and run instructions for the Registration Client on Windows are in [docs/dev-setup-windows.md](docs/dev-setup-windows.md).
 
+## Contributing
+
+- One branch per issue, named `feature/<topic>`, created from an up-to-date `main`. Changes reach `main` only through a pull request.
+- Commit messages in English, in the form `type(scope): description`, one commit per logical change.
+- Each commit is written by the member who makes it. A `Co-authored-by` trailer may only name a team member, with the GitHub noreply address of the member.
+- Every pull request runs the `Commit messages` check, which applies these rules to its commits, title and description. To apply them before each commit, enable the hook once in your clone:
+
+  ```powershell
+  git config core.hooksPath .githooks
+  ```
+
+- No face image, video or credential in the repository.
+
 ## Team
 
 Best_Team, Cotonou, Benin.
