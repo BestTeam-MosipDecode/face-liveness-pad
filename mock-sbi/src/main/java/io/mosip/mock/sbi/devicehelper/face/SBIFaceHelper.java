@@ -6,16 +6,31 @@ import org.slf4j.LoggerFactory;
 
 import io.mosip.mock.sbi.SBIConstant;
 import io.mosip.mock.sbi.devicehelper.SBIDeviceHelper;
+import io.mosip.mock.sbi.devicehelper.face.source.FaceFrameSource;
+import io.mosip.mock.sbi.devicehelper.face.source.FaceFrameSources;
 import io.mosip.mock.sbi.util.ApplicationPropertyHelper;
 import io.mosip.mock.sbi.util.BioUtilHelper;
+import io.mosip.mock.sbi.util.FaceIsoBuilder;
 import io.mosip.mock.sbi.util.StringHelper;
 
 public class SBIFaceHelper extends SBIDeviceHelper {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SBIFaceHelper.class);	
 
+	// Null in static mode: fixed stream image and prepared ISO records
+	private final FaceFrameSource frameSource;
+
 	private SBIFaceHelper(int port, String purpose, String keystoreFilePath, String biometricImageType)
 	{ 
 		super (port, purpose, SBIConstant.MOSIP_BIOMETRIC_TYPE_FACE, SBIConstant.MOSIP_BIOMETRIC_SUBTYPE_FACE, keystoreFilePath, biometricImageType);
+		this.frameSource = FaceFrameSources.create();
+		if (frameSource != null)
+		{
+			try {
+				frameSource.prepare();
+			} catch (Exception ex) {
+				LOGGER.error("Face frame source not available", ex);
+			}
+		}
 	} 
   
 	//synchronized method to control simultaneous access 
@@ -29,6 +44,15 @@ public class SBIFaceHelper extends SBIDeviceHelper {
 		SBIFaceCaptureInfo captureInfo = new SBIFaceCaptureInfo ();
 		captureInfo.initCaptureInfo();
 		setCaptureInfo (captureInfo);
+		if (frameSource != null)
+		{
+			try {
+				frameSource.open();
+			} catch (Exception ex) {
+				LOGGER.error("initDevice :: frame source cannot be opened", ex);
+				return -1;
+			}
+		}
 		return 0;
 	}
 
@@ -37,12 +61,14 @@ public class SBIFaceHelper extends SBIDeviceHelper {
 		if (getCaptureInfo () != null)
 			getCaptureInfo ().deInitCaptureInfo ();
 		setCaptureInfo (null);
+		if (frameSource != null)
+			frameSource.close();
 		return 0;
 	}
 
 	@Override
 	public int getLiveStream() {
-		byte [] image = getLiveStreamBufferedImage();
+		byte [] image = frameSource != null ? frameSource.nextFrame() : getLiveStreamBufferedImage();
 		if (image == null || image.length == 0)
 			return -1;
 		getCaptureInfo ().setImage(image);
@@ -78,7 +104,7 @@ public class SBIFaceHelper extends SBIDeviceHelper {
 
 		if (!isUsedForAuthenication)
 		{
-			isoData = getBiometricISOImage(seedName, SBIConstant.PROFILE_BIO_FILE_NAME_FACE);
+			isoData = frameSource != null ? getFaceISOFromFrame() : getBiometricISOImage(seedName, SBIConstant.PROFILE_BIO_FILE_NAME_FACE);
 			if (isoData != null && !((SBIFaceCaptureInfo)getCaptureInfo ()).isCaptureFace())
 			{
 				((SBIFaceCaptureInfo)getCaptureInfo ()).setBioValueFace(StringHelper.base64UrlEncode(isoData));
@@ -124,4 +150,14 @@ public class SBIFaceHelper extends SBIDeviceHelper {
 		}
 		return 0;
 	} 	
+
+	// Uses the last streamed frame, or reads one when RCAPTURE comes without STREAM
+	private byte[] getFaceISOFromFrame() throws Exception {
+		byte [] frame = getCaptureInfo ().getImage();
+		if (frame == null || frame.length == 0)
+			frame = frameSource.nextFrame();
+		if (frame == null || frame.length == 0)
+			return null;
+		return FaceIsoBuilder.fromJpeg(getPurpose(), frame);
+	}
 }
