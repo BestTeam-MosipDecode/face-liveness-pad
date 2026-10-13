@@ -57,6 +57,7 @@ The build and run instructions for the Registration Client on Windows are in [do
   git config core.hooksPath .githooks
   ```
 
+- The fork [registration-client](https://github.com/BestTeam-MosipDecode/registration-client) runs the same check on pull requests into `feature/face-liveness`, which only accepts changes through a pull request. Its hook is enabled the same way.
 - No face image, video or credential in the repository.
 
 ## Team

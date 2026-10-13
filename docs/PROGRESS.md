@@ -153,6 +153,8 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 - Restent hors de portée : les anciens commits visibles dans l'onglet « Commits » des Pull Requests fusionnées, et l'historique des modifications des descriptions (supprimable à la main depuis le menu « edited »).
 - Prévention : vérification `Commit messages` sur chaque Pull Request (`.github/workflows/commit-messages.yml`), même contrôle avant commit sur les postes (`.githooks/commit-msg`, à activer avec `git config core.hooksPath .githooks`), règle de protection de `main` (Pull Request obligatoire, vérification obligatoire, ni push forcé ni suppression). Un co-auteur n'est accepté que s'il est membre de l'équipe.
 - Chaque membre doit remettre son clone à jour (`git fetch origin`, `git switch main`, `git reset --hard origin/main`).
+- Même dispositif sur le fork `registration-client` (Pull Request n° 1 du fork) : script `.github/scripts/check-commit-messages.sh`, workflow `Commit messages`, hook `.githooks/commit-msg`, règle de protection de `feature/face-liveness` (mêmes règles que pour `main`). Ces fichiers restent propres au fork et n'entrent dans aucune proposition vers `mosip/registration-client`. Les deux workflows hérités de MOSIP (`push-trigger.yml`, `clear-artifacts.yml`) ont besoin des secrets de MOSIP : ils se désactivent depuis l'onglet Actions du fork, sans modifier leurs fichiers.
+- Un poste qui a déjà un `core.hooksPath` global n'a pas besoin du réglage local : un fichier `.git/hooks/commit-msg` qui appelle `.githooks/commit-msg` suffit, si le hook global relaie vers `.git/hooks`.
 
 ## Note de conception Android (issue n° 32)
 
