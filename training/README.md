@@ -238,3 +238,31 @@ YuNet boxes are taller than wide, while the detector used to train MiniFASNet gi
 The yaw ratio is the horizontal position of the nose tip between the two cheek edges: about 0.5 when facing the camera. It is close to 0 on `image_F1.jpg`, where the head is strongly turned, and 0.75 on `image_T1.jpg`, where it is slightly turned the other way. The lower eye aspect ratio of `image_T1.jpg` matches a gaze directed downwards. These values only show that the measures behave sensibly. Thresholds for the challenges come from the team captures (issue #5).
 
 Time per image on the reference machine (Intel Core i7-8550U, Python, ONNX Runtime on CPU): 22 to 40 ms for YuNet including the resize and the decoding, 14 to 15 ms for Face Mesh, 11 to 15 ms for the two classifiers.
+
+## Capture sessions
+
+`scripts/capture_session.py` records one sequence of the team captures from a webcam, following [docs/test-plan.md](../docs/test-plan.md). Each subject signs the [consent form](../docs/consent/consent-form.md) first and is identified by a pseudonym only (`S01`, `S02`...). The script needs OpenCV only.
+
+```powershell
+training\.venv\Scripts\python.exe training\scripts\capture_session.py --subject S01 --type bona_fide --light normal --camera-model "Logitech C270"
+training\.venv\Scripts\python.exe training\scripts\capture_session.py --subject S01 --type print_glossy --light backlight --presenter S02
+training\.venv\Scripts\python.exe training\scripts\capture_session.py --subject S01 --type action_blink --light low --dry-run
+```
+
+| Option | Values | Default |
+| --- | --- | --- |
+| `--subject` | Pseudonym, `S` and 2 or 3 digits. Anything else is refused | required |
+| `--type` | `bona_fide`, `action_blink`, `action_smile`, `action_turn_left`, `action_turn_right`, `print_matte`, `print_glossy`, `screen_phone`, `screen_laptop`, `replay_video`, `paper_mask` | required |
+| `--light` | `normal`, `low`, `backlight` | required |
+| `--presenter` | Pseudonym of the attack presenter, attack types only | none |
+| `--camera`, `--camera-model` | Camera index, webcam model written to the metadata | 0, empty |
+| `--seconds`, `--countdown` | Recording length, wait before recording | 10, 3 |
+| `--width`, `--height` | Requested resolution. The actual one is written to the metadata | 1280, 720 |
+| `--fps-save` | Frames saved per second | 10 |
+| `--output-root` | Root of the captures | `captures/`, ignored by Git |
+| `--no-preview` | No window. Ctrl+C aborts | off |
+| `--dry-run` | Opens no camera, writes nothing, prints the target folder | off |
+
+Output: `captures/<subject>/<type>/<light>_<YYYYmmdd-HHMMSS>/frame_00000.jpg`... and `metadata.json` (type, light, camera, actual resolution and rate, start time, timestamp of each frame in milliseconds, script version, operating system). Frames are saved as the camera delivers them: not mirrored, with no text. The preview is mirrored and shows the countdown, a REC indicator and, for the action types, the instruction after 2 seconds of holding still. `q` or `Esc` aborts and deletes the partial sequence.
+
+The script refuses an output folder inside the repository unless it lies under `captures/` and `git check-ignore` confirms that Git ignores it. Captures are never committed.

@@ -15,6 +15,8 @@
 | [mock-sbi.md](mock-sbi.md) | Simulated face device: study of the MOSIP mock device, what the client expects, fork decision. Installation and modes to come | Study |
 | [iso-30107-alignment.md](iso-30107-alignment.md) | Mapping to the clauses of ISO/IEC 30107-1 and 30107-3, test design, metrics, gaps | First version |
 | [security-privacy.md](security-privacy.md) | Protected assets, attacks and controls, limits, personal data, fairness, recommended settings | First version |
-| `test-plan.md` and `test-results.md` | Test cases, PAD metrics, processing times | Planned |
+| [test-plan.md](test-plan.md) | Test protocol: subjects, presentation types and artefacts, lighting, captures, splits, metrics, functional test matrix, data handling | First version |
+| [test-results.md](test-results.md) | PAD metrics, functional test results, performance. Skeleton, nothing measured yet | First version |
+| [consent/consent-form.md](consent/consent-form.md) | Consent form signed by each subject before the team captures | First version |
 
-Folders: `diagrams/` holds the PlantUML sources, `ui/` the screen mock-ups and screenshots, `consent/` the consent form used for the team's own face captures.
+Folders: `diagrams/` holds the PlantUML sources, `ui/` the screen mock-ups and screenshots, `consent/` the consent form used for the team's own face captures. Signed forms are not stored in the repository.
