@@ -25,15 +25,14 @@ from pathlib import Path
 
 import cv2
 import numpy as np
-import onnxruntime as ort
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 MODELS_DIR = REPO_ROOT / "liveness-engine" / "src" / "main" / "resources" / "models"
 sys.path.insert(0, str(REPO_ROOT / "training"))
 
-from liveness.crop import crop_patch  # noqa: E402
 from liveness.face_mesh import (LEFT_EYE, RIGHT_EYE, FaceMesh, eye_aspect_ratio,  # noqa: E402
                                 mouth_width_ratio, yaw_ratio)
+from liveness.minifas import MiniFAS  # noqa: E402
 from liveness.yunet import YuNet, classifier_box, iou  # noqa: E402
 
 # Boxes [x, y, w, h] of the reference detector, from training/README.md.
@@ -43,17 +42,6 @@ REFERENCE_BOXES = {
     "image_T1.jpg": [106, 147, 207, 213],
 }
 TIMING_RUNS = 20
-
-
-def real_score(sessions, image, box):
-    """Mean probability of the real class over the two MiniFASNet models."""
-    total = 0.0
-    for scale, session in sessions:
-        patch = crop_patch(image, [int(v) for v in box], scale)
-        logits = session.run(["logits"], {"input": patch.transpose(2, 0, 1)[np.newaxis].astype(np.float32)})[0][0]
-        probabilities = np.exp(logits - logits.max())
-        total += probabilities[1] / probabilities.sum()
-    return total / len(sessions)
 
 
 def mean_ms(function, runs=TIMING_RUNS):
@@ -72,9 +60,7 @@ def main():
     manifest = {m["name"]: m for m in json.loads((MODELS_DIR / "models.json").read_text(encoding="utf-8"))["models"]}
     detector = YuNet(MODELS_DIR / manifest["yunet"]["file"])
     mesh = FaceMesh(MODELS_DIR / manifest["face_mesh_v2"]["file"])
-    sessions = [(manifest[name]["cropScale"],
-                 ort.InferenceSession(str(MODELS_DIR / manifest[name]["file"]), providers=["CPUExecutionProvider"]))
-                for name in ("minifasnet_v2", "minifasnet_v1se")]
+    classifier = MiniFAS()
 
     for name, reference_box in REFERENCE_BOXES.items():
         image = cv2.imread(str(args.silent_face_dir / "images" / "sample" / name))
@@ -88,8 +74,8 @@ def main():
             [round(v) for v in face.box], face.score, reference_box, iou(face.box, reference_box),
             iou(square, reference_box)))
         print("  real-class score: reference box {:.4f}, YuNet box {:.4f}, square YuNet box {:.4f}".format(
-            real_score(sessions, image, reference_box), real_score(sessions, image, face.box),
-            real_score(sessions, image, square)))
+            classifier.score(image, reference_box), classifier.score(image, face.box),
+            classifier.score(image, square)))
 
         points, presence = mesh.landmarks(image, face.box)
         right_ear, left_ear = eye_aspect_ratio(points, RIGHT_EYE), eye_aspect_ratio(points, LEFT_EYE)
@@ -104,7 +90,7 @@ def main():
         print("  eye centres: largest offset to YuNet keypoints = {:.1%} of the distance between the eyes".format(offset))
         print("  time: YuNet {:.1f} ms, Face Mesh {:.1f} ms, two MiniFASNet {:.1f} ms".format(
             mean_ms(lambda: detector.detect(image)), mean_ms(lambda: mesh.landmarks(image, face.box)),
-            mean_ms(lambda: real_score(sessions, image, square))))
+            mean_ms(lambda: classifier.score(image, square))))
 
 
 if __name__ == "__main__":
