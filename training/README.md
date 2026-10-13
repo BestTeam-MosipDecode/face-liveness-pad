@@ -266,3 +266,29 @@ training\.venv\Scripts\python.exe training\scripts\capture_session.py --subject 
 Output: `captures/<subject>/<type>/<light>_<YYYYmmdd-HHMMSS>/frame_00000.jpg`... and `metadata.json` (type, light, camera, actual resolution and rate, start time, timestamp of each frame in milliseconds, script version, operating system). Frames are saved as the camera delivers them: not mirrored, with no text. The preview is mirrored and shows the countdown, a REC indicator and, for the action types, the instruction after 2 seconds of holding still. `q` or `Esc` aborts and deletes the partial sequence.
 
 The script refuses an output folder inside the repository unless it lies under `captures/` and `git check-ignore` confirms that Git ignores it. Captures are never committed.
+
+## Passive pipeline
+
+| Module | Content |
+| --- | --- |
+| `liveness/minifas.py` | `MiniFAS`: the two classifiers in ONNX Runtime, softmax of each model and the real-class score (mean probability of class 1) |
+| `liveness/quality.py` | Checks of section 3.5 of `docs/decision-flow.md`: face size, position, brightness, sharpness (variance of the Laplacian on a 128 x 128 face region), yaw from the five YuNet keypoints |
+| `liveness/passive.py` | `PassiveWindow`: median of the scored frames of the last 3 000 ms, decision against the pass and attack thresholds (section 4) |
+
+The brightness bounds (60 to 200), the sharpness bound (40) and the nose depth ratio of the yaw estimate (0.3) are provisional. They are calibrated on the team captures (issue #7).
+
+`scripts/check_reference_outputs.py` checks that `liveness/minifas.py` reproduces the reference outputs above:
+
+```powershell
+training\.venv\Scripts\python.exe training\scripts\check_reference_outputs.py --silent-face-dir ..\Silent-Face-Anti-Spoofing
+```
+
+Result on 13 October 2026: the three images match, with a largest softmax difference of 1.5e-06.
+
+On the sample images, the quality checks accept `image_T1.jpg` (yaw 0.7 degrees) and reject the two photos for their yaw (-55 and -22 degrees), before any score is computed.
+
+`scripts/demo_passive.py` runs the passive check on the webcam and prints, for each analysed frame, the quality measures, the frame score, the median of the window and the decision. It writes nothing to disk:
+
+```powershell
+training\.venv\Scripts\python.exe training\scripts\demo_passive.py
+```
