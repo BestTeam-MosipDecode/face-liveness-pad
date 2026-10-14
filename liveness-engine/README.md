@@ -68,3 +68,25 @@ The package has no dependency on the frame pipeline: the session gives it the nu
 `Resize` reproduces the vectorised path of OpenCV: identical results when shrinking to a width whose row size is a multiple of 16 bytes (80 x 80 patch, 256 x 256 Face Mesh input). OpenCV's scalar formula gives values one apart on most images, so it must not be used.
 
 ONNX Runtime is pinned to 1.19.2. Versions 1.20 and later fail to load inside the JVM on Windows (`UnsatisfiedLinkError: A dynamic link library (DLL) initialization routine failed`), because the JDK, and the JRE shipped with the Registration Client, load an older Visual C++ runtime. The tests pass on JDK 11 and JDK 17.
+
+## Frame processing
+
+| Class | Role |
+| --- | --- |
+| `face.YuNetDetector`, `face.FaceDetection` | Face detection, five keypoints, square classifier box (`training/liveness/yunet.py`) |
+| `face.FaceMesh` | 478 landmarks and the measures of the active check (`training/liveness/face_mesh.py`) |
+| `passive.QualityChecker`, `passive.QualityResult` | Face size, position, brightness, sharpness, yaw (section 3.5 of `docs/decision-flow.md`) |
+| `passive.PassiveWindow` | Median of the scored frames of the last 3 000 ms and passive decision (section 4) |
+| `passive.FrameAnalyzer` | One frame: detection, quality, score, and in the active check the measures; gives the `FrameObservation` of the `ChallengeRunner` |
+
+Points that matter for parity with the Python reference, which uses OpenCV:
+
+- `BgrImage.decode` applies the EXIF orientation, as `cv2.imread` does. The sample images of Silent-Face-Anti-Spoofing are stored sideways with an orientation tag: without it, no face is found.
+- The grey level follows OpenCV 4 `COLOR_BGR2GRAY`: weights 3735, 19235 and 9798 with a 15-bit shift. The 14-bit weights of older documentation differ by one on about 0.25 % of pixels.
+- The Laplacian uses the 3 x 3 aperture of `cv2.Laplacian` with the default border (reflected, edge not repeated).
+
+`SampleImagesTest` runs the whole chain on the three sample images and compares the YuNet score, the real-class score and the Face Mesh measures with the values of `training/README.md`. The images contain faces and stay outside the repository, so the test runs only when their folder is given:
+
+```powershell
+mvn verify "-Dliveness.samples=..\..\Silent-Face-Anti-Spoofing\images\sample"
+```
