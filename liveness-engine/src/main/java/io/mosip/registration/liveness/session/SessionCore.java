@@ -16,7 +16,9 @@ import io.mosip.registration.liveness.active.ChallengeGenerator;
 import io.mosip.registration.liveness.active.ChallengeRunner;
 import io.mosip.registration.liveness.active.ChallengeStatus;
 import io.mosip.registration.liveness.active.ChallengeType;
+import io.mosip.registration.liveness.active.FaceBox;
 import io.mosip.registration.liveness.active.FrameObservation;
+import io.mosip.registration.liveness.api.CaptureCheck;
 import io.mosip.registration.liveness.api.DeviceEvent;
 import io.mosip.registration.liveness.api.FailureReason;
 import io.mosip.registration.liveness.api.FeedbackCode;
@@ -44,6 +46,10 @@ final class SessionCore {
     static final long MAX_NO_FACE_MS = 1000;
     /** Minimum overlap with the tracked face (section 3.4). */
     static final double MIN_TRACK_OVERLAP = 0.3;
+    /** Captured image consistency (section 6): largest distance between centres, in image widths. */
+    static final double CAPTURE_MAX_SHIFT = 0.15;
+    static final double CAPTURE_MIN_WIDTH_RATIO = 0.67;
+    static final double CAPTURE_MAX_WIDTH_RATIO = 1.5;
 
     private final Workflow workflow;
     private final LivenessPolicy policy;
@@ -136,6 +142,93 @@ final class SessionCore {
             default:
                 break;
         }
+    }
+
+    /** Section 6: checks the image returned by the capture request. Only once, in PASSED. */
+    CaptureCheck checkCapture(BgrImage image) {
+        if (state != SessionState.PASSED || finished) {
+            return CaptureCheck.rejected(FailureReason.FACE_CONTINUITY_LOST, modelSetVersion);
+        }
+        FailureReason reason = captureFailure(image);
+        if (reason == null) {
+            finished = true;
+            emit(LivenessEvent.Type.PASSED, null, null, null);
+            publish(FeedbackCode.SUCCESS, null, 1.0, null);
+            return CaptureCheck.accepted(modelSetVersion);
+        }
+        fail(reason, reason == FailureReason.LOW_QUALITY ? lastTip : null);
+        return CaptureCheck.rejected(reason, modelSetVersion);
+    }
+
+    private FailureReason captureFailure(BgrImage image) {
+        if (image == null) {
+            return FailureReason.INVALID_FRAME;
+        }
+        FrameAnalysis analysis;
+        try {
+            analysis = analyzer.analyze(image, lastFrameT, false);
+        } catch (Exception e) {
+            return FailureReason.ENGINE_ERROR;
+        }
+        if (analysis.faces().size() != 1) {
+            return FailureReason.FACE_CONTINUITY_LOST;
+        }
+        QualityResult quality = analysis.quality();
+        if (quality == null || !quality.passed()) {
+            lastTip = quality == null ? null : GuidanceTip.valueOf(quality.tip().get().name());
+            return FailureReason.LOW_QUALITY;
+        }
+        if (analysis.score() == null || analysis.score() <= policy.attackThreshold()) {
+            return FailureReason.PAD_ATTACK_DETECTED;
+        }
+        FaceBox followed = tracker.box().orElse(null);
+        if (followed == null || !consistent(followed, imageWidth, imageHeight, analysis.faces().get(0).box(),
+                image.width(), image.height())) {
+            return FailureReason.FACE_CONTINUITY_LOST;
+        }
+        return null;
+    }
+
+    /**
+     * Same face in the stream and in the capture, which may have another resolution: centres at most 15 % of the
+     * image width apart, and ratio of the relative widths between 0.67 and 1.5.
+     */
+    static boolean consistent(FaceBox followed, int followedWidth, int followedHeight, FaceBox captured,
+            int capturedWidth, int capturedHeight) {
+        double dx = (followed.x() + followed.width() / 2) / followedWidth
+            - (captured.x() + captured.width() / 2) / capturedWidth;
+        double dy = (followed.y() + followed.height() / 2) / followedHeight
+            - (captured.y() + captured.height() / 2) / capturedHeight;
+        double shift = Math.hypot(dx, dy * capturedHeight / capturedWidth);
+        double ratio = (captured.width() / capturedWidth) / (followed.width() / followedWidth);
+        return shift <= CAPTURE_MAX_SHIFT && ratio >= CAPTURE_MIN_WIDTH_RATIO && ratio <= CAPTURE_MAX_WIDTH_RATIO;
+    }
+
+    /** Section 7: a new attempt after a failure, while attempts are left. */
+    boolean retry() {
+        if (finished || state != SessionState.FAILED) {
+            return false;
+        }
+        state = SessionState.INIT;
+        metrics.retried();
+        window.clear();
+        tracker.reset();
+        runner = null;
+        publish(FeedbackCode.CHECKING, null, 0, null);
+        return true;
+    }
+
+    /** Section 7: a device problem uses an attempt only once a frame of the attempt was analysed. */
+    void onDeviceEvent(DeviceEvent event, long t) {
+        if (finished || state == SessionState.FAILED) {
+            return;
+        }
+        emit(LivenessEvent.Type.DEVICE_ERROR, FailureReason.DEVICE_ERROR, null, event);
+        if (state == SessionState.INIT) {
+            publish(FeedbackCode.DEVICE_ERROR, null, 0, null);
+            return;
+        }
+        fail(FailureReason.DEVICE_ERROR, null);
     }
 
     private void startAttempt(long t) {
