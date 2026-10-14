@@ -19,6 +19,8 @@ Package `io.mosip.registration.liveness.api`, described in [docs/engine-api.md](
 | `minifasnet_v2_2.7_80x80.onnx` | Passive classifier, crop scale 2.7 | Silent-Face-Anti-Spoofing, Apache-2.0 | 1.7 MB |
 | `minifasnet_v1se_4.0_80x80.onnx` | Passive classifier, crop scale 4.0 | Silent-Face-Anti-Spoofing, Apache-2.0 | 1.7 MB |
 
+When the engine starts, `model.ModelManifest` checks each model file against `models.json` (size and SHA-256). A missing or modified file stops the engine with a `ModelIntegrityException` that names the file. The model set version (`modelSetVersion`) is reported in capture results and audit events.
+
 The preprocessing and output decoding of each model are specified in `training/README.md`, with a Python reference in `training/liveness/`. Below, the classifier contract.
 
 The input is a `float32` tensor of shape `1 x 3 x 80 x 80`, in B, G, R order, with values from 0 to 255 and no normalisation. The output is three logits. Class 1 is the real face.
