@@ -300,7 +300,7 @@ training\.venv\Scripts\python.exe training\scripts\demo_passive.py
 | Challenge | Measure | Detected when | Fails when |
 | --- | --- | --- | --- |
 | `BLINK` | Mean eye aspect ratio of both eyes | At most 0.6 x baseline, then at least 0.85 x baseline | none |
-| `SMILE` | Mouth width divided by face width | At least 1.10 x baseline on 2 consecutive frames | none |
+| `SMILE` | Mouth width divided by face width | At least 1.06 x baseline on 2 consecutive frames | none |
 | `TURN_LEFT` | Nose tip between the cheek edges | Baseline + 0.15 or more, then back within 0.08 | Baseline - 0.15 or less |
 | `TURN_RIGHT` | Same | Baseline - 0.15 or less, then back within 0.08 | Baseline + 0.15 or more |
 
@@ -332,3 +332,15 @@ Frame scores are cached in `training/results/frame_scores.csv` (numbers only). L
 ```powershell
 training\.venv\Scripts\python.exe training\scripts\evaluate.py --captures captures --markdown training\results\passive.md
 ```
+
+### First live measures
+
+14 October 2026, one subject, laptop webcam at 640 x 480, normal light, `demo_active.py` at about 3 analysed frames per second (measures only, no image kept). 3 rounds out of 5 passed.
+
+| Challenge | Observed | Consequence |
+| --- | --- | --- |
+| `TURN_LEFT`, `TURN_RIGHT` | 7 turns out of 8 detected, 2.7 to 5.4 s after the instruction. Turning to the person's right makes the ratio fall (0.5 to about 0.0), turning left makes it rise (to about 1.1). The miss was a late reaction: the turn started after 7 s | Direction of section 5.3 confirmed. Factors kept |
+| `BLINK` | Closed eyes measured at 0.03 to 0.15 against a baseline of 0.29 to 0.31, detected as soon as a closed-eye frame is analysed. At 1 frame per second most blinks fall between two frames | Factors kept. The analysis must reach 10 frames per second |
+| `SMILE` | Mouth ratio from 0.434 holding still (±1.2 %) to 0.46 to 0.48 for a broad smile, 1.06 to 1.10 x baseline. 1.10 was reached on a single frame | Factor lowered from 1.10 to 1.06 |
+
+The factors stay provisional until more team members are measured (issue #5).
