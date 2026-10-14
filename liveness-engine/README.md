@@ -2,11 +2,24 @@
 
 Java module that decides whether the face in a frame stream belongs to a live person. The Registration Client calls it during resident face capture, operator authentication and supervisor authentication.
 
-Status: frame pipeline, active check and public API. The session comes with #14.
+Status: frame pipeline, active check, public API, model integrity check and session.
 
 ## Public API
 
 Package `io.mosip.registration.liveness.api`, described in [docs/engine-api.md](../docs/engine-api.md). The core works on decoded pixels: JPEG decoding is a platform adapter (`platform.desktop.ImageIoFrameDecoder` on the desktop), so that no class outside that package uses `java.awt` or `javax.imageio` (`NoDesktopImportsTest`).
+
+## Session
+
+Package `io.mosip.registration.liveness.session` (sections 1 to 9 of `docs/decision-flow.md`):
+
+| Class | Role |
+| --- | --- |
+| `DefaultLivenessEngine` | Checks `models.json`, loads the models once, runs one session at a time |
+| `DefaultLivenessSession`, `FrameWorker` | Single analysis thread, frame skipping, waits bounded to 5 s |
+| `SessionCore` | State machine: passive check, active check, captured image check, attempts, device events, audit events |
+| `FaceTracker`, `MetricsRecorder` | Face continuity, anonymous counters |
+
+`SessionCore` is tested with scripted analyses and a manual clock, without models (`SessionCore*Test`). `DefaultLivenessEngineTest` runs the real models on a grey frame.
 
 ## Models
 

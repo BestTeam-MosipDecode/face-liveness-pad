@@ -6,9 +6,6 @@
 package io.mosip.registration.liveness.api;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
@@ -20,10 +17,5 @@ class ApiContractTest {
         };
         assertDoesNotThrow(() -> listener.onUpdate(null));
         assertDoesNotThrow(() -> listener.onEvent(null));
-    }
-
-    @Test
-    void engineCreationComesWithTheSession() {
-        assertThrows(UnsupportedOperationException.class, () -> LivenessEngine.create(bytes -> Optional.empty()));
     }
 }
