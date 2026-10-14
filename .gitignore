@@ -9,6 +9,9 @@ captures/
 **/results/**/*.png
 !**/results/**/chart_*.png
 
+# Score and measure files give values per frame and per person: shared privately, never committed
+*.csv
+
 # Model export leftovers
 *.onnx.tmp
 
