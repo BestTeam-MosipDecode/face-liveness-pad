@@ -2,11 +2,11 @@
 
 Suivi de travail interne du projet Face Liveness / PAD (MOSIP Decode 2026, sujet 04).
 Plan de référence : `PLAN_FACE_LIVENESS.md`, à la racine du workspace `mosip_decode/` (hors dépôt).
-Dernière mise à jour : 7 octobre 2026.
+Dernière mise à jour : 14 octobre 2026.
 
 ## Étape en cours
 
-Issue n° 32 (note de conception Android) : `docs/android.md`, sur la branche `feature/android-note`, commits locaux, en attente d'accord pour le push et la Pull Request. Documentation de l'issue n° 21 fusionnée avec la Pull Request n° 47. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
+Campagne de captures de l'équipe (issue n° 7) : Elisée filme les sujets S10 à S19 et transmet son fichier de scores avant le 20 octobre. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
 
 ## Terminé
 
@@ -145,6 +145,13 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 - Reste valable : le classifieur MiniFASNet, la fusion des scores, le clignement par rapport d'aspect de l'œil, le plan de mesures ISO/IEC 30107-3, le traitement entièrement local.
 - Change : la cible est le Registration Client de bureau (1.2.0.2, Java 11) et non Inji Wallet ni le mobile. L'intégration passe par les dispositifs SBI, trois parcours (résident, opérateur, superviseur), une configuration par parcours et une interface JavaFX.
 - Réduit par le calendrier : pas de jeux de données publics, Android en conception seulement.
+
+## Campagne de captures (issue n° 7, 14 octobre)
+
+- Consignes de PrinceSpecial sur l'issue n° 7 : chaque membre filme les sujets de sa tranche (S10 à S19 pour Elisée), calcule les scores sur son poste avec `evaluate.py --score-only` et transmet le fichier de scores. Les images ne quittent pas la machine.
+- Deux corrections publiées sur l'issue. Le fichier de scores part en privé à Temitayo et n'est jamais joint à une issue : le dépôt est public, le fichier donne un score par image et par pseudonyme, alors que le formulaire de consentement et le plan de test ne publient que des chiffres agrégés. Pour `paper_mask`, une autre personne que le sujet porte le masque (plan de test, section 3.2). `training/README.md` corrigé dans le même sens.
+- Paquets manquants de `training/.venv` installés sur le poste d'Elisée (matplotlib, pandas, scikit-learn, scipy), avec son accord.
+- Facteur du sourire passé de 1,10 à 1,06 par la Pull Request n° 61 : valeur provisoire, à valider par Elisée après les mesures de l'équipe.
 
 ## Nettoyage de l'historique et vérification des commits (13 octobre)
 
