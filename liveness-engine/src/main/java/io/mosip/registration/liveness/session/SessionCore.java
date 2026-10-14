@@ -6,6 +6,8 @@
 package io.mosip.registration.liveness.session;
 
 import java.time.Clock;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +80,9 @@ final class SessionCore {
     private boolean finished;
     private int invalidFrames;
     private volatile LivenessUpdate current;
+    /** Listener calls of the transition in progress, delivered once the session is consistent again. */
+    private final Deque<Runnable> outbox = new ArrayDeque<>();
+    private boolean delivering;
 
     SessionCore(Workflow workflow, LivenessPolicy policy, Analyzer analyzer, Clock clock, Random random,
             String modelSetVersion, LivenessEventListener listener, MetricsRecorder metrics) {
@@ -107,11 +112,25 @@ final class SessionCore {
 
     /** One frame of the stream, or null when it could not be decoded. */
     void onFrame(BgrImage image, long t) {
+        try {
+            onFrameNow(image, t);
+        } finally {
+            deliver();
+        }
+    }
+
+    private void onFrameNow(BgrImage image, long t) {
         if (finished || state == SessionState.FAILED) {
             return;
         }
         if (image == null) {
             invalidFrames++;
+            return;
+        }
+        if (state != SessionState.INIT && t < lastFrameT) {
+            // The device restarted its clock: windows, deadlines and timeouts can no longer be trusted.
+            emit(LivenessEvent.Type.DEVICE_ERROR, FailureReason.DEVICE_ERROR, null, DeviceEvent.STREAM_INTERRUPTED);
+            fail(FailureReason.DEVICE_ERROR, null);
             return;
         }
         if (state == SessionState.INIT) {
@@ -146,6 +165,14 @@ final class SessionCore {
 
     /** Section 6: checks the image returned by the capture request. Only once, in PASSED. */
     CaptureCheck checkCapture(BgrImage image) {
+        try {
+            return checkCaptureNow(image);
+        } finally {
+            deliver();
+        }
+    }
+
+    private CaptureCheck checkCaptureNow(BgrImage image) {
         if (state != SessionState.PASSED || finished) {
             return CaptureCheck.rejected(FailureReason.FACE_CONTINUITY_LOST, modelSetVersion);
         }
@@ -206,6 +233,14 @@ final class SessionCore {
 
     /** Section 7: a new attempt after a failure, while attempts are left. */
     boolean retry() {
+        try {
+            return retryNow();
+        } finally {
+            deliver();
+        }
+    }
+
+    private boolean retryNow() {
         if (finished || state != SessionState.FAILED) {
             return false;
         }
@@ -220,6 +255,14 @@ final class SessionCore {
 
     /** Section 7: a device problem uses an attempt only once a frame of the attempt was analysed. */
     void onDeviceEvent(DeviceEvent event, long t) {
+        try {
+            onDeviceEventNow(event, t);
+        } finally {
+            deliver();
+        }
+    }
+
+    private void onDeviceEventNow(DeviceEvent event, long t) {
         if (finished || state == SessionState.FAILED) {
             return;
         }
@@ -423,21 +466,37 @@ final class SessionCore {
 
     private void update(LivenessUpdate update) {
         current = update;
-        try {
-            listener.onUpdate(update);
-        } catch (RuntimeException ignored) {
-            // A client bug must not stop the session.
-        }
+        outbox.add(() -> listener.onUpdate(update));
     }
 
     private void emit(LivenessEvent.Type type, FailureReason reason, ChallengeType challenge, DeviceEvent device) {
         long duration = state == SessionState.INIT ? 0 : clock.millis() - attemptStartMs;
         LivenessEvent event = new LivenessEvent(type, workflow, attempt, duration, modelSetVersion, reason, challenge,
             device);
+        outbox.add(() -> listener.onEvent(event));
+    }
+
+    /**
+     * Calls the listener once the transition is complete, so that a listener calling {@code retry} or
+     * {@code checkCapture} back sees a consistent session. A call made during the delivery queues its own listener
+     * calls, which this loop delivers in order.
+     */
+    private void deliver() {
+        if (delivering) {
+            return;
+        }
+        delivering = true;
         try {
-            listener.onEvent(event);
-        } catch (RuntimeException ignored) {
-            // A client bug must not stop the session.
+            Runnable call;
+            while ((call = outbox.poll()) != null) {
+                try {
+                    call.run();
+                } catch (RuntimeException ignored) {
+                    // A client bug must not stop the session.
+                }
+            }
+        } finally {
+            delivering = false;
         }
     }
 }

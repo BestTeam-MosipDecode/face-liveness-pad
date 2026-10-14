@@ -10,6 +10,7 @@ import java.time.Clock;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
@@ -34,6 +35,9 @@ import io.mosip.registration.liveness.passive.QualityChecker;
  */
 public final class DefaultLivenessEngine implements LivenessEngine {
 
+    /** Longest wait for the worker to leave an inference before the models are released. */
+    static final long CLOSE_WAIT_MS = 2000;
+
     private final FrameDecoder decoder;
     private final Clock clock;
     private final String modelSetVersion;
@@ -42,6 +46,7 @@ public final class DefaultLivenessEngine implements LivenessEngine {
     private final FaceMesh mesh;
     private final MetricsRecorder metrics = new MetricsRecorder();
     private DefaultLivenessSession active;
+    private ExecutorService activeExecutor;
     private boolean closed;
 
     private DefaultLivenessEngine(FrameDecoder decoder, Clock clock, String modelSetVersion, YuNetDetector detector,
@@ -95,6 +100,7 @@ public final class DefaultLivenessEngine implements LivenessEngine {
             thread.setDaemon(true);
             return thread;
         });
+        activeExecutor = executor;
         active = new DefaultLivenessSession(workflow, core, new FrameWorker(executor, policy.samplingMs()), decoder,
             modelSetVersion, executor::shutdownNow);
         metrics.sessionStarted();
@@ -120,9 +126,28 @@ public final class DefaultLivenessEngine implements LivenessEngine {
         if (active != null) {
             active.close();
         }
+        // Closing an ONNX session during a native run would crash the JVM: keep the models open if the worker is
+        // still inside an inference after the wait. The process is ending anyway when the engine is closed.
+        if (!stopAndWait(activeExecutor, CLOSE_WAIT_MS)) {
+            return;
+        }
         closeQuietly(mesh);
         closeQuietly(classifier);
         closeQuietly(detector);
+    }
+
+    /** Stops a worker and waits for its current task. True when it has stopped, or when there is none. */
+    static boolean stopAndWait(ExecutorService executor, long timeoutMs) {
+        if (executor == null) {
+            return true;
+        }
+        executor.shutdownNow();
+        try {
+            return executor.awaitTermination(timeoutMs, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
+        }
     }
 
     private static void closeQuietly(AutoCloseable resource) {
