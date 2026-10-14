@@ -344,3 +344,22 @@ training\.venv\Scripts\python.exe training\scripts\evaluate.py --captures captur
 | `SMILE` | Mouth ratio from 0.434 holding still (±1.2 %) to 0.46 to 0.48 for a broad smile, 1.06 to 1.10 x baseline. 1.10 was reached on a single frame | Factor lowered from 1.10 to 1.06 |
 
 The factors stay provisional until more team members are measured (issue #5).
+
+### Team campaign on several machines
+
+Captures never leave the machine that recorded them. Each member:
+
+1. records with `capture_session.py`, using the pseudonyms of their range: S01 to S09 (Temitayo), S10 to S19 (Elisée), S20 to S29 (Tobi), S30 to S39 (Silverio), volunteers included;
+2. scores their own captures and writes the score file, which holds numbers only:
+
+   ```powershell
+   training\.venv\Scripts\python.exe training\scripts\evaluate.py --score-only
+   ```
+
+3. shares `training/results/frame_scores.csv`, renamed after the member, on issue #7.
+
+The evaluation then merges the files. It stops if two files use the same pseudonym:
+
+```powershell
+training\.venv\Scripts\python.exe training\scripts\evaluate.py --scores temitayo.csv elisee.csv tobi.csv silverio.csv --markdown training\results\passive.md
+```

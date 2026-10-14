@@ -18,11 +18,14 @@ scores every frame with the reference pipeline, then:
    ``docs/test-results.md``.
 
 Frame scores are cached in a CSV file (numbers only, no image), so the thresholds can be explored
-again without running the models.
+again without running the models. Each team member scores the captures of their own machine and shares
+only this file; ``--scores`` merges the files of several machines, so that no face image is moved.
 
 Usage::
 
     python training/scripts/evaluate.py --captures captures [--test-subjects S03,S04] [--markdown out.md]
+    python training/scripts/evaluate.py --score-only
+    python training/scripts/evaluate.py --scores prince.csv elisee.csv tobi.csv
 """
 
 import argparse
@@ -115,6 +118,17 @@ def score_frames(captures, cache, step, max_yaw_deg):
 def read_cache(cache):
     with open(cache, newline="", encoding="utf-8") as handle:
         return list(csv.DictReader(handle))
+
+
+def check_unique_subjects(paths):
+    """Stop when two score files use the same subject pseudonym: each machine has its own range."""
+    owner = {}
+    for path in paths:
+        for subject in {row["subject"] for row in read_cache(path)}:
+            if subject in owner and owner[subject] != path:
+                sys.exit("subject {} appears in {} and {}: use distinct pseudonym ranges".format(
+                    subject, owner[subject], path))
+            owner[subject] = path
 
 
 def group_sequences(rows):
@@ -277,6 +291,10 @@ def main():
     parser.add_argument("--captures", type=Path, default=REPO_ROOT / "captures")
     parser.add_argument("--cache", type=Path, default=DEFAULT_CACHE)
     parser.add_argument("--rescore", action="store_true", help="ignore the cache and run the models again")
+    parser.add_argument("--score-only", action="store_true",
+                        help="score the local captures, write the cache and stop: the file to share with the team")
+    parser.add_argument("--scores", type=Path, nargs="+",
+                        help="merge these score files (from several machines) instead of reading local captures")
     parser.add_argument("--step", type=int, default=1, help="score one frame out of this number")
     parser.add_argument("--test-subjects", help="comma-separated pseudonyms of the test subjects")
     parser.add_argument("--seed", type=int, default=2026, help="seed of the subject split when none is given")
@@ -287,11 +305,20 @@ def main():
     parser.add_argument("--det", type=Path, default=RESULTS_DIR / "chart_det.png")
     args = parser.parse_args()
 
-    if args.cache.exists() and not args.rescore:
+    if args.scores:
+        rows = []
+        for path in args.scores:
+            rows += read_cache(path)
+            print("frame scores read from {}".format(path))
+        check_unique_subjects(args.scores)
+    elif args.cache.exists() and not args.rescore and not args.score_only:
         rows = read_cache(args.cache)
         print("frame scores read from {}".format(args.cache))
     else:
         rows = score_frames(args.captures, args.cache, args.step, args.max_yaw_deg)
+        if args.score_only:
+            print("{} frames scored, written to {}: share this file, it holds no image".format(len(rows), args.cache))
+            return
     all_sequences = group_sequences(rows)
 
     calibration_subjects, test_subjects = split_subjects(
