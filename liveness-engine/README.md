@@ -2,7 +2,11 @@
 
 Java module that decides whether the face in a frame stream belongs to a live person. The Registration Client calls it during resident face capture, operator authentication and supervisor authentication.
 
-Status: Maven skeleton with the models and the parity test data. No Java source code yet.
+Status: frame pipeline, active check and public API. The session comes with #14.
+
+## Public API
+
+Package `io.mosip.registration.liveness.api`, described in [docs/engine-api.md](../docs/engine-api.md). The core works on decoded pixels: JPEG decoding is a platform adapter (`platform.desktop.ImageIoFrameDecoder` on the desktop), so that no class outside that package uses `java.awt` or `javax.imageio` (`NoDesktopImportsTest`).
 
 ## Models
 
