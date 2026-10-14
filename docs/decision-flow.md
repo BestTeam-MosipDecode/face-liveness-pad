@@ -124,7 +124,7 @@ Measures come from the Face Mesh V2 landmarks (`training/liveness/face_mesh.py`)
 | Challenge | Measure | Detected when | Fails with `CHALLENGE_FAILED` when |
 | --- | --- | --- | --- |
 | `BLINK` | Mean eye aspect ratio of both eyes | It drops to at most 0.6 × baseline, then rises back to at least 0.85 × baseline | none |
-| `SMILE` | Distance between the mouth corners divided by the face width | It reaches at least 1.10 × baseline on 2 consecutive analysed frames | none |
+| `SMILE` | Distance between the mouth corners divided by the face width | It reaches at least 1.06 × baseline on 2 consecutive analysed frames | none |
 | `TURN_LEFT` | Position of the nose tip between the cheek edges, 0.5 when facing the camera | It rises to at least baseline + 0.15, then comes back within 0.08 of the baseline | It falls to baseline - 0.15 or lower (turn to the right) |
 | `TURN_RIGHT` | Same | It falls to at most baseline - 0.15, then comes back within 0.08 of the baseline | It rises to baseline + 0.15 or higher (turn to the left) |
 
@@ -282,7 +282,7 @@ These values are fixed in the engine for now. They can become configuration keys
 | Lighting and sharpness bounds | to calibrate | 3.5 |
 | Minimum number of baseline frames | 3 | 5.2 |
 | Blink factors | 0.6 and 0.85 of the baseline | 5.3 |
-| Smile factor | 1.10 of the baseline, 2 frames | 5.3 |
+| Smile factor | 1.06 of the baseline, 2 frames (1.10 before the first live measures) | 5.3 |
 | Head turn amplitude and return margin | 0.15 and 0.08 | 5.3 |
 | Captured image consistency | centres within 15 % of the image width, width ratio between 0.67 and 1.5 | 6 |
 

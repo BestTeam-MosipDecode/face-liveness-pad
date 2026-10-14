@@ -5,10 +5,10 @@
  */
 package io.mosip.registration.liveness.active;
 
-/** The mouth width ratio reaches at least 1.10 x baseline on 2 consecutive analysed frames. */
+/** The mouth width ratio reaches at least 1.06 x baseline on 2 consecutive analysed frames. */
 public final class SmileDetector implements ActionDetector {
 
-    public static final double FACTOR = 1.10;
+    public static final double FACTOR = 1.06;
     public static final int FRAMES = 2;
 
     private final double level;

@@ -34,7 +34,7 @@ INSTRUCTIONS = {
 
 BLINK_CLOSED = 0.6
 BLINK_OPEN = 0.85
-SMILE_FACTOR = 1.10
+SMILE_FACTOR = 1.06
 SMILE_FRAMES = 2
 TURN_AMPLITUDE = 0.15
 TURN_RETURN = 0.08
@@ -98,7 +98,7 @@ class BlinkDetector:
 
 
 class SmileDetector:
-    """Mouth width ratio reaches at least 1.10 x baseline on 2 consecutive analysed frames."""
+    """Mouth width ratio reaches at least 1.06 x baseline on 2 consecutive analysed frames."""
 
     def __init__(self, baseline, factor=SMILE_FACTOR, frames=SMILE_FRAMES):
         self.level = baseline.mouth * factor
