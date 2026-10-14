@@ -29,12 +29,26 @@ public final class FrameAnalyzer implements AutoCloseable {
     private final MiniFasClassifier classifier;
     private final FaceMesh mesh;
     private final QualityChecker quality;
+    private final boolean ownsModels;
 
     public FrameAnalyzer(OrtEnvironment environment, QualityChecker quality) throws OrtException {
         this.detector = new YuNetDetector(environment);
         this.classifier = new MiniFasClassifier(environment);
         this.mesh = new FaceMesh(environment);
         this.quality = quality;
+        this.ownsModels = true;
+    }
+
+    /**
+     * Analyser on models loaded by the caller, such as the engine that shares them between its sessions. Its
+     * {@link #close()} leaves the models open: they belong to the caller.
+     */
+    public FrameAnalyzer(YuNetDetector detector, MiniFasClassifier classifier, FaceMesh mesh, QualityChecker quality) {
+        this.detector = detector;
+        this.classifier = classifier;
+        this.mesh = mesh;
+        this.quality = quality;
+        this.ownsModels = false;
     }
 
     /**
@@ -110,6 +124,9 @@ public final class FrameAnalyzer implements AutoCloseable {
 
     @Override
     public void close() throws OrtException {
+        if (!ownsModels) {
+            return;
+        }
         detector.close();
         classifier.close();
         mesh.close();
