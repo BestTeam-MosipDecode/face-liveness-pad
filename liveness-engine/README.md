@@ -52,3 +52,19 @@ Package `io.mosip.registration.liveness.active`, ported from `training/liveness/
 | `ActiveSettings`, `ChallengeStatus` | Parameters, and the outcome, feedback code and progress after each frame |
 
 The package has no dependency on the frame pipeline: the session gives it the number of faces, the face box, the Face Mesh measures and the passive score of each analysed frame.
+
+## Passive classifier
+
+| Class | Role |
+| --- | --- |
+| `image.BgrImage` | 8-bit image in the OpenCV layout (rows, columns, B, G, R), JPEG and PNG decoding, crop |
+| `image.Resize` | Bilinear resize with the fixed-point arithmetic of OpenCV `INTER_LINEAR` |
+| `passive.ClassifierCrop` | Crop box and 80 x 80 patch of `training/liveness/crop.py` |
+| `passive.MiniFasClassifier` | The two MiniFASNet models in ONNX Runtime, real-class score |
+| `ModelResources` | Loads the models from the JAR |
+
+`GoldenParityTest` checks the 4 network cases and the 12 preprocessing cases of `src/test/resources/golden/`: crop boxes and patches are identical byte for byte, logits within 1e-3.
+
+`Resize` reproduces the vectorised path of OpenCV: identical results when shrinking to a width whose row size is a multiple of 16 bytes (80 x 80 patch, 256 x 256 Face Mesh input). OpenCV's scalar formula gives values one apart on most images, so it must not be used.
+
+ONNX Runtime is pinned to 1.19.2. Versions 1.20 and later fail to load inside the JVM on Windows (`UnsatisfiedLinkError: A dynamic link library (DLL) initialization routine failed`), because the JDK, and the JRE shipped with the Registration Client, load an older Visual C++ runtime. The tests pass on JDK 11 and JDK 17.
