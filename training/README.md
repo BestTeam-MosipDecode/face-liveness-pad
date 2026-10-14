@@ -349,14 +349,14 @@ The factors stay provisional until more team members are measured (issue #5).
 
 Captures never leave the machine that recorded them. Each member:
 
-1. records with `capture_session.py`, using the pseudonyms of their range: S01 to S09 (Temitayo), S10 to S19 (Elisée), S20 to S29 (Tobi), S30 to S39 (Silverio), volunteers included;
-2. scores their own captures and writes the score file, which holds numbers only:
+1. records with `capture_session.py`, using the pseudonyms of their range: S01 to S09 (Temitayo), S10 to S19 (Elisée), S20 to S29 (Tobi), S30 to S39 (Silverio), volunteers included. For `paper_mask`, another person than the subject wears the mask, and their pseudonym is given with `--presenter` (section 3.2 of `docs/test-plan.md`);
+2. scores their own captures and writes the score file, which holds no image:
 
    ```powershell
    training\.venv\Scripts\python.exe training\scripts\evaluate.py --score-only
    ```
 
-3. shares `training/results/frame_scores.csv`, renamed after the member, on issue #7.
+3. sends `training/results/frame_scores.csv`, renamed after the member, to Temitayo through a private channel (team chat or e-mail). The file is never attached to an issue or a pull request, since the repository is public: it holds a score per frame for each pseudonym, with the date and time of each sequence, and only aggregated figures are published (section 3 of the consent form, section 10 of the test plan). The received files are kept outside the repository and deleted with the captures.
 
 The evaluation then merges the files. It stops if two files use the same pseudonym:
 
