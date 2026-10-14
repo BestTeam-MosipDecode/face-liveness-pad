@@ -283,6 +283,16 @@ Le détail est dans `training/README.md`. À retenir :
 - Exécution faite avec un script placé hors du dossier, sans écriture dans `Silent-Face-Anti-Spoofing/` (`test.py` y aurait écrit une image annotée).
 - `images/sample/pie.jpg` et `pie_result.jpg` sont des copies de `image_T1.jpg` et de son résultat (même SHA-256). Ce ne sont pas des photos d'un membre de l'équipe.
 
+## AMA du 14 octobre
+
+Relevé dans la transcription fournie par Elisée. Elle commence à 12 h 52 (heure de Cotonou), le début de la séance manque. Arrivé en retard, Elisée n'a pu poser que la question de l'accès Collab.
+
+- Accès Collab : Varaniya annonce l'envoi des accès par e-mail avant la fin de la journée du 14 octobre.
+- Licence de MiniFASNet, question posée par une autre équipe du sujet 04 : pour Jana, le modèle peut servir pour Decode mais pas pour un usage commercial, selon les licences et les jeux de données d'entraînement. Anusha précise par écrit que les modèles sous licence MPL ou Apache sont acceptés, sans restriction sur les poids pré-entraînés. Nos poids MiniFASNet et Face Mesh sont sous Apache 2.0, YuNet sous MIT (`THIRD_PARTY_NOTICES.md`).
+- SBI, réponse d'Anusha à un autre participant : découverte, informations du dispositif, puis RCAPTURE, présenté comme l'endpoint où la vérification de vivacité doit avoir lieu, avec la MockMDS pour relier le tout au Registration Client. Notre conception analyse le flux STREAM côté client et contrôle l'image signée de RCAPTURE (`docs/decision-flow.md`, section 6), comme le demande le sujet 04. À confirmer avec Varaniya et Jana (Q16).
+- Soumission : date limite inchangée, 26 octobre à 23 h 59 IST, soit 19 h 29 à Cotonou. E-mail avec le nom d'équipe, le sujet et le lien d'un dossier Drive qui contient le code et les fichiers. Au pitch, une démonstration en direct est appréciée, avec la vidéo en secours, dans un fichier séparé.
+- Séances : chaque mercredi de 17 h à 18 h IST, soit de 12 h 30 à 13 h 30 à Cotonou. Le 21 octobre sera sans doute la dernière. Entre deux séances : `community.mosip.io` (recommandé, visible de tous) ou `decode@mosip.io`. L'enregistrement est disponible dans le « resource deck » partagé pendant la séance.
+
 ## AMA du 7 octobre et calendrier
 
 Relevé dans la transcription de la séance fournie par Elisée.
@@ -340,7 +350,7 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 
 ## Blocages
 
-- Accès Collab. Elisée a envoyé le formulaire de demande, puis un e-mail à `decode@mosip.io` le 7 octobre à 14 h 25. Réponse de MOSIP Decode (Pragya, Community Manager) le 7 octobre à 21 h 58 : la demande est transmise aux mentors du sujet 04, Varaniya et Jana, pour vérifier l'accès Collab et aider à la mise en route du client. En attente de leur retour au 8 octobre. Sans enregistrement de la machine, sans identifiants et sans accès WireGuard, le client ne peut pas se synchroniser avec le serveur. La fin de l'étape 0.4 attend cet accès. Les étapes 0.5, 0.6 et 0.8 n'en dépendent pas.
+- Accès Collab. Elisée a envoyé le formulaire de demande, puis un e-mail à `decode@mosip.io` le 7 octobre à 14 h 25. Réponse de MOSIP Decode (Pragya, Community Manager) le 7 octobre à 21 h 58 : la demande est transmise aux mentors du sujet 04, Varaniya et Jana, pour vérifier l'accès Collab et aider à la mise en route du client. En attente de leur retour au 8 octobre. À l'AMA du 14 octobre, Varaniya annonce l'envoi des accès par e-mail le jour même. Sans enregistrement de la machine, sans identifiants et sans accès WireGuard, le client ne peut pas se synchroniser avec le serveur. La fin de l'étape 0.4 attend cet accès. Les étapes 0.5, 0.6 et 0.8 n'en dépendent pas.
 
 ## Écarts relevés par rapport au plan
 
@@ -358,7 +368,7 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - Q1 (close, 7 octobre) : base = 1.2.0.2.
 - Q2 (close, 7 octobre) : date limite = 26 octobre 2026, 19 h 29 à Cotonou.
 - Q9 (close, 7 octobre) : calendrier resserré et périmètre réduit validés.
-- Q3 (ouverte, étape 0.4) : accès Collab demandé, sans réponse. À la réception : nom d'hôte de l'environnement, identifiants, configuration WireGuard, tous hors dépôt.
+- Q3 (ouverte, étape 0.4) : accès Collab demandé, promis par e-mail pour le 14 octobre au soir. À la réception : nom d'hôte de l'environnement, identifiants, configuration WireGuard, tous hors dépôt.
 - Q0 (close, 7 octobre) : JDK 21.0.3 et Maven 3.9.6 non installés, ils ne servent pas à la 1.2.0.2.
 - Q4 (close, 7 octobre) : membres, comptes GitHub et répartition reçus (voir Équipe).
 - Q10 (close, 7 octobre) : issues et étiquettes créées, phase 1 répartie.
@@ -367,5 +377,6 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - Q13 (close, 7 octobre) : Pull Request n° 40 ouverte avec l'accord d'Elisée, puis fusionnée par Elisée.
 - Q14 (close, 7 octobre) : clés `passive.timeout_ms` et `active.baseline_ms`, opération de contrôle de l'image capturée et règle de comptage des tentatives validées.
 - Q7 (close, 7 octobre) : résident orienté vers la procédure d'exception de MOSIP après la dernière tentative.
-- Q15 (ouverte, AMA du 14 octobre) : comment une exception de vivacité du visage doit-elle être portée dans le paquet pour le traitement côté serveur ?
+- Q15 (ouverte, non posée le 14 octobre faute de temps) : comment une exception de vivacité du visage doit-elle être portée dans le paquet pour le traitement côté serveur ?
+- Q16 (ouverte, 14 octobre) : à l'AMA, Anusha place la vérification de vivacité dans RCAPTURE, côté dispositif. Les mentors du sujet 04 attendent-ils aussi une vérification côté dispositif, en plus de celle du client sur le flux ?
 - Q6 étendue (étape 2.1) : moteur compilé pour Java 11, nom de paquet `io.mosip.registration.liveness`.
