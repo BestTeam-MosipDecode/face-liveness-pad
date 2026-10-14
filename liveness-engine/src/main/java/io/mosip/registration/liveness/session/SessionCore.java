@@ -14,7 +14,9 @@ import java.util.Random;
 import io.mosip.registration.liveness.active.ActiveSettings;
 import io.mosip.registration.liveness.active.ChallengeGenerator;
 import io.mosip.registration.liveness.active.ChallengeRunner;
+import io.mosip.registration.liveness.active.ChallengeStatus;
 import io.mosip.registration.liveness.active.ChallengeType;
+import io.mosip.registration.liveness.active.FrameObservation;
 import io.mosip.registration.liveness.api.DeviceEvent;
 import io.mosip.registration.liveness.api.FailureReason;
 import io.mosip.registration.liveness.api.FeedbackCode;
@@ -121,8 +123,18 @@ final class SessionCore {
         metrics.frameAnalysed(clock.millis() - started);
         imageWidth = image.width();
         imageHeight = image.height();
-        if (state == SessionState.PASSIVE_CHECK) {
-            passive(analysis, t);
+        switch (state) {
+            case PASSIVE_CHECK:
+                passive(analysis, t);
+                break;
+            case ACTIVE_CHALLENGE:
+                active(analysis, t);
+                break;
+            case PASSED:
+                passed(analysis, t);
+                break;
+            default:
+                break;
         }
     }
 
@@ -225,6 +237,64 @@ final class SessionCore {
         challengeClockStart = clock.millis();
         emit(LivenessEvent.Type.ACTIVE_TRIGGERED, null, null, null);
         publish(FeedbackCode.HOLD_STILL, null, 0, challenges.get(0));
+    }
+
+    private void active(FrameAnalysis analysis, long t) {
+        FrameObservation observation = analysis.toObservation();
+        // The runner starts with an empty track: the session checks continuity with the face of the passive check.
+        if (observation.box().isPresent() && !tracker.follow(observation.box().get(), t)) {
+            fail(FailureReason.FACE_CONTINUITY_LOST, null);
+            return;
+        }
+        if (analysis.score() != null) {
+            lastScore = analysis.score();
+        }
+        ChallengeStatus status = runner.update(observation);
+        while (completedChallenges < status.completed()) {
+            ChallengeType done = runner.challenges().get(completedChallenges);
+            completedChallenges++;
+            long now = clock.millis();
+            metrics.challengeCompleted(now - challengeClockStart);
+            challengeClockStart = now;
+            emit(LivenessEvent.Type.CHALLENGE_PASSED, null, done, null);
+        }
+        switch (status.outcome()) {
+            case RUNNING:
+                publish(FeedbackCode.valueOf(status.feedback().name()), null, status.progress(), status.challenge());
+                break;
+            case PASSED:
+                enterPassed();
+                break;
+            default:
+                FailureReason reason = FailureReason.valueOf(status.outcome().name());
+                boolean missed = reason == FailureReason.CHALLENGE_TIMEOUT || reason == FailureReason.CHALLENGE_FAILED;
+                if (missed) {
+                    emit(LivenessEvent.Type.CHALLENGE_FAILED, reason, status.challenge(), null);
+                }
+                fail(reason, missed ? GuidanceTip.FOLLOW_ACTION : null);
+        }
+    }
+
+    /** Section 6: after PASSED, the face keeps being followed with the rules of the active check. */
+    private void passed(FrameAnalysis analysis, long t) {
+        List<FaceDetection> faces = analysis.faces();
+        if (faces.size() > 1) {
+            fail(FailureReason.FACE_CONTINUITY_LOST, null);
+            return;
+        }
+        if (faces.isEmpty()) {
+            if (tracker.withinNoFaceLimit(t)) {
+                publish(FeedbackCode.NO_FACE, null, 1.0, null);
+            } else {
+                fail(FailureReason.FACE_CONTINUITY_LOST, GuidanceTip.STAY_IN_FRAME);
+            }
+            return;
+        }
+        if (!tracker.follow(faces.get(0).box(), t)) {
+            fail(FailureReason.FACE_CONTINUITY_LOST, null);
+            return;
+        }
+        publish(FeedbackCode.HOLD_STILL, null, 1.0, null);
     }
 
     private ActiveSettings activeSettings() {
