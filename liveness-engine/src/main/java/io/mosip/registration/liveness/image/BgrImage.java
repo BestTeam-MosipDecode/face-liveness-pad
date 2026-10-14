@@ -32,17 +32,99 @@ public final class BgrImage {
         this.pixels = pixels;
     }
 
-    /** Decodes a JPEG or PNG frame. Returns an empty result when the bytes are not a readable image. */
+    /**
+     * Decodes a JPEG or PNG frame and applies its EXIF orientation, as OpenCV {@code imread} does. Returns an empty
+     * result when the bytes are not a readable image.
+     */
     public static Optional<BgrImage> decode(byte[] encoded) {
         if (encoded == null || encoded.length == 0) {
             return Optional.empty();
         }
         try {
             BufferedImage image = ImageIO.read(new ByteArrayInputStream(encoded));
-            return image == null ? Optional.empty() : Optional.of(of(image));
+            return image == null ? Optional.empty() : Optional.of(of(image).orient(exifOrientation(encoded)));
         } catch (IOException | RuntimeException e) {
             return Optional.empty();
         }
+    }
+
+    /** EXIF orientation of a JPEG (1 to 8), or 1 when there is none. */
+    static int exifOrientation(byte[] jpeg) {
+        if (jpeg.length < 4 || (jpeg[0] & 0xFF) != 0xFF || (jpeg[1] & 0xFF) != 0xD8) {
+            return 1;
+        }
+        int pos = 2;
+        while (pos + 4 <= jpeg.length && (jpeg[pos] & 0xFF) == 0xFF) {
+            int marker = jpeg[pos + 1] & 0xFF;
+            int length = ((jpeg[pos + 2] & 0xFF) << 8) | (jpeg[pos + 3] & 0xFF);
+            if (marker == 0xDA || length < 2) {
+                return 1;
+            }
+            int start = pos + 4;
+            if (marker == 0xE1 && start + 14 <= jpeg.length && jpeg[start] == 'E' && jpeg[start + 1] == 'x'
+                    && jpeg[start + 2] == 'i' && jpeg[start + 3] == 'f') {
+                return tiffOrientation(jpeg, start + 6, Math.min(jpeg.length, pos + 2 + length));
+            }
+            pos += 2 + length;
+        }
+        return 1;
+    }
+
+    private static int tiffOrientation(byte[] b, int tiff, int end) {
+        boolean little = b[tiff] == 'I';
+        int ifd = tiff + (int) read(b, tiff + 4, 4, little);
+        if (ifd + 2 > end) {
+            return 1;
+        }
+        int entries = (int) read(b, ifd, 2, little);
+        for (int i = 0; i < entries; i++) {
+            int entry = ifd + 2 + i * 12;
+            if (entry + 12 > end) {
+                return 1;
+            }
+            if (read(b, entry, 2, little) == 0x0112) {
+                int value = (int) read(b, entry + 8, 2, little);
+                return value >= 1 && value <= 8 ? value : 1;
+            }
+        }
+        return 1;
+    }
+
+    private static long read(byte[] b, int offset, int size, boolean little) {
+        long value = 0;
+        for (int i = 0; i < size; i++) {
+            int byteValue = b[offset + (little ? size - 1 - i : i)] & 0xFF;
+            value = (value << 8) | byteValue;
+        }
+        return value;
+    }
+
+    /** The image displayed upright for an EXIF orientation value. */
+    BgrImage orient(int orientation) {
+        if (orientation <= 1 || orientation > 8) {
+            return this;
+        }
+        boolean swap = orientation >= 5;
+        int w = swap ? height : width;
+        int h = swap ? width : height;
+        byte[] out = new byte[w * h * 3];
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int sx;
+                int sy;
+                switch (orientation) {
+                    case 2: sx = width - 1 - x; sy = y; break;
+                    case 3: sx = width - 1 - x; sy = height - 1 - y; break;
+                    case 4: sx = x; sy = height - 1 - y; break;
+                    case 5: sx = y; sy = x; break;
+                    case 6: sx = y; sy = height - 1 - x; break;
+                    case 7: sx = width - 1 - y; sy = height - 1 - x; break;
+                    default: sx = width - 1 - y; sy = x; break;
+                }
+                System.arraycopy(pixels, (sy * width + sx) * 3, out, (y * w + x) * 3, 3);
+            }
+        }
+        return new BgrImage(w, h, out);
     }
 
     public static BgrImage of(BufferedImage image) {
