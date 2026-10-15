@@ -66,9 +66,9 @@ session.retry();
 - `submit` returns at once. A single worker thread per session analyses the frames. A frame is skipped while another one is analysed, or when it comes less than `samplingMs` after the last analysed frame. A frame whose timestamp goes back is not skipped: during an attempt it means that the device restarted its clock, so the attempt fails with `DEVICE_ERROR` (stream interrupted), as a device problem would.
 - Frame times come from a monotonic clock (`System.nanoTime() / 1_000_000`), never from the wall clock, which goes back when the system time is adjusted.
 - `submit` decodes the frame later, on the worker: the caller must not reuse the array it passed.
-- `deviceEvent`, `retry` and `checkCapture` are never skipped. `checkCapture` and `retry` wait for their result at most 5 seconds; after that, `checkCapture` refuses the image with `ENGINE_ERROR`, `retry` returns `false`, and the call never runs later.
+- `deviceEvent`, `retry` and `checkCapture` are never skipped. `checkCapture` and `retry` wait for their result at most 5 seconds; after that, a call that has not started yet is dropped: `checkCapture` refuses the image with `ENGINE_ERROR` and `retry` returns `false`. A call already started is awaited and its result returned, since the session has acted on it.
 - The listener runs on the worker thread, after each transition is complete. Calling `retry` or `checkCapture` from the listener is allowed. The listener must return quickly and never block: while it runs, no frame is analysed and the face is not followed. The capture request goes to another thread.
-- `session.close()` lets an analysis in progress finish without interrupting it; nothing reaches the listener after `close()`. `newSession` and `engine.close()` wait up to 2 seconds for the previous worker before going on, so the models are never released during an inference.
+- `session.close()` lets an analysis in progress finish without interrupting it; after `close()`, the session changes nothing more; a transition already under way is still delivered in full, so a failure never reaches the audit without its update. `newSession` and `engine.close()` wait up to 2 seconds for the previous worker before going on, so the models are never released during an inference.
 
 ## 5. Policy
 
@@ -94,7 +94,7 @@ Invalid values throw `IllegalArgumentException`. The configuration provider of t
 
 ## 6. Updates
 
-`LivenessUpdate` holds the state, a `FeedbackCode`, an optional `GuidanceTip`, the challenge in progress, a progress value between 0 and 1, the attempt number and the maximum, the failure reason, `retryAvailable` and `finished`. The score is present only when `diagnostic` is true.
+`LivenessUpdate` holds the state, a `FeedbackCode`, an optional `GuidanceTip`, the challenge in progress with its position (`challengeIndex()` from 1 and `challengeCount()`, both 0 outside the active check, for "Challenge 1 of 2"), a progress value between 0 and 1, the attempt number and the maximum, the failure reason, `retryAvailable` and `finished`. The score is present only when `diagnostic` is true.
 
 | Feedback code | Message key |
 | --- | --- |

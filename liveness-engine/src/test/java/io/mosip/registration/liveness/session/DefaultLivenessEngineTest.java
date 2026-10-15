@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -94,5 +95,26 @@ class DefaultLivenessEngineTest {
         assertThrows(IllegalStateException.class,
             () -> engine.newSession(Workflow.RESIDENT, LivenessPolicy.defaults(), new LivenessEventListener() {
             }));
+    }
+
+    @Test
+    void aNewSessionFromTheListenerOfThePreviousOneDoesNotWait() throws Exception {
+        try (LivenessEngine engine = LivenessEngine.create(new ImageIoFrameDecoder())) {
+            BlockingQueue<Long> waits = new LinkedBlockingQueue<>();
+            LivenessSession first = engine.newSession(Workflow.RESIDENT, LivenessPolicy.defaults(),
+                new LivenessEventListener() {
+                    @Override
+                    public void onUpdate(LivenessUpdate update) {
+                        long start = System.nanoTime();
+                        engine.newSession(Workflow.OPERATOR, LivenessPolicy.defaults(), new LivenessEventListener() {
+                        });
+                        waits.add((System.nanoTime() - start) / 1_000_000);
+                    }
+                });
+            first.submit(greyJpeg(), 100);
+            Long waited = waits.poll(10, TimeUnit.SECONDS);
+            assertNotNull(waited);
+            assertTrue(waited < 1000, "waited " + waited + " ms on its own worker");
+        }
     }
 }

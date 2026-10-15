@@ -164,4 +164,22 @@ class SessionCoreActiveTest {
         assertEquals(FailureReason.FACE_CONTINUITY_LOST,
             f.frame(core, scoredAt(FAR_BOX, LIVE)).failureReason().get());
     }
+
+    @Test
+    void updatesGiveThePositionOfTheChallenge() {
+        SessionCore core = f.core(LivenessPolicy.builder().challengeTypes(BLINK_ONLY.challengeTypes()).minChallenges(2)
+            .build());
+        LivenessUpdate passive = f.frame(core, scored(AMBIGUOUS));
+        assertEquals(0, passive.challengeIndex());
+        assertEquals(0, passive.challengeCount());
+        f.frames(core, 4, scored(AMBIGUOUS));
+        LivenessUpdate first = holdStill(core);
+        assertEquals(1, first.challengeIndex());
+        assertEquals(2, first.challengeCount());
+        f.frame(core, active(EYES_CLOSED, LIVE));
+        LivenessUpdate detected = f.frame(core, active(BASE, LIVE));
+        assertEquals(FeedbackCode.ACTION_DETECTED, detected.feedback());
+        assertEquals(2, detected.challengeIndex());
+        assertEquals(2, detected.challengeCount());
+    }
 }

@@ -48,6 +48,7 @@ public final class DefaultLivenessEngine implements LivenessEngine {
     private final MetricsRecorder metrics = new MetricsRecorder();
     private DefaultLivenessSession active;
     private ExecutorService activeExecutor;
+    private volatile Thread activeWorker;
     private boolean closed;
 
     private DefaultLivenessEngine(FrameDecoder decoder, Clock clock, String modelSetVersion, YuNetDetector detector,
@@ -94,7 +95,10 @@ public final class DefaultLivenessEngine implements LivenessEngine {
         if (active != null) {
             active.close();
             // The previous worker may still be inside an inference: let it finish before the engine can close.
-            stopAndWait(activeExecutor, CLOSE_WAIT_MS);
+            // Not from the worker itself, a listener opening the next session: it would wait for its own end.
+            if (Thread.currentThread() != activeWorker) {
+                stopAndWait(activeExecutor, CLOSE_WAIT_MS);
+            }
         }
         FrameAnalyzer analyzer = new FrameAnalyzer(detector, classifier, mesh,
             new QualityChecker(policy.minFacePx(), policy.maxYawDeg()));
@@ -102,6 +106,7 @@ public final class DefaultLivenessEngine implements LivenessEngine {
             modelSetVersion, listener, metrics);
         ExecutorService executor = Executors.newSingleThreadExecutor(task -> {
             Thread thread = new Thread(task, "liveness-worker");
+            activeWorker = thread;
             thread.setDaemon(true);
             return thread;
         });
@@ -133,7 +138,7 @@ public final class DefaultLivenessEngine implements LivenessEngine {
         }
         // Closing an ONNX session during a native run would crash the JVM: keep the models open if the worker is
         // still inside an inference after the wait. The process is ending anyway when the engine is closed.
-        if (!stopAndWait(activeExecutor, CLOSE_WAIT_MS)) {
+        if (Thread.currentThread() == activeWorker || !stopAndWait(activeExecutor, CLOSE_WAIT_MS)) {
             return;
         }
         closeQuietly(mesh);

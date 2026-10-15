@@ -13,6 +13,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Single analysis thread of a session (section 3.1 of docs/decision-flow.md). Frames are skipped while one is
@@ -22,6 +23,10 @@ final class FrameWorker {
 
     private final Executor executor;
     private final long samplingMs;
+    private static final int QUEUED = 0;
+    private static final int STARTED = 1;
+    private static final int ABANDONED = 2;
+
     private final AtomicBoolean busy = new AtomicBoolean();
     private volatile boolean hasFrame;
     private volatile long lastFrameT;
@@ -79,9 +84,10 @@ final class FrameWorker {
                 return fallback;
             }
         }
-        // Once the caller has given up, the task must not run later: its result was never seen.
-        AtomicBoolean abandoned = new AtomicBoolean();
-        FutureTask<T> future = new FutureTask<>(() -> abandoned.get() ? fallback : task.call());
+        // A task the caller gave up on before it started never runs. A task already started goes to the end and its
+        // result is returned: the session has acted on it, so the caller must see what it did.
+        AtomicInteger stage = new AtomicInteger(QUEUED);
+        FutureTask<T> future = new FutureTask<>(() -> stage.compareAndSet(QUEUED, STARTED) ? task.call() : fallback);
         if (!execute(future)) {
             return fallback;
         }
@@ -89,19 +95,30 @@ final class FrameWorker {
             return future.get(timeoutMs, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            abandon(future, abandoned);
+            if (stage.compareAndSet(QUEUED, ABANDONED)) {
+                future.cancel(false);
+            }
             return fallback;
         } catch (TimeoutException e) {
-            abandon(future, abandoned);
-            return fallback;
+            if (stage.compareAndSet(QUEUED, ABANDONED)) {
+                future.cancel(false);
+                return fallback;
+            }
+            return awaitStarted(future, fallback);
         } catch (ExecutionException e) {
             return fallback;
         }
     }
 
-    private static void abandon(FutureTask<?> future, AtomicBoolean abandoned) {
-        abandoned.set(true);
-        future.cancel(false);
+    private static <T> T awaitStarted(FutureTask<T> future, T fallback) {
+        try {
+            return future.get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return fallback;
+        } catch (ExecutionException e) {
+            return fallback;
+        }
     }
 
     /** Refuses every later task. */

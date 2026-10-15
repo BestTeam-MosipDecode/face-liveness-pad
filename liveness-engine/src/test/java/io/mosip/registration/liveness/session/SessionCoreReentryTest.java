@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -23,6 +24,7 @@ import io.mosip.registration.liveness.api.FailureReason;
 import io.mosip.registration.liveness.api.LivenessEvent;
 import io.mosip.registration.liveness.api.LivenessEventListener;
 import io.mosip.registration.liveness.api.LivenessPolicy;
+import io.mosip.registration.liveness.api.LivenessUpdate;
 import io.mosip.registration.liveness.api.SessionState;
 import io.mosip.registration.liveness.api.Workflow;
 
@@ -101,5 +103,31 @@ class SessionCoreReentryTest {
         core.onDeviceEvent(DeviceEvent.UNAVAILABLE, 1000);
         assertEquals(1, f.analyzer.calls());
         assertEquals(updates, f.updates.size());
+    }
+
+    @Test
+    void closingDuringADeliveryFinishesTheTransition() {
+        AtomicReference<SessionCore> self = new AtomicReference<>();
+        List<LivenessUpdate> updates = new java.util.ArrayList<>();
+        SessionCore core = new SessionCore(Workflow.RESIDENT, LivenessPolicy.defaults(), f.analyzer, f.clock,
+            new Random(5), "1.1.0", new LivenessEventListener() {
+                @Override
+                public void onUpdate(LivenessUpdate update) {
+                    updates.add(update);
+                }
+
+                @Override
+                public void onEvent(LivenessEvent event) {
+                    if (event.type() == LivenessEvent.Type.FAILED) {
+                        self.get().close();
+                    }
+                }
+            }, f.metrics);
+        self.set(core);
+        f.frames(core, 5, scored(SPOOF));
+        assertEquals(SessionState.FAILED, updates.get(updates.size() - 1).state(),
+            "the FAILED update of the transition still reaches the listener");
+        f.frame(core, scored(LIVE));
+        assertEquals(5, f.analyzer.calls(), "nothing after the transition");
     }
 }
