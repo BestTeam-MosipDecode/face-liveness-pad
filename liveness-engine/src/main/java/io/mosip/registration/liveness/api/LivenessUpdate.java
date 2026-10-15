@@ -27,14 +27,27 @@ public final class LivenessUpdate {
     private final boolean retryAvailable;
     private final boolean finished;
     private final Double diagnosticScore;
+    private final int challengeIndex;
+    private final int challengeCount;
 
     /**
      * Created by the engine. {@code tip}, {@code challenge}, {@code failureReason} and {@code diagnosticScore} may
-     * be null.
+     * be null. No challenge position.
      */
     public LivenessUpdate(SessionState state, FeedbackCode feedback, GuidanceTip tip, ChallengeType challenge,
             double progress, int attempt, int maxAttempts, FailureReason failureReason, boolean retryAvailable,
             boolean finished, Double diagnosticScore) {
+        this(state, feedback, tip, challenge, progress, attempt, maxAttempts, failureReason, retryAvailable, finished,
+            diagnosticScore, 0, 0);
+    }
+
+    /**
+     * Created by the engine, with the position of the challenge in the active check: {@code challengeIndex} from 1,
+     * {@code challengeCount} the number of challenges drawn, both 0 outside the active check.
+     */
+    public LivenessUpdate(SessionState state, FeedbackCode feedback, GuidanceTip tip, ChallengeType challenge,
+            double progress, int attempt, int maxAttempts, FailureReason failureReason, boolean retryAvailable,
+            boolean finished, Double diagnosticScore, int challengeIndex, int challengeCount) {
         this.state = state;
         this.feedback = feedback;
         this.tip = tip;
@@ -46,6 +59,18 @@ public final class LivenessUpdate {
         this.retryAvailable = retryAvailable;
         this.finished = finished;
         this.diagnosticScore = diagnosticScore;
+        this.challengeIndex = challengeIndex;
+        this.challengeCount = challengeCount;
+    }
+
+    /** Position of the challenge in progress, from 1; 0 outside the active check. */
+    public int challengeIndex() {
+        return challengeIndex;
+    }
+
+    /** Number of challenges of the active check; 0 outside it. */
+    public int challengeCount() {
+        return challengeCount;
     }
 
     /** Current state of the session. */

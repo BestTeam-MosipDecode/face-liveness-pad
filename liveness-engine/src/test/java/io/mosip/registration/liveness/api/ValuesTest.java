@@ -58,4 +58,15 @@ class ValuesTest {
         assertEquals(0.25, m.retryRate());
         assertEquals(0.5, m.failureRate());
     }
+    @Test
+    void anUpdateCarriesThePositionOfTheChallenge() {
+        LivenessUpdate u = new LivenessUpdate(SessionState.ACTIVE_CHALLENGE, FeedbackCode.CHALLENGE, null,
+            ChallengeType.SMILE, 0.5, 1, 3, null, false, false, null, 2, 3);
+        assertEquals(2, u.challengeIndex());
+        assertEquals(3, u.challengeCount());
+        LivenessUpdate passive = new LivenessUpdate(SessionState.PASSIVE_CHECK, FeedbackCode.CHECKING, null, null, 0.2,
+            1, 3, null, false, false, null);
+        assertEquals(0, passive.challengeIndex());
+        assertEquals(0, passive.challengeCount());
+    }
 }

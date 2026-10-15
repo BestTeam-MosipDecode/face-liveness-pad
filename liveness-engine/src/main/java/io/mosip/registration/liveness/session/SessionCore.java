@@ -83,6 +83,8 @@ final class SessionCore {
     /** Listener calls of the transition in progress, delivered once the session is consistent again. */
     private final Deque<Runnable> outbox = new ArrayDeque<>();
     private boolean delivering;
+    private int challengeIndex;
+    private int challengeCount;
     private volatile boolean closed;
 
     SessionCore(Workflow workflow, LivenessPolicy policy, Analyzer analyzer, Clock clock, Random random,
@@ -101,10 +103,12 @@ final class SessionCore {
             policy.maxAttempts(), null, false, false, null);
     }
 
-    /** Stops the session: later frames, events and calls change nothing and reach no listener. */
+    /**
+     * Stops the session: later frames, events and calls change nothing. A transition already under way is still
+     * delivered in full, so that a listener never sees the event of a failure without its update.
+     */
     void close() {
         closed = true;
-        outbox.clear();
     }
 
     /** Last update published. Safe to read from any thread. */
@@ -387,6 +391,8 @@ final class SessionCore {
         List<ChallengeType> challenges = new ChallengeGenerator(policy.challengeTypes(), policy.minChallenges(),
             random).next();
         runner = new ChallengeRunner(challenges, activeSettings(), t);
+        challengeIndex = 1;
+        challengeCount = challenges.size();
         state = SessionState.ACTIVE_CHALLENGE;
         completedChallenges = 0;
         challengeClockStart = clock.millis();
@@ -405,6 +411,7 @@ final class SessionCore {
             lastScore = analysis.score();
         }
         ChallengeStatus status = runner.update(observation);
+        challengeIndex = Math.min(status.completed() + 1, status.total());
         while (completedChallenges < status.completed()) {
             ChallengeType done = runner.challenges().get(completedChallenges);
             completedChallenges++;
@@ -459,6 +466,7 @@ final class SessionCore {
 
     /** Ends the attempt. Detected attacks and engine errors carry no tip, as section 8 asks. */
     private void fail(FailureReason reason, GuidanceTip tip) {
+        boolean inActiveCheck = state == SessionState.ACTIVE_CHALLENGE;
         state = SessionState.FAILED;
         metrics.attemptFailed();
         GuidanceTip shown = reason == FailureReason.PAD_ATTACK_DETECTED || reason == FailureReason.ENGINE_ERROR
@@ -471,12 +479,15 @@ final class SessionCore {
         }
         update(new LivenessUpdate(SessionState.FAILED,
             exhausted ? FeedbackCode.MAX_ATTEMPTS_EXCEEDED : FeedbackCode.FAILED, shown, null, current.progress(),
-            attempt, policy.maxAttempts(), reason, !exhausted, exhausted, diagnosticScore()));
+            attempt, policy.maxAttempts(), reason, !exhausted, exhausted, diagnosticScore(),
+            inActiveCheck ? challengeIndex : 0, inActiveCheck ? challengeCount : 0));
     }
 
     private void publish(FeedbackCode feedback, GuidanceTip tip, double progress, ChallengeType challenge) {
+        boolean inActiveCheck = state == SessionState.ACTIVE_CHALLENGE;
         update(new LivenessUpdate(state, feedback, tip, challenge, progress, attempt, policy.maxAttempts(), null,
-            false, finished, diagnosticScore()));
+            false, finished, diagnosticScore(), inActiveCheck ? challengeIndex : 0,
+            inActiveCheck ? challengeCount : 0));
     }
 
     private Double diagnosticScore() {
@@ -501,17 +512,13 @@ final class SessionCore {
      * calls, which this loop delivers in order.
      */
     private void deliver() {
-        if (closed) {
-            outbox.clear();
-            return;
-        }
         if (delivering) {
             return;
         }
         delivering = true;
         try {
             Runnable call;
-            while (!closed && (call = outbox.poll()) != null) {
+            while ((call = outbox.poll()) != null) {
                 try {
                     call.run();
                 } catch (RuntimeException ignored) {
