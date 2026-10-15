@@ -22,6 +22,7 @@ import io.mosip.registration.liveness.face.FaceDetection;
 import io.mosip.registration.liveness.face.FaceMesh;
 import io.mosip.registration.liveness.face.YuNetDetector;
 import io.mosip.registration.liveness.image.BgrImage;
+import io.mosip.registration.liveness.platform.desktop.ImageIoFrameDecoder;
 
 /**
  * End-to-end check on the sample images of Silent-Face-Anti-Spoofing, against the Python results recorded in
@@ -45,7 +46,7 @@ class SampleImagesTest {
         Path path = Paths.get(dir, name);
         assumeTrue(Files.exists(path), "missing " + path);
 
-        BgrImage image = BgrImage.decode(Files.readAllBytes(path)).orElseThrow(AssertionError::new);
+        BgrImage image = new ImageIoFrameDecoder().decode(Files.readAllBytes(path)).orElseThrow(AssertionError::new);
         OrtEnvironment environment = OrtEnvironment.getEnvironment();
         try (YuNetDetector detector = new YuNetDetector(environment);
                 MiniFasClassifier classifier = new MiniFasClassifier(environment);

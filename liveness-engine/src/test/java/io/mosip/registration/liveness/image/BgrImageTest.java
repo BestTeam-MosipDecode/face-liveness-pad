@@ -6,14 +6,8 @@
 package io.mosip.registration.liveness.image;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-
-import javax.imageio.ImageIO;
 
 import org.junit.jupiter.api.Test;
 
@@ -62,27 +56,6 @@ class BgrImageTest {
         assertEquals(8, BgrImage.exifOrientation(exifHeader(8, false)));
         assertEquals(1, BgrImage.exifOrientation(exifHeader(9, true)));
         assertEquals(1, BgrImage.exifOrientation(new byte[] {1, 2, 3, 4}));
-    }
-
-    @Test
-    void decodesAJpegWithoutExif() throws Exception {
-        BufferedImage image = new BufferedImage(16, 8, BufferedImage.TYPE_INT_RGB);
-        image.setRGB(0, 0, 0xFF0000);
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ImageIO.write(image, "png", out);
-        BgrImage decoded = BgrImage.decode(out.toByteArray()).get();
-        assertEquals(16, decoded.width());
-        assertEquals(8, decoded.height());
-        assertEquals(255, decoded.get(0, 0, 2));
-        assertEquals(0, decoded.get(0, 0, 0));
-        assertEquals(1, BgrImage.exifOrientation(out.toByteArray()));
-    }
-
-    @Test
-    void unreadableBytesGiveNothing() {
-        assertFalse(BgrImage.decode(new byte[] {1, 2, 3}).isPresent());
-        assertFalse(BgrImage.decode(new byte[0]).isPresent());
-        assertFalse(BgrImage.decode(null).isPresent());
     }
 
     @Test

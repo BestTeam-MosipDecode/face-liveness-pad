@@ -5,17 +5,10 @@
  */
 package io.mosip.registration.liveness.image;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.Optional;
-
-import javax.imageio.ImageIO;
-
 /**
  * 8-bit image in the memory layout of OpenCV: rows, then columns, then channels B, G, R. All models and the
- * preprocessing of {@code training/liveness/} work on this layout.
+ * preprocessing of {@code training/liveness/} work on this layout. Decoding is done by a {@code FrameDecoder}, so
+ * that this class has no desktop dependency.
  */
 public final class BgrImage {
 
@@ -32,24 +25,8 @@ public final class BgrImage {
         this.pixels = pixels;
     }
 
-    /**
-     * Decodes a JPEG or PNG frame and applies its EXIF orientation, as OpenCV {@code imread} does. Returns an empty
-     * result when the bytes are not a readable image.
-     */
-    public static Optional<BgrImage> decode(byte[] encoded) {
-        if (encoded == null || encoded.length == 0) {
-            return Optional.empty();
-        }
-        try {
-            BufferedImage image = ImageIO.read(new ByteArrayInputStream(encoded));
-            return image == null ? Optional.empty() : Optional.of(of(image).orient(exifOrientation(encoded)));
-        } catch (IOException | RuntimeException e) {
-            return Optional.empty();
-        }
-    }
-
     /** EXIF orientation of a JPEG (1 to 8), or 1 when there is none. */
-    static int exifOrientation(byte[] jpeg) {
+    public static int exifOrientation(byte[] jpeg) {
         if (jpeg.length < 4 || (jpeg[0] & 0xFF) != 0xFF || (jpeg[1] & 0xFF) != 0xD8) {
             return 1;
         }
@@ -100,7 +77,7 @@ public final class BgrImage {
     }
 
     /** The image displayed upright for an EXIF orientation value. */
-    BgrImage orient(int orientation) {
+    public BgrImage orient(int orientation) {
         if (orientation <= 1 || orientation > 8) {
             return this;
         }
@@ -125,16 +102,6 @@ public final class BgrImage {
             }
         }
         return new BgrImage(w, h, out);
-    }
-
-    public static BgrImage of(BufferedImage image) {
-        BufferedImage bgr = image;
-        if (image.getType() != BufferedImage.TYPE_3BYTE_BGR) {
-            bgr = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
-            bgr.getGraphics().drawImage(image, 0, 0, null);
-        }
-        byte[] data = ((DataBufferByte) bgr.getRaster().getDataBuffer()).getData();
-        return new BgrImage(bgr.getWidth(), bgr.getHeight(), data.clone());
     }
 
     public int width() {
