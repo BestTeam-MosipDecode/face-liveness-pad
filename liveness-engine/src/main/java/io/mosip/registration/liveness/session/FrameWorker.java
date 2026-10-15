@@ -79,7 +79,9 @@ final class FrameWorker {
                 return fallback;
             }
         }
-        FutureTask<T> future = new FutureTask<>(task);
+        // Once the caller has given up, the task must not run later: its result was never seen.
+        AtomicBoolean abandoned = new AtomicBoolean();
+        FutureTask<T> future = new FutureTask<>(() -> abandoned.get() ? fallback : task.call());
         if (!execute(future)) {
             return fallback;
         }
@@ -87,10 +89,19 @@ final class FrameWorker {
             return future.get(timeoutMs, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            abandon(future, abandoned);
             return fallback;
-        } catch (ExecutionException | TimeoutException e) {
+        } catch (TimeoutException e) {
+            abandon(future, abandoned);
+            return fallback;
+        } catch (ExecutionException e) {
             return fallback;
         }
+    }
+
+    private static void abandon(FutureTask<?> future, AtomicBoolean abandoned) {
+        abandoned.set(true);
+        future.cancel(false);
     }
 
     /** Refuses every later task. */

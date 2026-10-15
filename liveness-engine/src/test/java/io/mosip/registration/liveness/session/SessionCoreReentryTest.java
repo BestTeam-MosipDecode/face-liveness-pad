@@ -90,4 +90,16 @@ class SessionCoreReentryTest {
         f.t = 0;
         assertEquals(SessionState.PASSED, f.frames(core, 5, scored(LIVE)).state());
     }
+
+    @Test
+    void aClosedSessionNeitherAnalysesNorPublishes() {
+        SessionCore core = f.core(LivenessPolicy.defaults());
+        f.frame(core, scored(LIVE));
+        int updates = f.updates.size();
+        core.close();
+        f.frame(core, scored(LIVE));
+        core.onDeviceEvent(DeviceEvent.UNAVAILABLE, 1000);
+        assertEquals(1, f.analyzer.calls());
+        assertEquals(updates, f.updates.size());
+    }
 }

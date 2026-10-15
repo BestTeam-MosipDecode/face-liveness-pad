@@ -270,6 +270,9 @@ public final class LivenessPolicy {
             if (attackThreshold >= passThreshold) {
                 throw new IllegalArgumentException("attackThreshold must be below passThreshold");
             }
+            if (windowMs < (long) minFrames * samplingMs) {
+                throw new IllegalArgumentException("windowMs must hold minFrames frames at samplingMs");
+            }
             if (baselineMs >= challengeTimeoutMs) {
                 throw new IllegalArgumentException("baselineMs must be below challengeTimeoutMs");
             }

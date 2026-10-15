@@ -65,8 +65,13 @@ public final class FaceMesh implements AutoCloseable {
     private final OrtSession session;
 
     public FaceMesh(OrtEnvironment environment) throws OrtException {
+        this(environment, ModelResources.read(ModelResources.FACE_MESH));
+    }
+
+    /** Landmark model on bytes already verified by the engine. */
+    public FaceMesh(OrtEnvironment environment, byte[] model) throws OrtException {
         this.environment = environment;
-        this.session = ModelResources.open(environment, ModelResources.FACE_MESH);
+        this.session = ModelResources.open(environment, model);
     }
 
     public Landmarks landmarks(BgrImage image, FaceBox box) throws OrtException {

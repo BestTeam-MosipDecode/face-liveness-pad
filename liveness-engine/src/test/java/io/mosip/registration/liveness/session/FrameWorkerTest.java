@@ -122,4 +122,17 @@ class FrameWorkerTest {
         assertTrue(executor.tasks.isEmpty());
         assertEquals(-1, (int) worker.call(() -> 42, 1000, -1));
     }
+
+    @Test
+    void aTimedOutCallNeverRunsLater() {
+        ManualExecutor executor = new ManualExecutor();
+        FrameWorker worker = new FrameWorker(executor, 100);
+        List<String> ran = new ArrayList<>();
+        assertEquals(-1, (int) worker.call(() -> {
+            ran.add("late");
+            return 42;
+        }, 50, -1));
+        executor.runAll();
+        assertTrue(ran.isEmpty(), "the caller gave up: the task must not run");
+    }
 }

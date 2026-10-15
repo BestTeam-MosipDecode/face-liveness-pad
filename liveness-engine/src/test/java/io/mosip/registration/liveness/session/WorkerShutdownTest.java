@@ -46,4 +46,22 @@ class WorkerShutdownTest {
         assertTrue(DefaultLivenessEngine.stopAndWait(Executors.newSingleThreadExecutor(), 100));
         assertTrue(DefaultLivenessEngine.stopAndWait(null, 100));
     }
+
+    @Test
+    void stoppingLetsTheCurrentTaskFinishUninterrupted() throws Exception {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        CountDownLatch started = new CountDownLatch(1);
+        java.util.concurrent.atomic.AtomicBoolean interrupted = new java.util.concurrent.atomic.AtomicBoolean();
+        executor.execute(() -> {
+            started.countDown();
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                interrupted.set(true);
+            }
+        });
+        assertTrue(started.await(2, TimeUnit.SECONDS));
+        assertTrue(DefaultLivenessEngine.stopAndWait(executor, 2000));
+        assertFalse(interrupted.get(), "an audit write in the listener must not be interrupted");
+    }
 }

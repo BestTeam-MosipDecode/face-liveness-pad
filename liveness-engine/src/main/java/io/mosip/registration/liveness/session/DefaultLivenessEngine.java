@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
+import io.mosip.registration.liveness.ModelResources;
 import io.mosip.registration.liveness.api.FrameDecoder;
 import io.mosip.registration.liveness.api.LivenessEngine;
 import io.mosip.registration.liveness.api.LivenessEventListener;
@@ -68,9 +69,11 @@ public final class DefaultLivenessEngine implements LivenessEngine {
         YuNetDetector detector = null;
         MiniFasClassifier classifier = null;
         try {
-            detector = new YuNetDetector(environment);
-            classifier = new MiniFasClassifier(environment);
-            FaceMesh mesh = new FaceMesh(environment);
+            // The sessions are built from the bytes verified against models.json, not read again.
+            detector = new YuNetDetector(environment, manifest.bytes(ModelResources.YUNET));
+            classifier = new MiniFasClassifier(environment, manifest.bytes(ModelResources.MINIFASNET_V2),
+                manifest.bytes(ModelResources.MINIFASNET_V1SE));
+            FaceMesh mesh = new FaceMesh(environment, manifest.bytes(ModelResources.FACE_MESH));
             return new DefaultLivenessEngine(decoder, clock, manifest.modelSetVersion(), detector, classifier, mesh);
         } catch (OrtException e) {
             closeQuietly(classifier);
@@ -90,6 +93,8 @@ public final class DefaultLivenessEngine implements LivenessEngine {
         Objects.requireNonNull(listener, "listener");
         if (active != null) {
             active.close();
+            // The previous worker may still be inside an inference: let it finish before the engine can close.
+            stopAndWait(activeExecutor, CLOSE_WAIT_MS);
         }
         FrameAnalyzer analyzer = new FrameAnalyzer(detector, classifier, mesh,
             new QualityChecker(policy.minFacePx(), policy.maxYawDeg()));
@@ -102,7 +107,7 @@ public final class DefaultLivenessEngine implements LivenessEngine {
         });
         activeExecutor = executor;
         active = new DefaultLivenessSession(workflow, core, new FrameWorker(executor, policy.samplingMs()), decoder,
-            modelSetVersion, executor::shutdownNow);
+            modelSetVersion, executor::shutdown);
         metrics.sessionStarted();
         return active;
     }
@@ -141,7 +146,8 @@ public final class DefaultLivenessEngine implements LivenessEngine {
         if (executor == null) {
             return true;
         }
-        executor.shutdownNow();
+        // shutdown, not shutdownNow: an interrupt could break an audit write done by the listener.
+        executor.shutdown();
         try {
             return executor.awaitTermination(timeoutMs, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {

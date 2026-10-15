@@ -5,6 +5,7 @@
  */
 package io.mosip.registration.liveness.model;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -87,5 +88,30 @@ class ModelManifestTest {
     void sha256IsHexadecimal() {
         assertEquals("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
             ModelManifest.sha256(new byte[0]));
+    }
+
+    @Test
+    void refusesAManifestWithoutARequiredModel() {
+        byte[] abc = "abc".getBytes(StandardCharsets.UTF_8);
+        String manifest = "{\"modelSetVersion\": \"1\", \"models\": [{\"file\": \"a.onnx\", \"sha256\": \""
+            + ModelManifest.sha256(abc) + "\", \"sizeBytes\": 3}]}";
+        ModelIntegrityException e = assertThrows(ModelIntegrityException.class,
+            () -> ModelManifest.load(name -> name.equals("a.onnx") ? abc : manifest.getBytes(StandardCharsets.UTF_8)));
+        assertTrue(e.getMessage().contains(ModelResources.YUNET), e.getMessage());
+    }
+
+    @Test
+    void keepsTheVerifiedBytes() throws Exception {
+        ModelManifest manifest = ModelManifest.load();
+        assertArrayEquals(resource(ModelResources.FACE_MESH), manifest.bytes(ModelResources.FACE_MESH));
+    }
+
+    @Test
+    void aNullManifestOrModelIsAnIntegrityError() {
+        assertThrows(ModelIntegrityException.class,
+            () -> ModelManifest.load(name -> "null".getBytes(StandardCharsets.UTF_8)));
+        assertThrows(ModelIntegrityException.class,
+            () -> ModelManifest.load(name -> "{\"modelSetVersion\": \"1\", \"models\": [null]}"
+                .getBytes(StandardCharsets.UTF_8)));
     }
 }

@@ -83,6 +83,7 @@ final class SessionCore {
     /** Listener calls of the transition in progress, delivered once the session is consistent again. */
     private final Deque<Runnable> outbox = new ArrayDeque<>();
     private boolean delivering;
+    private volatile boolean closed;
 
     SessionCore(Workflow workflow, LivenessPolicy policy, Analyzer analyzer, Clock clock, Random random,
             String modelSetVersion, LivenessEventListener listener, MetricsRecorder metrics) {
@@ -98,6 +99,12 @@ final class SessionCore {
             policy.windowMs());
         this.current = new LivenessUpdate(SessionState.INIT, FeedbackCode.CHECKING, null, null, 0, 0,
             policy.maxAttempts(), null, false, false, null);
+    }
+
+    /** Stops the session: later frames, events and calls change nothing and reach no listener. */
+    void close() {
+        closed = true;
+        outbox.clear();
     }
 
     /** Last update published. Safe to read from any thread. */
@@ -120,6 +127,9 @@ final class SessionCore {
     }
 
     private void onFrameNow(BgrImage image, long t) {
+        if (closed) {
+            return;
+        }
         if (finished || state == SessionState.FAILED) {
             return;
         }
@@ -173,6 +183,9 @@ final class SessionCore {
     }
 
     private CaptureCheck checkCaptureNow(BgrImage image) {
+        if (closed) {
+            return CaptureCheck.rejected(FailureReason.ENGINE_ERROR, modelSetVersion);
+        }
         if (state != SessionState.PASSED || finished) {
             return CaptureCheck.rejected(FailureReason.FACE_CONTINUITY_LOST, modelSetVersion);
         }
@@ -241,6 +254,9 @@ final class SessionCore {
     }
 
     private boolean retryNow() {
+        if (closed) {
+            return false;
+        }
         if (finished || state != SessionState.FAILED) {
             return false;
         }
@@ -263,6 +279,9 @@ final class SessionCore {
     }
 
     private void onDeviceEventNow(DeviceEvent event, long t) {
+        if (closed) {
+            return;
+        }
         if (finished || state == SessionState.FAILED) {
             return;
         }
@@ -482,13 +501,17 @@ final class SessionCore {
      * calls, which this loop delivers in order.
      */
     private void deliver() {
+        if (closed) {
+            outbox.clear();
+            return;
+        }
         if (delivering) {
             return;
         }
         delivering = true;
         try {
             Runnable call;
-            while ((call = outbox.poll()) != null) {
+            while (!closed && (call = outbox.poll()) != null) {
                 try {
                     call.run();
                 } catch (RuntimeException ignored) {

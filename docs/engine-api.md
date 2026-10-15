@@ -21,12 +21,13 @@ The engine has no dependency on the Registration Client, on JavaFX or on `java.a
 LivenessEngine engine = LivenessEngine.create(new ImageIoFrameDecoder());   // once, at start-up
 
 AtomicBoolean captureRequested = new AtomicBoolean();
+ExecutorService captureThread = Executors.newSingleThreadExecutor();
 LivenessSession session = engine.newSession(Workflow.RESIDENT, policy, new LivenessEventListener() {
     @Override
     public void onUpdate(LivenessUpdate update) {
         Platform.runLater(() -> showOnScreen(update));          // worker thread -> JavaFX thread
         if (update.state() == SessionState.PASSED && captureRequested.compareAndSet(false, true)) {
-            requestCapture();                                   // RCAPTURE once, only after PASSED
+            captureThread.execute(() -> requestCapture());      // RCAPTURE once, after PASSED, off the worker
         }
     }
 
@@ -36,13 +37,17 @@ LivenessSession session = engine.newSession(Workflow.RESIDENT, policy, new Liven
     }
 });
 
-// For each frame of the device stream (Streamer thread):
-session.submit(jpegBytes, System.currentTimeMillis());
+// For each frame of the device stream (Streamer thread), with a monotonic clock:
+session.submit(jpegBytes, System.nanoTime() / 1_000_000);
 
-// When the capture request returns:
-CaptureCheck check = session.checkCapture(capturedImageBytes);
+// When the capture request returns: RCAPTURE gives an ISO/IEC 19794-5 record holding a JPEG 2000 image.
+ConvertRequestDto request = new ConvertRequestDto();
+request.setVersion("ISO19794_5_2011");
+request.setInputBytes(isoRecord);
+BgrImage captured = ImageIoFrameDecoder.toBgr(FaceDecoder.convertFaceISOToBufferedImage(request));
+CaptureCheck check = session.checkCapture(captured);
 if (check.accepted()) {
-    store(capturedImageBytes);
+    store(isoRecord);
 }
 
 // After a failure, if update.retryAvailable():
@@ -52,16 +57,18 @@ session.retry();
 
 ## 3. Life cycle
 
-- `LivenessEngine.create(decoder)` reads `models.json`, compares the size and the SHA-256 of each model file, then loads the four models. A missing or modified file throws `ModelIntegrityException`, whose message names the file: the engine does not start.
+- `LivenessEngine.create(decoder)` reads `models.json`, checks that it lists the four models of the engine, compares the size and the SHA-256 of each model file, then builds the ONNX sessions from the verified bytes. A missing or modified file throws `ModelIntegrityException`, whose message names the file: the engine does not start.
 - One session is active at a time. `newSession` closes the previous one.
 - `session.close()` stops the session. `engine.close()` closes the active session and releases the models.
 
 ## 4. Threads
 
 - `submit` returns at once. A single worker thread per session analyses the frames. A frame is skipped while another one is analysed, or when it comes less than `samplingMs` after the last analysed frame. A frame whose timestamp goes back is not skipped: during an attempt it means that the device restarted its clock, so the attempt fails with `DEVICE_ERROR` (stream interrupted), as a device problem would.
-- `deviceEvent`, `retry` and `checkCapture` are never skipped. `checkCapture` and `retry` wait for their result at most 5 seconds; after that, `checkCapture` refuses the image with `ENGINE_ERROR`.
-- The listener runs on the worker thread, after each transition is complete. Calling `retry` or `checkCapture` from the listener is allowed. The listener must never block on the UI thread.
-- `engine.close()` waits up to 2 seconds for an analysis in progress before it releases the models.
+- Frame times come from a monotonic clock (`System.nanoTime() / 1_000_000`), never from the wall clock, which goes back when the system time is adjusted.
+- `submit` decodes the frame later, on the worker: the caller must not reuse the array it passed.
+- `deviceEvent`, `retry` and `checkCapture` are never skipped. `checkCapture` and `retry` wait for their result at most 5 seconds; after that, `checkCapture` refuses the image with `ENGINE_ERROR`, `retry` returns `false`, and the call never runs later.
+- The listener runs on the worker thread, after each transition is complete. Calling `retry` or `checkCapture` from the listener is allowed. The listener must return quickly and never block: while it runs, no frame is analysed and the face is not followed. The capture request goes to another thread.
+- `session.close()` lets an analysis in progress finish without interrupting it; nothing reaches the listener after `close()`. `newSession` and `engine.close()` wait up to 2 seconds for the previous worker before going on, so the models are never released during an inference.
 
 ## 5. Policy
 
@@ -107,6 +114,10 @@ Invalid values throw `IllegalArgumentException`. The configuration provider of t
 The screen never says that an attack was suspected: `PAD_ATTACK_DETECTED` shows the same message as an engine error.
 
 ## 7. Capture check
+
+RCAPTURE returns an ISO/IEC 19794-5 record holding a JPEG 2000 image, which the engine does not decode. The client extracts the image with the MOSIP `FaceDecoder.convertFaceISOToBufferedImage`, which it already uses to display the captured face, and calls `checkCapture(BgrImage)` with `ImageIoFrameDecoder.toBgr`. `checkCapture(byte[])` takes JPEG or PNG bytes.
+
+A device event after `PASSED` ends the attempt. Once the capture is requested, the client stops reporting the end of the stream (`LivenessFrameSource.captureRequested()` in the Registration Client), since a device may end its stream after the capture.
 
 After `PASSED`, the session keeps following the face on the stream. `checkCapture` accepts the captured image when it decodes, holds exactly one face, passes the quality checks, scores above the attack threshold, and is consistent in position and size with the last face followed (section 6 of the decision flow). A refused image ends the attempt with its reason. A second call after a success is refused without changing anything.
 

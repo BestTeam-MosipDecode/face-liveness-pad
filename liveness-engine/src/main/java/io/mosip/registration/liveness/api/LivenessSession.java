@@ -5,6 +5,8 @@
  */
 package io.mosip.registration.liveness.api;
 
+import io.mosip.registration.liveness.image.BgrImage;
+
 /**
  * One liveness session: one resident face capture, or one operator or supervisor face authentication. Frames go in
  * through {@link #submit}; results come out through the listener given to {@link LivenessEngine#newSession}. Every
@@ -16,8 +18,12 @@ public interface LivenessSession extends AutoCloseable {
      * Offers one frame of the device stream. Returns at once. The frame is skipped while another one is analysed or
      * when it comes less than {@code samplingMs} after the last analysed frame.
      *
-     * @param encodedFrame JPEG or PNG bytes, as received from the device
-     * @param timestampMs time of the frame in milliseconds, increasing along the stream
+     * @param encodedFrame JPEG or PNG bytes, as received from the device. The frame is decoded later on the worker
+     *            thread: the caller must not reuse or modify the array.
+     * @param timestampMs time of the frame in milliseconds, from a monotonic clock such as
+     *            {@code System.nanoTime() / 1_000_000}. A time that goes back during an attempt ends it with
+     *            {@code DEVICE_ERROR}, so the wall clock, which moves when the system time is adjusted, must not be
+     *            used.
      */
     void submit(byte[] encodedFrame, long timestampMs);
 
@@ -27,9 +33,20 @@ public interface LivenessSession extends AutoCloseable {
     /**
      * Checks the image returned by the capture request (section 6 of docs/decision-flow.md). Call it once, after
      * the state became {@link SessionState#PASSED}; in any other case the image is refused and the state does not
-     * change. Waits for the result at most 5 seconds.
+     * change. Waits for the result at most 5 seconds; a check that has not started by then never runs.
+     *
+     * @param encodedImage JPEG or PNG bytes, decoded by the platform decoder of the engine. RCAPTURE returns an
+     *            ISO/IEC 19794-5 record holding a JPEG 2000 image: convert it first, or use
+     *            {@link #checkCapture(BgrImage)}.
      */
     CaptureCheck checkCapture(byte[] encodedImage);
+
+    /**
+     * Same check on an image already decoded by the client, for example the {@code BufferedImage} that the MOSIP
+     * {@code FaceDecoder.convertFaceISOToBufferedImage} extracts from the ISO/IEC 19794-5 record of RCAPTURE, turned
+     * into pixels with {@code ImageIoFrameDecoder.toBgr}. No JPEG round trip.
+     */
+    CaptureCheck checkCapture(BgrImage capturedImage);
 
     /**
      * Starts a new attempt after a failure, with an empty score window and new challenges.

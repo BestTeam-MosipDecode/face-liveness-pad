@@ -45,8 +45,18 @@ public final class YuNetDetector implements AutoCloseable {
 
     public YuNetDetector(OrtEnvironment environment, double scoreThreshold, double nmsThreshold)
             throws OrtException {
+        this(environment, ModelResources.read(ModelResources.YUNET), scoreThreshold, nmsThreshold);
+    }
+
+    /** Detector on model bytes already verified by the engine. */
+    public YuNetDetector(OrtEnvironment environment, byte[] model) throws OrtException {
+        this(environment, model, SCORE_THRESHOLD, NMS_THRESHOLD);
+    }
+
+    private YuNetDetector(OrtEnvironment environment, byte[] model, double scoreThreshold, double nmsThreshold)
+            throws OrtException {
         this.environment = environment;
-        this.session = ModelResources.open(environment, ModelResources.YUNET);
+        this.session = ModelResources.open(environment, model);
         this.scoreThreshold = scoreThreshold;
         this.nmsThreshold = nmsThreshold;
     }

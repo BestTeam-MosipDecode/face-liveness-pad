@@ -9,6 +9,9 @@ package io.mosip.registration.liveness.api;
  * Receives the updates and the audit events of a session. Both methods are called on the worker thread of the
  * session: a JavaFX client moves to its own thread with {@code Platform.runLater}. Exceptions thrown here are
  * ignored by the engine. Calling {@code retry()} or {@code checkCapture()} from here is allowed.
+ *
+ * <p>Both methods must return quickly and never block: while they run, the session analyses no frame and does not
+ * follow the face. Hand slow work, such as the capture request to the device, to another thread.
  */
 public interface LivenessEventListener {
 

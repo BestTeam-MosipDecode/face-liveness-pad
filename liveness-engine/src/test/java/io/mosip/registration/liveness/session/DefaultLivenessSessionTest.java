@@ -131,4 +131,15 @@ class DefaultLivenessSessionTest {
         assertEquals(FailureReason.ENGINE_ERROR, session.checkCapture(FRAME).failureReason().get());
         assertFalse(session.retry());
     }
+
+    @Test
+    void aCaptureCanBeCheckedFromDecodedPixels() {
+        DefaultLivenessSession session = session(f.core(LivenessPolicy.defaults()));
+        for (int i = 1; i <= 5; i++) {
+            f.analyzer.then(scored(LIVE));
+            session.submit(FRAME, 100 * i);
+        }
+        f.analyzer.then(scored(LIVE));
+        assertTrue(session.checkCapture(IMAGE).accepted());
+    }
 }
