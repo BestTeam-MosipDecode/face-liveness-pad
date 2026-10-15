@@ -38,7 +38,7 @@ Every key starts with `mosip.registration.face.liveness.`, written `…` below.
 | `…active.challenge_timeout_ms` | integer, ms | `8000` | 3000 to 30000 | Time to perform one challenge, hold-still phase included |
 | `…active.baseline_ms` | integer, ms | `600` | 300 to 3000 | Duration of the hold-still phase before an instruction |
 | `…max_attempts` | integer | `3` | 1 to 10 | Attempts per capture or authentication |
-| `…on_max_attempts` | text | `BLOCK` | `BLOCK`; `EXCEPTION` for residents only | What follows the last failed attempt |
+| `…on_max_attempts` | text | `EXCEPTION` for residents, `BLOCK` for operators and supervisors | `BLOCK`; `EXCEPTION` for residents only | What follows the last failed attempt |
 | `…diagnostic.enabled` | boolean | `false` | `true`, `false`, `Y`, `N` | Shows scores and states on screen and writes them to the diagnostic log |
 
 Notes:
