@@ -135,4 +135,18 @@ class FrameWorkerTest {
         executor.runAll();
         assertTrue(ran.isEmpty(), "the caller gave up: the task must not run");
     }
+
+    @Test
+    void aCallAlreadyRunningGivesItsResult() {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        try {
+            FrameWorker worker = new FrameWorker(executor, 100);
+            assertEquals(42, (int) worker.call(() -> {
+                Thread.sleep(300);
+                return 42;
+            }, 50, -1), "a started check must not be reported as failed while it completes");
+        } finally {
+            executor.shutdownNow();
+        }
+    }
 }
