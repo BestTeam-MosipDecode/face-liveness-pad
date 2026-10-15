@@ -2,11 +2,11 @@
 
 Suivi de travail interne du projet Face Liveness / PAD (MOSIP Decode 2026, sujet 04).
 Plan de référence : `PLAN_FACE_LIVENESS.md`, à la racine du workspace `mosip_decode/` (hors dépôt).
-Dernière mise à jour : 14 octobre 2026.
+Dernière mise à jour : 15 octobre 2026.
 
 ## Étape en cours
 
-Campagne de captures de l'équipe (issue n° 7) : Elisée filme les sujets S10 à S19 et transmet son fichier de scores avant le 20 octobre. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
+Campagne de captures de l'équipe (issue n° 7) : sujet S10 terminé le 15 octobre, fichier de scores transmis en privé à Temitayo. Volontaires S12 et suivants possibles jusqu'au 20 octobre. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
 
 ## Terminé
 
@@ -152,6 +152,7 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 - Deux corrections publiées sur l'issue. Le fichier de scores part en privé à Temitayo et n'est jamais joint à une issue : le dépôt est public, le fichier donne un score par image et par pseudonyme, alors que le formulaire de consentement et le plan de test ne publient que des chiffres agrégés. Pour `paper_mask`, une autre personne que le sujet porte le masque (plan de test, section 3.2). `training/README.md` corrigé dans le même sens.
 - Paquets manquants de `training/.venv` installés sur le poste d'Elisée (matplotlib, pandas, scikit-learn, scipy), avec son accord.
 - Facteur du sourire passé de 1,10 à 1,06 par la Pull Request n° 61 : valeur provisoire, à valider par Elisée après les mesures de l'équipe.
+- 15 octobre : sujet S10 enregistré sur le poste d'Elisée, 36 séquences sous les trois éclairages, avec un outil de séance local rangé sous `captures/` et ignoré par Git (enchaînement des séquences, contrôle des trous d'enregistrement et du sens des rotations, fabrication des supports imprimés). Masques portés par un volontaire signataire du formulaire, faute d'autre membre disponible : écart à la section 3.2 du plan de test, noté dans le registre local. Fichier de scores envoyé en privé à Temitayo, avec les observations sur le masque, le sourire et le sens des rotations. Aucun chiffre par sujet n'est publié ici.
 
 ## Nettoyage de l'historique et vérification des commits (13 octobre)
 
