@@ -59,6 +59,12 @@ final class DefaultLivenessSession implements LivenessSession {
     }
 
     @Override
+    public CaptureCheck checkCapture(BgrImage capturedImage) {
+        return worker.call(() -> core.checkCapture(capturedImage), CALL_TIMEOUT_MS,
+            CaptureCheck.rejected(FailureReason.ENGINE_ERROR, modelSetVersion));
+    }
+
+    @Override
     public boolean retry() {
         return worker.call(core::retry, CALL_TIMEOUT_MS, Boolean.FALSE);
     }
@@ -77,6 +83,7 @@ final class DefaultLivenessSession implements LivenessSession {
     public void close() {
         if (closed.compareAndSet(false, true)) {
             worker.close();
+            core.close();
             onClose.run();
         }
     }
