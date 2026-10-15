@@ -99,4 +99,11 @@ class LivenessPolicyTest {
         LivenessPolicy p = LivenessPolicy.defaults();
         assertThrows(UnsupportedOperationException.class, () -> p.challengeTypes().clear());
     }
+
+    @Test
+    void refusesAWindowTooShortForItsFrames() {
+        assertThrows(IllegalArgumentException.class,
+            () -> LivenessPolicy.builder().minFrames(10).samplingMs(500).windowMs(3000).build());
+        LivenessPolicy.builder().minFrames(10).samplingMs(300).windowMs(3000).build();
+    }
 }
