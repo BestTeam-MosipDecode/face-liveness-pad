@@ -7,6 +7,8 @@ package io.mosip.registration.liveness.api;
 
 import java.time.Clock;
 
+import io.mosip.registration.liveness.session.DefaultLivenessEngine;
+
 /**
  * Entry point of the engine. Create it once: it checks the model files against models.json and loads them. It runs
  * one session at a time.
@@ -25,7 +27,7 @@ public interface LivenessEngine extends AutoCloseable {
 
     /** Same as {@link #create(FrameDecoder)} with the clock used for durations and metrics. */
     static LivenessEngine create(FrameDecoder decoder, Clock clock) throws ModelIntegrityException {
-        throw new UnsupportedOperationException("implemented with the session, issue #14");
+        return DefaultLivenessEngine.create(decoder, clock);
     }
 
     /**

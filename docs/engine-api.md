@@ -58,9 +58,10 @@ session.retry();
 
 ## 4. Threads
 
-- `submit` returns at once. A single worker thread per session analyses the frames. A frame is skipped while another one is analysed, or when it comes less than `samplingMs` after the last analysed frame. A frame whose timestamp goes back is analysed.
+- `submit` returns at once. A single worker thread per session analyses the frames. A frame is skipped while another one is analysed, or when it comes less than `samplingMs` after the last analysed frame. A frame whose timestamp goes back is not skipped: during an attempt it means that the device restarted its clock, so the attempt fails with `DEVICE_ERROR` (stream interrupted), as a device problem would.
 - `deviceEvent`, `retry` and `checkCapture` are never skipped. `checkCapture` and `retry` wait for their result at most 5 seconds; after that, `checkCapture` refuses the image with `ENGINE_ERROR`.
-- The listener runs on the worker thread. Calling `retry` or `checkCapture` from the listener is allowed.
+- The listener runs on the worker thread, after each transition is complete. Calling `retry` or `checkCapture` from the listener is allowed. The listener must never block on the UI thread.
+- `engine.close()` waits up to 2 seconds for an analysis in progress before it releases the models.
 
 ## 5. Policy
 
@@ -120,6 +121,7 @@ After `PASSED`, the session keeps following the face on the stream. `checkCaptur
 | Frame that does not decode | Ignored, counted for diagnostics |
 | Device problem before the first analysed frame | Update `DEVICE_ERROR`, no attempt used |
 | Device problem later | Attempt failed with `DEVICE_ERROR` |
+| Frame timestamp that goes back during an attempt | Attempt failed with `DEVICE_ERROR`, audit event with `STREAM_INTERRUPTED` |
 | Exception inside the models | Attempt failed with `ENGINE_ERROR`; nothing is thrown to the caller |
 | Model file missing or modified | `ModelIntegrityException` from `LivenessEngine.create` |
 | Engine closed | `newSession` throws `IllegalStateException` |
