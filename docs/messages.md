@@ -1,6 +1,6 @@
 # Messages
 
-Status on 8 October 2026: first version. All texts of the face liveness feature, in English and French, with lines ready to paste into the message and label files of the Registration Client. The keys of the project plan are kept, and the keys needed by the screens of [ui/README.md](ui/README.md) are added. Which message appears in which situation is defined in [decision-flow.md](decision-flow.md), section 8.
+Status on 15 October 2026: English, French and Arabic. All texts of the face liveness feature, with lines ready to paste into the message and label files of the Registration Client. The keys of the project plan are kept, and the keys needed by the screens of [ui/README.md](ui/README.md) are added. Which message appears in which situation is defined in [decision-flow.md](decision-flow.md), section 8.
 ## Rules
 
 - Short sentences, plain words, no technical term. The person reads them in a few seconds, sometimes from a distance.
@@ -8,7 +8,7 @@ Status on 8 October 2026: first version. All texts of the face liveness feature,
 - A detected attack is never named on screen: it shows `LIVENESS_GENERIC_FAILURE`, the message of an engine error.
 - `{0}` and `{1}` are filled with `MessageFormat`. In a text that contains a placeholder, a single quote must be written twice (`''`). None of the texts below has both.
 - Encoding: `messages_fr.properties` and `labels_fr.properties` of the client are encoded in ISO-8859-1, and `messages_ar.properties` uses `\uXXXX` escapes only. The lines to paste below use `\uXXXX` escapes for every non-ASCII character, which reads correctly whatever the encoding of the file.
-- Arabic: the keys are added with the English text until a translation is available, so that no screen shows a missing key.
+- Arabic: first translation, written on 15 October 2026. It is to be read by an Arabic speaker before the screens are frozen. The readable text is in the Arabic section below.
 ## Messages
 
 Files `messages_en.properties`, `messages_fr.properties`, `messages_ar.properties`.
@@ -22,8 +22,8 @@ Files `messages_en.properties`, `messages_fr.properties`, `messages_ar.propertie
 | `LIVENESS_INSTRUCTION_SOON` | An instruction will appear in a moment. | Une consigne va s'afficher dans un instant. | Under the band, hold-still phase |
 | `LIVENESS_CHALLENGE_BLINK` | Please blink | Veuillez cligner des yeux | Challenge |
 | `LIVENESS_CHALLENGE_SMILE` | Please smile | Veuillez sourire | Challenge |
-| `LIVENESS_CHALLENGE_TURN_LEFT` | Please turn your head to the left | Veuillez tourner la tête vers la gauche | Challenge |
-| `LIVENESS_CHALLENGE_TURN_RIGHT` | Please turn your head to the right | Veuillez tourner la tête vers la droite | Challenge |
+| `LIVENESS_CHALLENGE_TURN_LEFT` | Please turn your head to your left | Veuillez tourner la tête vers votre gauche | Challenge |
+| `LIVENESS_CHALLENGE_TURN_RIGHT` | Please turn your head to your right | Veuillez tourner la tête vers votre droite | Challenge |
 | `LIVENESS_KEEP_GOING` | Please continue | Veuillez continuer | Action not detected yet |
 | `LIVENESS_ACTION_DETECTED` | Action detected | Action détectée | Action detected |
 | `LIVENESS_SUCCESS` | Face captured successfully | Visage capturé avec succès | Captured image accepted |
@@ -66,6 +66,55 @@ Files `labels_en.properties`, `labels_fr.properties`, `labels_ar.properties`. Sh
 | `livenessSignInPassword` | Sign in with password | Se connecter avec le mot de passe |
 | `livenessDiagnostic` | Diagnostic mode, enabled by configuration | Mode diagnostic, activé par la configuration |
 
+## Arabic
+
+Text of `messages_ar.properties` and `labels_ar.properties`, for reading. Head turns say "your left" and "your right" in every language: in the first team capture session, the mirrored preview led to turns the wrong way.
+
+| Key | Arabic |
+| --- | --- |
+| `LIVENESS_CHECKING` | جارٍ التحقق من حيوية الوجه… |
+| `LIVENESS_PASSIVE_HINT` | انظر إلى الكاميرا. لا يلزم القيام بأي حركة. |
+| `LIVENESS_AUTH_HINT` | انظر إلى الكاميرا. يستمر تسجيل الدخول تلقائيًا بعد التحقق من الحيوية. |
+| `LIVENESS_HOLD_STILL` | لا تتحرك |
+| `LIVENESS_INSTRUCTION_SOON` | ستظهر تعليمات بعد لحظة. |
+| `LIVENESS_CHALLENGE_BLINK` | يُرجى رمش العينين |
+| `LIVENESS_CHALLENGE_SMILE` | يُرجى الابتسام |
+| `LIVENESS_CHALLENGE_TURN_LEFT` | يُرجى إدارة رأسك نحو يسارك |
+| `LIVENESS_CHALLENGE_TURN_RIGHT` | يُرجى إدارة رأسك نحو يمينك |
+| `LIVENESS_KEEP_GOING` | يُرجى المتابعة |
+| `LIVENESS_ACTION_DETECTED` | تم رصد الحركة |
+| `LIVENESS_SUCCESS` | تم التقاط الوجه بنجاح |
+| `LIVENESS_SUCCESS_HINT` | تحقق من الصورة، ثم انتقل إلى الخطوة التالية. |
+| `LIVENESS_FAILED` | تعذّر التحقق من حيوية الوجه. يُرجى المحاولة مرة أخرى. |
+| `LIVENESS_GENERIC_FAILURE` | تعذّر إكمال التحقق من الوجه. يُرجى المحاولة مرة أخرى. |
+| `LIVENESS_RETRY_AVAILABLE` | المحاولة {0} من {1}. يمكنك المحاولة مرة أخرى. |
+| `LIVENESS_MAX_ATTEMPTS` | تعذّر إكمال التحقق من الوجه. يُرجى اتباع إجراء الاستثناء. |
+| `LIVENESS_EXCEPTION_INFO` | يُلتقط الوجه مرة أخرى دون قرار بشأن الحيوية. يجب أن يصادق المشرف قبل إرسال التسجيل. |
+| `LIVENESS_MAX_ATTEMPTS_AUTH` | تعذّر إكمال التحقق من الوجه. استخدم طريقة أخرى لتسجيل الدخول أو اتصل بالمشرف. |
+| `LIVENESS_TIP_LOOK_CAMERA` | انظر مباشرة إلى الكاميرا |
+| `LIVENESS_TIP_FACE_VISIBLE` | تأكد من أن وجهك ظاهر بوضوح |
+| `LIVENESS_TIP_LIGHTING` | حسّن الإضاءة |
+| `LIVENESS_TIP_STAY_IN_FRAME` | أبقِ وجهك داخل الإطار |
+| `LIVENESS_TIP_FOLLOW_ACTION` | اتبع الحركة المطلوبة |
+| `LIVENESS_NO_FACE` | لم يتم رصد أي وجه |
+| `LIVENESS_MULTIPLE_FACES` | يجب أن يكون شخص واحد فقط أمام الكاميرا |
+| `LIVENESS_DEVICE_UNAVAILABLE` | جهاز التقاط الوجه غير متاح |
+| `LIVENESS_TIP_DEVICE` | تحقق من أن جهاز التقاط الوجه موصول ومشغّل، ثم أعد المحاولة. |
+| `liveness` | الحيوية |
+| `livenessChecking` | جارٍ التحقق |
+| `livenessWaitingAction` | في انتظار حركة |
+| `livenessVerified` | تم التحقق |
+| `livenessNotVerified` | لم يتم التحقق |
+| `livenessNotStarted` | لم يبدأ |
+| `livenessChallengeCount` | الحركة {0} من {1} |
+| `livenessTimeLeft` | الوقت المتبقي |
+| `livenessCaptureStartsAfter` | يبدأ الالتقاط بعد التحقق من الحيوية |
+| `livenessTryAgain` | إعادة المحاولة |
+| `livenessCaptureAgain` | الالتقاط مرة أخرى |
+| `livenessContinueException` | المتابعة بموجب استثناء |
+| `livenessSignInPassword` | تسجيل الدخول بكلمة المرور |
+| `livenessDiagnostic` | وضع التشخيص، مفعّل عبر الإعدادات |
+
 ## Lines to paste
 
 ### `messages_en.properties`
@@ -79,8 +128,8 @@ LIVENESS_HOLD_STILL=Hold still
 LIVENESS_INSTRUCTION_SOON=An instruction will appear in a moment.
 LIVENESS_CHALLENGE_BLINK=Please blink
 LIVENESS_CHALLENGE_SMILE=Please smile
-LIVENESS_CHALLENGE_TURN_LEFT=Please turn your head to the left
-LIVENESS_CHALLENGE_TURN_RIGHT=Please turn your head to the right
+LIVENESS_CHALLENGE_TURN_LEFT=Please turn your head to your left
+LIVENESS_CHALLENGE_TURN_RIGHT=Please turn your head to your right
 LIVENESS_KEEP_GOING=Please continue
 LIVENESS_ACTION_DETECTED=Action detected
 LIVENESS_SUCCESS=Face captured successfully
@@ -113,8 +162,8 @@ LIVENESS_HOLD_STILL=Ne bougez plus
 LIVENESS_INSTRUCTION_SOON=Une consigne va s'afficher dans un instant.
 LIVENESS_CHALLENGE_BLINK=Veuillez cligner des yeux
 LIVENESS_CHALLENGE_SMILE=Veuillez sourire
-LIVENESS_CHALLENGE_TURN_LEFT=Veuillez tourner la t\u00eate vers la gauche
-LIVENESS_CHALLENGE_TURN_RIGHT=Veuillez tourner la t\u00eate vers la droite
+LIVENESS_CHALLENGE_TURN_LEFT=Veuillez tourner la t\u00eate vers votre gauche
+LIVENESS_CHALLENGE_TURN_RIGHT=Veuillez tourner la t\u00eate vers votre droite
 LIVENESS_KEEP_GOING=Veuillez continuer
 LIVENESS_ACTION_DETECTED=Action d\u00e9tect\u00e9e
 LIVENESS_SUCCESS=Visage captur\u00e9 avec succ\u00e8s
@@ -139,35 +188,35 @@ LIVENESS_TIP_DEVICE=V\u00e9rifiez que le dispositif de capture du visage est bra
 ### `messages_ar.properties`
 
 ```properties
-#Face liveness, English text until translated
-LIVENESS_CHECKING=Checking face liveness\u2026
-LIVENESS_PASSIVE_HINT=Look at the camera. No action is needed.
-LIVENESS_AUTH_HINT=Look at the camera. Sign-in continues automatically once liveness is verified.
-LIVENESS_HOLD_STILL=Hold still
-LIVENESS_INSTRUCTION_SOON=An instruction will appear in a moment.
-LIVENESS_CHALLENGE_BLINK=Please blink
-LIVENESS_CHALLENGE_SMILE=Please smile
-LIVENESS_CHALLENGE_TURN_LEFT=Please turn your head to the left
-LIVENESS_CHALLENGE_TURN_RIGHT=Please turn your head to the right
-LIVENESS_KEEP_GOING=Please continue
-LIVENESS_ACTION_DETECTED=Action detected
-LIVENESS_SUCCESS=Face captured successfully
-LIVENESS_SUCCESS_HINT=Check the image, then go to the next step.
-LIVENESS_FAILED=We could not verify face liveness. Please try again.
-LIVENESS_GENERIC_FAILURE=Face verification could not be completed. Please try again.
-LIVENESS_RETRY_AVAILABLE=Attempt {0} of {1}. You can try again.
-LIVENESS_MAX_ATTEMPTS=Face verification could not be completed. Please follow the exception process.
-LIVENESS_EXCEPTION_INFO=The face is captured once more without a liveness decision. A supervisor must authenticate before the registration is submitted.
-LIVENESS_MAX_ATTEMPTS_AUTH=Face verification could not be completed. Use another sign-in method or contact your supervisor.
-LIVENESS_TIP_LOOK_CAMERA=Look directly at the camera
-LIVENESS_TIP_FACE_VISIBLE=Make sure your face is clearly visible
-LIVENESS_TIP_LIGHTING=Improve the lighting
-LIVENESS_TIP_STAY_IN_FRAME=Keep your face inside the frame
-LIVENESS_TIP_FOLLOW_ACTION=Follow the requested action
-LIVENESS_NO_FACE=No face detected
-LIVENESS_MULTIPLE_FACES=Only one person should be in front of the camera
-LIVENESS_DEVICE_UNAVAILABLE=Face capture device not available
-LIVENESS_TIP_DEVICE=Check that the face device is connected and switched on, then try again.
+#Face liveness
+LIVENESS_CHECKING=\u062C\u0627\u0631\u064D \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u062D\u064A\u0648\u064A\u0629 \u0627\u0644\u0648\u062C\u0647\u2026
+LIVENESS_PASSIVE_HINT=\u0627\u0646\u0638\u0631 \u0625\u0644\u0649 \u0627\u0644\u0643\u0627\u0645\u064A\u0631\u0627. \u0644\u0627 \u064A\u0644\u0632\u0645 \u0627\u0644\u0642\u064A\u0627\u0645 \u0628\u0623\u064A \u062D\u0631\u0643\u0629.
+LIVENESS_AUTH_HINT=\u0627\u0646\u0638\u0631 \u0625\u0644\u0649 \u0627\u0644\u0643\u0627\u0645\u064A\u0631\u0627. \u064A\u0633\u062A\u0645\u0631 \u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062F\u062E\u0648\u0644 \u062A\u0644\u0642\u0627\u0626\u064A\u064B\u0627 \u0628\u0639\u062F \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u062D\u064A\u0648\u064A\u0629.
+LIVENESS_HOLD_STILL=\u0644\u0627 \u062A\u062A\u062D\u0631\u0643
+LIVENESS_INSTRUCTION_SOON=\u0633\u062A\u0638\u0647\u0631 \u062A\u0639\u0644\u064A\u0645\u0627\u062A \u0628\u0639\u062F \u0644\u062D\u0638\u0629.
+LIVENESS_CHALLENGE_BLINK=\u064A\u064F\u0631\u062C\u0649 \u0631\u0645\u0634 \u0627\u0644\u0639\u064A\u0646\u064A\u0646
+LIVENESS_CHALLENGE_SMILE=\u064A\u064F\u0631\u062C\u0649 \u0627\u0644\u0627\u0628\u062A\u0633\u0627\u0645
+LIVENESS_CHALLENGE_TURN_LEFT=\u064A\u064F\u0631\u062C\u0649 \u0625\u062F\u0627\u0631\u0629 \u0631\u0623\u0633\u0643 \u0646\u062D\u0648 \u064A\u0633\u0627\u0631\u0643
+LIVENESS_CHALLENGE_TURN_RIGHT=\u064A\u064F\u0631\u062C\u0649 \u0625\u062F\u0627\u0631\u0629 \u0631\u0623\u0633\u0643 \u0646\u062D\u0648 \u064A\u0645\u064A\u0646\u0643
+LIVENESS_KEEP_GOING=\u064A\u064F\u0631\u062C\u0649 \u0627\u0644\u0645\u062A\u0627\u0628\u0639\u0629
+LIVENESS_ACTION_DETECTED=\u062A\u0645 \u0631\u0635\u062F \u0627\u0644\u062D\u0631\u0643\u0629
+LIVENESS_SUCCESS=\u062A\u0645 \u0627\u0644\u062A\u0642\u0627\u0637 \u0627\u0644\u0648\u062C\u0647 \u0628\u0646\u062C\u0627\u062D
+LIVENESS_SUCCESS_HINT=\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0635\u0648\u0631\u0629\u060C \u062B\u0645 \u0627\u0646\u062A\u0642\u0644 \u0625\u0644\u0649 \u0627\u0644\u062E\u0637\u0648\u0629 \u0627\u0644\u062A\u0627\u0644\u064A\u0629.
+LIVENESS_FAILED=\u062A\u0639\u0630\u0651\u0631 \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u062D\u064A\u0648\u064A\u0629 \u0627\u0644\u0648\u062C\u0647. \u064A\u064F\u0631\u062C\u0649 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0645\u0631\u0629 \u0623\u062E\u0631\u0649.
+LIVENESS_GENERIC_FAILURE=\u062A\u0639\u0630\u0651\u0631 \u0625\u0643\u0645\u0627\u0644 \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0648\u062C\u0647. \u064A\u064F\u0631\u062C\u0649 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0645\u0631\u0629 \u0623\u062E\u0631\u0649.
+LIVENESS_RETRY_AVAILABLE=\u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 {0} \u0645\u0646 {1}. \u064A\u0645\u0643\u0646\u0643 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0645\u0631\u0629 \u0623\u062E\u0631\u0649.
+LIVENESS_MAX_ATTEMPTS=\u062A\u0639\u0630\u0651\u0631 \u0625\u0643\u0645\u0627\u0644 \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0648\u062C\u0647. \u064A\u064F\u0631\u062C\u0649 \u0627\u062A\u0628\u0627\u0639 \u0625\u062C\u0631\u0627\u0621 \u0627\u0644\u0627\u0633\u062A\u062B\u0646\u0627\u0621.
+LIVENESS_EXCEPTION_INFO=\u064A\u064F\u0644\u062A\u0642\u0637 \u0627\u0644\u0648\u062C\u0647 \u0645\u0631\u0629 \u0623\u062E\u0631\u0649 \u062F\u0648\u0646 \u0642\u0631\u0627\u0631 \u0628\u0634\u0623\u0646 \u0627\u0644\u062D\u064A\u0648\u064A\u0629. \u064A\u062C\u0628 \u0623\u0646 \u064A\u0635\u0627\u062F\u0642 \u0627\u0644\u0645\u0634\u0631\u0641 \u0642\u0628\u0644 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u062A\u0633\u062C\u064A\u0644.
+LIVENESS_MAX_ATTEMPTS_AUTH=\u062A\u0639\u0630\u0651\u0631 \u0625\u0643\u0645\u0627\u0644 \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0648\u062C\u0647. \u0627\u0633\u062A\u062E\u062F\u0645 \u0637\u0631\u064A\u0642\u0629 \u0623\u062E\u0631\u0649 \u0644\u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062F\u062E\u0648\u0644 \u0623\u0648 \u0627\u062A\u0635\u0644 \u0628\u0627\u0644\u0645\u0634\u0631\u0641.
+LIVENESS_TIP_LOOK_CAMERA=\u0627\u0646\u0638\u0631 \u0645\u0628\u0627\u0634\u0631\u0629 \u0625\u0644\u0649 \u0627\u0644\u0643\u0627\u0645\u064A\u0631\u0627
+LIVENESS_TIP_FACE_VISIBLE=\u062A\u0623\u0643\u062F \u0645\u0646 \u0623\u0646 \u0648\u062C\u0647\u0643 \u0638\u0627\u0647\u0631 \u0628\u0648\u0636\u0648\u062D
+LIVENESS_TIP_LIGHTING=\u062D\u0633\u0651\u0646 \u0627\u0644\u0625\u0636\u0627\u0621\u0629
+LIVENESS_TIP_STAY_IN_FRAME=\u0623\u0628\u0642\u0650 \u0648\u062C\u0647\u0643 \u062F\u0627\u062E\u0644 \u0627\u0644\u0625\u0637\u0627\u0631
+LIVENESS_TIP_FOLLOW_ACTION=\u0627\u062A\u0628\u0639 \u0627\u0644\u062D\u0631\u0643\u0629 \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629
+LIVENESS_NO_FACE=\u0644\u0645 \u064A\u062A\u0645 \u0631\u0635\u062F \u0623\u064A \u0648\u062C\u0647
+LIVENESS_MULTIPLE_FACES=\u064A\u062C\u0628 \u0623\u0646 \u064A\u0643\u0648\u0646 \u0634\u062E\u0635 \u0648\u0627\u062D\u062F \u0641\u0642\u0637 \u0623\u0645\u0627\u0645 \u0627\u0644\u0643\u0627\u0645\u064A\u0631\u0627
+LIVENESS_DEVICE_UNAVAILABLE=\u062C\u0647\u0627\u0632 \u0627\u0644\u062A\u0642\u0627\u0637 \u0627\u0644\u0648\u062C\u0647 \u063A\u064A\u0631 \u0645\u062A\u0627\u062D
+LIVENESS_TIP_DEVICE=\u062A\u062D\u0642\u0642 \u0645\u0646 \u0623\u0646 \u062C\u0647\u0627\u0632 \u0627\u0644\u062A\u0642\u0627\u0637 \u0627\u0644\u0648\u062C\u0647 \u0645\u0648\u0635\u0648\u0644 \u0648\u0645\u0634\u063A\u0651\u0644\u060C \u062B\u0645 \u0623\u0639\u062F \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629.
 ```
 
 ### `labels_en.properties`
@@ -213,19 +262,19 @@ livenessDiagnostic=Mode diagnostic, activ\u00e9 par la configuration
 ### `labels_ar.properties`
 
 ```properties
-#Face liveness, English text until translated
-liveness=Liveness
-livenessChecking=Checking
-livenessWaitingAction=Waiting for an action
-livenessVerified=Verified
-livenessNotVerified=Not verified
-livenessNotStarted=Not started
-livenessChallengeCount=Challenge {0} of {1}
-livenessTimeLeft=Time left
-livenessCaptureStartsAfter=The capture starts once liveness is verified
-livenessTryAgain=Try again
-livenessCaptureAgain=Capture again
-livenessContinueException=Continue under exception
-livenessSignInPassword=Sign in with password
-livenessDiagnostic=Diagnostic mode, enabled by configuration
+#Face liveness
+liveness=\u0627\u0644\u062D\u064A\u0648\u064A\u0629
+livenessChecking=\u062C\u0627\u0631\u064D \u0627\u0644\u062A\u062D\u0642\u0642
+livenessWaitingAction=\u0641\u064A \u0627\u0646\u062A\u0638\u0627\u0631 \u062D\u0631\u0643\u0629
+livenessVerified=\u062A\u0645 \u0627\u0644\u062A\u062D\u0642\u0642
+livenessNotVerified=\u0644\u0645 \u064A\u062A\u0645 \u0627\u0644\u062A\u062D\u0642\u0642
+livenessNotStarted=\u0644\u0645 \u064A\u0628\u062F\u0623
+livenessChallengeCount=\u0627\u0644\u062D\u0631\u0643\u0629 {0} \u0645\u0646 {1}
+livenessTimeLeft=\u0627\u0644\u0648\u0642\u062A \u0627\u0644\u0645\u062A\u0628\u0642\u064A
+livenessCaptureStartsAfter=\u064A\u0628\u062F\u0623 \u0627\u0644\u0627\u0644\u062A\u0642\u0627\u0637 \u0628\u0639\u062F \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u062D\u064A\u0648\u064A\u0629
+livenessTryAgain=\u0625\u0639\u0627\u062F\u0629 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629
+livenessCaptureAgain=\u0627\u0644\u0627\u0644\u062A\u0642\u0627\u0637 \u0645\u0631\u0629 \u0623\u062E\u0631\u0649
+livenessContinueException=\u0627\u0644\u0645\u062A\u0627\u0628\u0639\u0629 \u0628\u0645\u0648\u062C\u0628 \u0627\u0633\u062A\u062B\u0646\u0627\u0621
+livenessSignInPassword=\u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062F\u062E\u0648\u0644 \u0628\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631
+livenessDiagnostic=\u0648\u0636\u0639 \u0627\u0644\u062A\u0634\u062E\u064A\u0635\u060C \u0645\u0641\u0639\u0651\u0644 \u0639\u0628\u0631 \u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A
 ```
