@@ -5,17 +5,21 @@
  */
 package io.mosip.registration.liveness.model;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import io.mosip.registration.liveness.ModelResources;
 import io.mosip.registration.liveness.api.ModelIntegrityException;
 
 /**
@@ -27,12 +31,18 @@ public final class ModelManifest {
 
     static final String MANIFEST = "models.json";
 
+    /** Models the engine loads: the manifest must list each of them. */
+    static final List<String> REQUIRED = Collections.unmodifiableList(Arrays.asList(ModelResources.YUNET,
+        ModelResources.FACE_MESH, ModelResources.MINIFASNET_V2, ModelResources.MINIFASNET_V1SE));
+
     private final String modelSetVersion;
     private final List<String> files;
+    private final Map<String, byte[]> verified;
 
-    private ModelManifest(String modelSetVersion, List<String> files) {
+    private ModelManifest(String modelSetVersion, List<String> files, Map<String, byte[]> verified) {
         this.modelSetVersion = modelSetVersion;
         this.files = Collections.unmodifiableList(files);
+        this.verified = verified;
     }
 
     /** Reads and checks the manifest and the model files of the JAR. */
@@ -49,7 +59,11 @@ public final class ModelManifest {
         String version;
         List<?> models;
         try {
-            Map<?, ?> root = (Map<?, ?>) JsonReader.parse(new String(manifest, StandardCharsets.UTF_8));
+            Object parsed = JsonReader.parse(new String(manifest, StandardCharsets.UTF_8));
+            if (!(parsed instanceof Map)) {
+                throw new ModelIntegrityException(MANIFEST + " is not a valid model manifest");
+            }
+            Map<?, ?> root = (Map<?, ?>) parsed;
             version = (String) root.get("modelSetVersion");
             models = (List<?>) root.get("models");
         } catch (IllegalArgumentException | ClassCastException e) {
@@ -59,7 +73,11 @@ public final class ModelManifest {
             throw new ModelIntegrityException(MANIFEST + " gives no model set version or no model");
         }
         List<String> files = new ArrayList<>();
+        Map<String, byte[]> verified = new HashMap<>();
         for (Object item : models) {
+            if (!(item instanceof Map)) {
+                throw new ModelIntegrityException(MANIFEST + " is not a valid model manifest");
+            }
             String file;
             String sha256;
             Number size;
@@ -74,10 +92,17 @@ public final class ModelManifest {
             if (file == null || sha256 == null || size == null) {
                 throw new ModelIntegrityException(MANIFEST + " has an incomplete model entry");
             }
-            check(file, sha256, size.longValue(), source.apply(file));
+            byte[] data = source.apply(file);
+            check(file, sha256, size.longValue(), data);
             files.add(file);
+            verified.put(file, data);
         }
-        return new ModelManifest(version, files);
+        for (String required : REQUIRED) {
+            if (!verified.containsKey(required)) {
+                throw new ModelIntegrityException(MANIFEST + " does not list the model " + required);
+            }
+        }
+        return new ModelManifest(version, files, verified);
     }
 
     private static void check(String file, String sha256, long size, byte[] data) throws ModelIntegrityException {
@@ -103,6 +128,18 @@ public final class ModelManifest {
         return files;
     }
 
+    /**
+     * Bytes of a model file, as verified against the manifest: the engine builds its ONNX sessions from them, so the
+     * models in use are the ones that were checked. Callers must not modify the array.
+     */
+    public byte[] bytes(String file) {
+        byte[] data = verified.get(file);
+        if (data == null) {
+            throw new IllegalArgumentException("not a model of " + MANIFEST + ": " + file);
+        }
+        return data;
+    }
+
     static String sha256(byte[] data) {
         try {
             byte[] digest = MessageDigest.getInstance("SHA-256").digest(data);
@@ -118,7 +155,17 @@ public final class ModelManifest {
 
     private static byte[] resource(String file) {
         try (InputStream in = ModelManifest.class.getResourceAsStream("/models/" + file)) {
-            return in == null ? null : in.readAllBytes();
+            if (in == null) {
+                return null;
+            }
+            // InputStream.readAllBytes is not available on older Android versions.
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buffer = new byte[64 * 1024];
+            int n;
+            while ((n = in.read(buffer)) > 0) {
+                out.write(buffer, 0, n);
+            }
+            return out.toByteArray();
         } catch (IOException e) {
             return null;
         }

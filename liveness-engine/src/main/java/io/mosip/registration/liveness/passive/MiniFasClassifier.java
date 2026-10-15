@@ -32,9 +32,15 @@ public final class MiniFasClassifier implements AutoCloseable {
     private final OrtSession v1se;
 
     public MiniFasClassifier(OrtEnvironment environment) throws OrtException {
+        this(environment, ModelResources.read(ModelResources.MINIFASNET_V2),
+            ModelResources.read(ModelResources.MINIFASNET_V1SE));
+    }
+
+    /** Classifiers on model bytes already verified by the engine: the 2.7 model, then the 4.0 model. */
+    public MiniFasClassifier(OrtEnvironment environment, byte[] v2Model, byte[] v1seModel) throws OrtException {
         this.environment = environment;
-        this.v2 = ModelResources.open(environment, ModelResources.MINIFASNET_V2);
-        this.v1se = ModelResources.open(environment, ModelResources.MINIFASNET_V1SE);
+        this.v2 = ModelResources.open(environment, v2Model);
+        this.v1se = ModelResources.open(environment, v1seModel);
     }
 
     /** Real-class score of the face, between 0 and 1. {@code face} is the square classifier box. */

@@ -46,10 +46,15 @@ public final class ModelResources {
     }
 
     public static OrtSession open(OrtEnvironment environment, String file) throws OrtException {
+        return open(environment, read(file));
+    }
+
+    /** Session on model bytes already read, for example the bytes verified against models.json. */
+    public static OrtSession open(OrtEnvironment environment, byte[] model) throws OrtException {
         try (OrtSession.SessionOptions options = new OrtSession.SessionOptions()) {
             options.setIntraOpNumThreads(INTRA_OP_THREADS);
             options.setOptimizationLevel(OrtSession.SessionOptions.OptLevel.ALL_OPT);
-            return environment.createSession(read(file), options);
+            return environment.createSession(model, options);
         }
     }
 }
