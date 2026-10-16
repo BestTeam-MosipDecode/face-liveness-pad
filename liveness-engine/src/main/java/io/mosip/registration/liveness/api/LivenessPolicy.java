@@ -151,7 +151,9 @@ public final class LivenessPolicy {
         private double maxYawDeg = 20;
         private boolean activeEnabled = true;
         private int minChallenges = 2;
-        private Set<ChallengeType> challengeTypes = EnumSet.allOf(ChallengeType.class);
+        // SMILE is left out of the default: not reliable enough on the team captures (#5). Still configurable.
+        private Set<ChallengeType> challengeTypes = EnumSet.of(ChallengeType.BLINK, ChallengeType.TURN_LEFT,
+            ChallengeType.TURN_RIGHT);
         private long challengeTimeoutMs = 8000;
         private long baselineMs = 600;
         private int maxAttempts = 3;
