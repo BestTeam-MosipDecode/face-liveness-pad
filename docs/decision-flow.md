@@ -220,6 +220,7 @@ After each analysed frame, the session returns its state, a feedback code and a 
 | Retry possible | `FAILED` | adds `LIVENESS_RETRY_AVAILABLE` with the attempt number and the maximum |
 | Attempts exhausted, resident | `MAX_ATTEMPTS_EXCEEDED` | `LIVENESS_MAX_ATTEMPTS` |
 | Attempts exhausted, operator or supervisor | `MAX_ATTEMPTS_EXCEEDED` | `LIVENESS_MAX_ATTEMPTS_AUTH` (section 7.1) |
+| Attempts exhausted, resident, `on_max_attempts` set to `BLOCK` | `MAX_ATTEMPTS_EXCEEDED` | `LIVENESS_MAX_ATTEMPTS_BLOCKED` |
 | Device error | `DEVICE_ERROR` | `LIVENESS_DEVICE_UNAVAILABLE` |
 
 A detected attack always shows the generic message, identical to the one of an engine error. The screen never tells the user that an attack was suspected. Scores, measures and model data appear on screen only when `diagnostic.enabled` is true.
