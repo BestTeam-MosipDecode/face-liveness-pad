@@ -64,7 +64,7 @@ Files `labels_en.properties`, `labels_fr.properties`, `labels_ar.properties`. Sh
 | `livenessTryAgain` | Try again | Réessayer |
 | `livenessCaptureAgain` | Capture again | Capturer de nouveau |
 | `livenessContinueException` | Continue under exception | Continuer sous exception |
-| `livenessSignInPassword` | Sign in with password | Se connecter avec le mot de passe |
+| `livenessOtherSignIn` | Use another sign-in method | Utiliser un autre mode de connexion |
 | `livenessDiagnostic` | Diagnostic mode, enabled by configuration | Mode diagnostic, activé par la configuration |
 
 ## Arabic
@@ -114,7 +114,7 @@ Text of `messages_ar.properties` and `labels_ar.properties`, for reading. Head t
 | `livenessTryAgain` | إعادة المحاولة |
 | `livenessCaptureAgain` | الالتقاط مرة أخرى |
 | `livenessContinueException` | المتابعة بموجب استثناء |
-| `livenessSignInPassword` | تسجيل الدخول بكلمة المرور |
+| `livenessOtherSignIn` | استخدام طريقة أخرى لتسجيل الدخول |
 | `livenessDiagnostic` | وضع التشخيص، مفعّل عبر الإعدادات |
 
 ## Lines to paste
@@ -240,7 +240,7 @@ livenessCaptureStartsAfter=The capture starts once liveness is verified
 livenessTryAgain=Try again
 livenessCaptureAgain=Capture again
 livenessContinueException=Continue under exception
-livenessSignInPassword=Sign in with password
+livenessOtherSignIn=Use another sign-in method
 livenessDiagnostic=Diagnostic mode, enabled by configuration
 ```
 
@@ -260,7 +260,7 @@ livenessCaptureStartsAfter=La capture d\u00e9marre une fois la vivacit\u00e9 v\u
 livenessTryAgain=R\u00e9essayer
 livenessCaptureAgain=Capturer de nouveau
 livenessContinueException=Continuer sous exception
-livenessSignInPassword=Se connecter avec le mot de passe
+livenessOtherSignIn=Utiliser un autre mode de connexion
 livenessDiagnostic=Mode diagnostic, activ\u00e9 par la configuration
 ```
 
@@ -280,6 +280,6 @@ livenessCaptureStartsAfter=\u064A\u0628\u062F\u0623 \u0627\u0644\u0627\u0644\u06
 livenessTryAgain=\u0625\u0639\u0627\u062F\u0629 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629
 livenessCaptureAgain=\u0627\u0644\u0627\u0644\u062A\u0642\u0627\u0637 \u0645\u0631\u0629 \u0623\u062E\u0631\u0649
 livenessContinueException=\u0627\u0644\u0645\u062A\u0627\u0628\u0639\u0629 \u0628\u0645\u0648\u062C\u0628 \u0627\u0633\u062A\u062B\u0646\u0627\u0621
-livenessSignInPassword=\u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062F\u062E\u0648\u0644 \u0628\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631
+livenessOtherSignIn=\u0627\u0633\u062A\u062E\u062F\u0627\u0645 \u0637\u0631\u064A\u0642\u0629 \u0623\u062E\u0631\u0649 \u0644\u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062F\u062E\u0648\u0644
 livenessDiagnostic=\u0648\u0636\u0639 \u0627\u0644\u062A\u0634\u062E\u064A\u0635\u060C \u0645\u0641\u0639\u0651\u0644 \u0639\u0628\u0631 \u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A
 ```
