@@ -34,7 +34,7 @@ Every key starts with `mosip.registration.face.liveness.`, written `…` below.
 | `…quality.max_yaw_deg` | integer, degrees | `20` | 5 to 45 | Largest head turn accepted for the passive check |
 | `…active.enabled` | boolean | `true` | `true`, `false`, `Y`, `N` | Allows the active check when the passive score is ambiguous |
 | `…active.min_challenges` | integer | `2` | 1 to 4 | Challenges drawn per attempt. The same type never comes twice in a row, unless only one type is allowed |
-| `…active.challenge_types` | list | `BLINK,SMILE,TURN_LEFT,TURN_RIGHT` | non-empty subset of the default, comma-separated | Challenges that may be drawn |
+| `…active.challenge_types` | list | `BLINK,TURN_LEFT,TURN_RIGHT` | non-empty subset of `BLINK,SMILE,TURN_LEFT,TURN_RIGHT`, comma-separated | Challenges that may be drawn. `SMILE` is left out of the default (#5) and can be set again here |
 | `…active.challenge_timeout_ms` | integer, ms | `8000` | 3000 to 30000 | Time to perform one challenge, hold-still phase included |
 | `…active.baseline_ms` | integer, ms | `600` | 300 to 3000 | Duration of the hold-still phase before an instruction |
 | `…max_attempts` | integer | `3` | 1 to 10 | Attempts per capture or authentication |
@@ -124,7 +124,7 @@ mosip.registration.face.liveness.active.enabled=Y
 #Challenges drawn per attempt. Possible values 1 to 4
 mosip.registration.face.liveness.active.min_challenges=2
 #Challenges that may be drawn. Possible values: comma-separated subset of BLINK,SMILE,TURN_LEFT,TURN_RIGHT
-mosip.registration.face.liveness.active.challenge_types=BLINK,SMILE,TURN_LEFT,TURN_RIGHT
+mosip.registration.face.liveness.active.challenge_types=BLINK,TURN_LEFT,TURN_RIGHT
 #Time to perform one challenge, in milliseconds. Possible values 3000 to 30000
 mosip.registration.face.liveness.active.challenge_timeout_ms=8000
 #Duration of the hold-still phase before an instruction, in milliseconds. Possible values 300 to 3000

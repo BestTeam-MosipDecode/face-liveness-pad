@@ -1,6 +1,6 @@
 # Decision flow
 
-Status on 16 October 2026: implemented in the engine (#56, #59, #60, #66 to #68, #74, #77). The exception process of section 7.1 was confirmed by the coordinator on 15 October 2026. The smile factor (section 5.3) is provisional, and removing `SMILE` from the default challenge types is under discussion in #5. This document specifies how a liveness session reaches its decision. It is the reference for the engine issues: preprocessing (#11), detection, quality and passive score (#12), challenges (#13), session state machine (#14) and tests (#15). Thresholds and limits marked "to calibrate" will be set from the team captures (#5 and #7).
+Status on 16 October 2026: implemented in the engine (#56, #59, #60, #66 to #68, #74, #77). The exception process of section 7.1 was confirmed by the coordinator on 15 October 2026. `SMILE` was left out of the default challenge types on 16 October 2026 (#5, #82); its factor (section 5.3) stays provisional for a configuration that sets it again. This document specifies how a liveness session reaches its decision. It is the reference for the engine issues: preprocessing (#11), detection, quality and passive score (#12), challenges (#13), session state machine (#14) and tests (#15). Thresholds and limits marked "to calibrate" will be set from the team captures (#5 and #7).
 
 Values in this document follow the configuration keys of the project plan, with the prefix `mosip.registration.face.liveness.`. This document adds two keys and a capture check operation to the engine API. The coordinator approved them on 7 October 2026, together with the attempt counting rule of section 7 and the exception process for residents of section 7.1.
 
@@ -105,7 +105,7 @@ If no decision is reached within `passive.timeout_ms` after the first frame (add
 
 ### 5.1 Drawing the challenges
 
-The session draws `active.min_challenges` challenges (default 2) among the types listed in `active.challenge_types` (default `BLINK, SMILE, TURN_LEFT, TURN_RIGHT`), with `java.security.SecureRandom`. The same type never appears twice in a row, unless only one type is enabled. Each attempt draws a new sequence. Tests inject a seeded generator.
+The session draws `active.min_challenges` challenges (default 2) among the types listed in `active.challenge_types` (default `BLINK, TURN_LEFT, TURN_RIGHT`; `SMILE` can be added by configuration), with `java.security.SecureRandom`. The same type never appears twice in a row, unless only one type is enabled. Each attempt draws a new sequence. Tests inject a seeded generator.
 
 The sequence cannot be known in advance, so a replayed video cannot perform the right actions in the right order.
 
@@ -257,7 +257,7 @@ Every event of the engine carries the workflow, the attempt number, the duration
 | `quality.max_yaw_deg` | `20` | Sections 3.5, 3.6 |
 | `active.enabled` | `true` | Section 4 |
 | `active.min_challenges` | `2` | Section 5.1 |
-| `active.challenge_types` | `BLINK,SMILE,TURN_LEFT,TURN_RIGHT` | Section 5.1 |
+| `active.challenge_types` | `BLINK,TURN_LEFT,TURN_RIGHT` | Section 5.1 |
 | `active.challenge_timeout_ms` | `8000` | Section 5.2 |
 | `max_attempts` | `3` | Section 7 |
 | `on_max_attempts` | `BLOCK`, and `EXCEPTION` for residents | Section 7.1 |
