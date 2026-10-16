@@ -77,7 +77,7 @@ The passive classifier and its preprocessing are described in [../training/READM
 | Workflow | Class in `registration-client` | Point of integration | Status |
 | --- | --- | --- | --- |
 | Resident face capture | `GenericBiometricsController` | Liveness scan before `rCaptureTaskService()`, which runs only after `PASSED`. Captured image checked inside the capture task | Implemented (registration-client#6, pane in #8) |
-| Exception process after the last attempt of a resident | `GenericBiometricsController`, reviewer authentication of `AuthenticationController` | "Continue under exception": one capture without a liveness decision, liveness exception mark, supervisor authentication at submission | In progress (decision of 15 October 2026) |
+| Exception process after the last attempt of a resident | `GenericBiometricsController`, reviewer authentication of `AuthenticationController` | "Continue under exception": one capture without a liveness decision, liveness exception mark, supervisor authentication at submission, not by face until #23 | In progress (registration-client#9) |
 | Operator login by face | `LoginController` | A `PASSED` session before the face is captured and matched | In progress (#23) |
 | Operator and supervisor authentication | `AuthenticationController`, `BaseController.captureAndValidateFace(...)` | Liveness before the capture, captured image checked before `authValidator(...)`. The supervisor policy for reviewers | In progress (#23) |
 | End of day approval by the supervisor | `EODAuthenticationController` | Same entry point, with the supervisor policy | In progress (#23) |

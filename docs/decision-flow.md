@@ -182,16 +182,16 @@ Whether the stream keeps running during `RCAPTURE` depends on the device. This i
 
 Configuration: `mosip.registration.face.liveness.on_max_attempts=BLOCK` and `mosip.registration.face.liveness.resident.on_max_attempts=EXCEPTION`. `EXCEPTION` is not accepted for the authentication workflows: a person whose liveness cannot be established must never be authenticated.
 
-In Registration Client 1.2.0.2, the face cannot be marked as a biometric exception: the exception screen covers fingerprints and iris only, and the exception photo is taken when those are missing. The client does have an exception path, used whenever a registration carries a biometric exception: after the operator, a second user with the supervisor role must authenticate before the packet is created (`AuthenticationController`, reviewer authentication, which refuses the operator's own account). The packet then carries the exceptions to the server for review.
+In Registration Client 1.2.0.2, the face cannot be marked as a biometric exception: the exception screen covers fingerprints and iris only, and the exception photo is taken when those are missing. The client does have an exception path, used whenever a registration carries a biometric exception: after the operator, a second user must authenticate before the packet is created (`AuthenticationController`, reviewer authentication). In release 1.2.0.2 this check only refuses the operator's own account, compared with regard to case, and does not check the supervisor role; the exception process for liveness requires both (step 4). The packet then carries the exceptions to the server for review.
 
 The exception process for liveness reuses that path:
 
 1. The screen shows `LIVENESS_MAX_ATTEMPTS` ("Please follow the exception process") and offers the operator to continue under exception.
-2. The operator captures the face once more. The image goes through the normal capture, without a liveness decision.
-3. The registration is marked as a face liveness exception, recorded in the audit trail (`LIVENESS_MAX_ATTEMPTS`, with the workflow and the number of attempts) and in the packet.
-4. At submission, the supervisor authentication required for exceptions is triggered, as for a fingerprint or iris exception. The supervisor's own face authentication goes through liveness like any other.
+2. The operator captures the face once more. The image goes through the normal capture, with its quality and duplicate checks, without a liveness decision.
+3. The registration is marked as a face liveness exception as soon as the operator chooses to continue under exception, before the face is stored. The capture is recorded in the audit trail (`LIVENESS_EXCEPTION_CAPTURE`, `REG-EVT-112`, with the workflow, the number of attempts and the field, no image and no score). The packet carries the mark: entry `faceLivenessException` of the `metaData` list of the packet meta info, with the ids of the face fields concerned.
+4. At submission, the supervisor authentication of the exception path is required for a marked registration, whatever `mosip.registration.reviewer_authentication_configuration` says. The supervisor must be another user than the operator, compared without regard to case, and hold the supervisor role. Until the supervisor's own face authentication goes through liveness (#23), the face is not offered as an authentication mode of the supervisor for a marked registration: password or fingerprint only (coordinator decision of 16 October 2026). Without an authentication method configured for the exception process, the registration cannot be submitted.
 
-How the mark travels in the packet (a field of the packet metadata, or another mechanism) is to be confirmed with the mentors, since it is read on the server side. The client changes belong to #22 and #24.
+The `faceLivenessException` entry is provisional: how the mark travels in the packet is to be confirmed with the mentors (Q15), since it is read on the server side. The client changes are in registration-client#9.
 
 The message `LIVENESS_MAX_ATTEMPTS` refers to the exception process, which does not apply to authentication. The authentication screens need a second key, for example `LIVENESS_MAX_ATTEMPTS_AUTH`: "Face verification could not be completed. Use another sign-in method or contact your supervisor." / « La vérification du visage n'a pas pu aboutir. Utilisez un autre mode de connexion ou contactez votre superviseur. » (#24).
 
@@ -237,8 +237,9 @@ A detected attack always shows the generic message, identical to the one of an e
 | Attempt failed | `LIVENESS_FAILED`, with the reason |
 | Attempts exhausted | `LIVENESS_MAX_ATTEMPTS` |
 | Device error | `LIVENESS_DEVICE_ERROR` |
+| Face captured under the exception process (section 7.1) | `LIVENESS_EXCEPTION_CAPTURE` (`REG-EVT-112`), written by the client |
 
-Every event carries the workflow, the attempt number, the duration and the model set version. No event carries a score or an image. Scores go only to the diagnostic log, and only when `diagnostic.enabled` is true.
+Every event of the engine carries the workflow, the attempt number, the duration and the model set version; the exception capture carries the workflow, the number of attempts and the field. No event carries a score or an image. Scores go only to the diagnostic log, and only when `diagnostic.enabled` is true.
 
 ## 10. Parameters
 

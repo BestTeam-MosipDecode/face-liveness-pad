@@ -350,6 +350,7 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - 7 octobre. Pas de vecteurs dorés pour YuNet et Face Mesh dans cette étape : Java exécutera les mêmes fichiers ONNX avec ONNX Runtime. Le risque d'écart porte sur le prétraitement et le décodage, à tester dans les issues n° 11 et n° 12 contre `training/liveness/`.
 
 - 15 octobre. Après la dernière tentative ratée d'un résident : procédure d'exception de la section 7.1 de `docs/decision-flow.md` (option A), décidée par Elisée. L'opérateur continue sous exception, le dossier est marqué et audité, un superviseur s'authentifie à la soumission. Le marquage dans le paquet reste provisoire en attendant la réponse des mentors (Q15). Demandé à Tobi3h dans la Pull Request n° 6 du fork, après la correction de sécurité de la capture et l'authentification opérateur et superviseur (n° 23).
+- 16 octobre. Tant que l'authentification du superviseur par le visage ne passe pas par la vérification de vivacité (#23), le visage n'est pas proposé au superviseur pour valider un dossier marqué en exception : mot de passe ou empreinte seulement. Décidé par Elisée à la relecture de la Pull Request n° 9 du fork, qui doit aussi corriger le contrôle du superviseur (casse de l'identifiant, rôle) et la perte possible du marquage.
 
 ## Blocages
 
