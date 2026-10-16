@@ -1,6 +1,6 @@
 # Workflows
 
-Status on 7 October 2026: design, first version. This document shows how liveness fits into the three face workflows of Registration Client 1.2.0.2: resident face capture, operator authentication and supervisor authentication. It completes [architecture.md](architecture.md), which lists the integration points, and [decision-flow.md](decision-flow.md), which specifies the rules of a liveness session. It is the reference for the integration issues #20 to #26.
+Status on 16 October 2026: the resident face capture is implemented as described in section 1.2 (registration-client#6, screen pane in #8). Operator and supervisor authentication (#23) and the exception process after the last attempt of a resident are in progress. This document shows how liveness fits into the three face workflows of Registration Client 1.2.0.2: resident face capture, operator authentication and supervisor authentication. It completes [architecture.md](architecture.md), which lists the integration points, and [decision-flow.md](decision-flow.md), which specifies the rules of a liveness session. It is the reference for the integration issues #20 to #26.
 
 Class names and line numbers refer to the `feature/face-liveness` branch of the team's `registration-client` fork, identical to release 1.2.0.2 on 7 October 2026.
 
@@ -30,6 +30,8 @@ The capture request leaves at the same time as the stream. When the device retur
 | Captured image | Submit the image returned by `RCAPTURE` to the session for the check of section 6 of the decision flow, before the existing quality and duplicate checks |
 | Failure | Show the message of the feedback code. Offer a new attempt while attempts are left |
 | Last attempt failed | Offer the exception process: one capture without liveness decision, liveness exception mark, supervisor authentication at submission (decision flow, section 7.1) |
+
+As implemented, the liveness attempts of the face field count for the whole registration: an accepted capture does not reset them, so alternating a live face and a photo cannot give unlimited attempts. The capture response must hold exactly one face record; any other count ends the attempt as an invalid capture, and nothing is stored.
 
 The existing attempt counter of the registration (`ATTEMPTS`, used for the number of retries recorded with each biometric) is not the liveness attempt counter. A liveness attempt that ends before `RCAPTURE` sends no capture request, so it does not change the existing counter.
 

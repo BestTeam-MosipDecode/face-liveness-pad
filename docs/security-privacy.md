@@ -1,6 +1,6 @@
 # Security and privacy
 
-Status on 7 October 2026: design, first version. This document lists what the liveness feature protects, the attacks it addresses, the controls in place or planned, the limits that remain, and how personal data is handled. It relies on [decision-flow.md](decision-flow.md) and [workflows.md](workflows.md).
+Status on 16 October 2026: the controls below are implemented in the engine and in the resident face capture, unless marked otherwise. Operator and supervisor authentication follow in #23. This document lists what the liveness feature protects, the attacks it addresses, the controls in place or planned, the limits that remain, and how personal data is handled. It relies on [decision-flow.md](decision-flow.md) and [workflows.md](workflows.md).
 
 ## 1. What is protected
 
@@ -21,7 +21,7 @@ Status on 7 October 2026: design, first version. This document lists what the li
 | Printed photo, matte or glossy | Passive classifier (two MiniFASNet models), aggregated over several frames | Decision flow, sections 3.6 and 4 |
 | Photo or video shown on a phone, tablet or laptop screen | Same classifier. Active challenges when the score is ambiguous | Sections 4 and 5 |
 | Replayed video in which the person blinks, smiles or turns | Challenges drawn with `SecureRandom` at each attempt, action required after the instruction and before the deadline, turn in the wrong direction rejected | Sections 5.1 to 5.3 |
-| Cut-out paper mask | Classifier, plus challenges that need a moving mouth or eyelids | Sections 4 and 5 |
+| Cut-out paper mask | Classifier, plus challenges that need a moving mouth or eyelids. Partial: worn by another person, the mask shows real eyes and a real mouth (section 3) | Sections 4 and 5 |
 | Photo used during a challenge, after a live face passed the start | Passive score still computed during the challenges, face continuity checked from frame to frame | Section 5.4 |
 | A second person or a swapped face during the session | Only one face accepted. A second face or a jump of the face box ends the attempt | Sections 3.3 and 3.4 |
 
@@ -30,6 +30,7 @@ Status on 7 October 2026: design, first version. This document lists what the li
 | Attack | Controls | Where |
 | --- | --- | --- |
 | Liveness passed on the stream, another image returned by the capture | The image returned by `RCAPTURE` is checked: one face, quality, score outside the attack zone, consistent position and size with the face followed on the stream | Decision flow, section 6 |
+| A capture response with several face records, a live one and another image | The response is accepted only when it holds exactly one face record, and that image goes through the check above. Any other count ends the attempt as an invalid capture | Client, `LivenessCapture` |
 | Forged image returned by a fake device | The client already validates the signature of `RCAPTURE` responses against the device trust domain (`MosipDeviceSpecificationHelper.validateJWTResponse`). This validation stays untouched in production | Existing client |
 | Many attempts until one passes by chance | Maximum number of attempts per capture or authentication. Every failure after the first analysed frame counts, device errors included, so unplugging the device does not reset the counter | Section 7 |
 | Operator using the resident exception process to bypass liveness | A supervisor, another user, must authenticate at submission, and the supervisor's own face goes through liveness. The exception is recorded in the audit trail and marked in the packet for review on the server side | Section 7.1 |
@@ -38,7 +39,7 @@ Status on 7 October 2026: design, first version. This document lists what the li
 
 ### 2.3 Integrity of models and configuration
 
-- **Models.** Each model file has its SHA-256 in `models.json`. The engine will check them at startup and refuse to start on a mismatch (#31). The model set version is written in every audit event.
+- **Models.** Each model file has its size and SHA-256 in `models.json`. At startup the engine requires the four models in the manifest, checks them, and builds its ONNX sessions from the verified bytes; any difference stops the engine and the capture is refused (#31, #74). The model set version is written in every audit event.
 - **Client files.** At startup, the client verifies the signature of its JAR files (`ClientIntegrityValidator`), but only for files named `registration-client*` and `registration-services*`, and not when `environment=LOCAL`. A separate `liveness-engine` JAR would not be covered. Either the check is extended to it, or the engine is packaged inside one of the two verified JARs. To decide with the integration (#26).
 - **Configuration.** Liveness settings come from the server configuration, synchronised like the other client settings and read through `ApplicationContext`. When a key is missing, the engine applies its packaged defaults, never a weaker value. Changing the local database of a client is outside the scope of this feature.
 - **Randomness.** Challenges are drawn with `java.security.SecureRandom`. A fixed seed is only possible in tests, through injection.
@@ -52,6 +53,7 @@ These attacks are not, or only partly, covered. They are stated in the submissio
 3. **RGB cameras only.** L0 and L1 face devices provide colour images. No depth or infrared signal is available to the engine.
 4. **Small calibration set.** Thresholds are set on the captures of four team members. The error rates published with the submission come with their sample size and should not be read as a certification result.
 5. **Head roll.** The landmark region is not rotated, so a strongly tilted head lowers the accuracy of the challenges (decision flow, section 3.5).
+6. **Cut-out paper masks worn by another person.** Real eyes and a real mouth show through the holes, so the passive classifier can accept the mask, and a blink or a head turn is performed by a live person. The first team captures confirm that such a mask can pass the passive check. The measured rate is reported in [test-results.md](test-results.md) with the other species.
 
 ## 4. Personal data
 

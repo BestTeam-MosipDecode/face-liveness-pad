@@ -3,8 +3,11 @@
 ' License, v. 2.0. If a copy of the MPL was not distributed with this
 ' file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
+left to right direction
 skinparam componentStyle rectangle
 skinparam shadowing false
+skinparam nodesep 30
+skinparam ranksep 60
 
 title Face liveness and PAD in the Registration Client: components
 
@@ -13,34 +16,47 @@ node "Biometric device (L0/L1)" {
 }
 
 package "Registration Client 1.2.0.2 (Java 11, JavaFX)" {
-  [SBI providers\n0.9.2 / 0.9.5 / 1.0] as providers
-  [Streamer\npreview and frame listener] as streamer
-  [Frame source adapter] as adapter
-  [Capture and authentication\ncontrollers] as controllers
-  [Liveness configuration provider] as config
-  [Audit service] as audit
+
+  package "registration-client" {
+    [SBI providers\n0.9.2 / 0.9.5 / 1.0] as providers
+    [Streamer\npreview, frame listener] as streamer
+    [Capture and authentication\ncontrollers] as controllers
+    [LivenessStatusPane] as pane
+  }
+
+  package "registration-services: liveness" {
+    [LivenessFrameSource] as adapter
+    [LivenessService\nLivenessCapture\nLivenessEngineProvider] as service
+    [LivenessConfigProvider] as config
+    [LivenessStatusModel\nLivenessMessages] as model
+    [LivenessAuditListener\nwriter thread] as auditlistener
+    [Audit service] as audit
+  }
 
   package "liveness-engine (JAR)" {
-    [Liveness session\nstate machine] as session
-    [Face detector (YuNet)\nand quality checks] as detector
-    [Passive scorer\nMiniFASNet x2] as passive
-    [Challenge generator,\nlandmarks (Face Mesh V2)\nand action detectors] as active
+    [Session\nSessionCore, FrameWorker] as session
+    [Frame analysis\nYuNet, quality, MiniFASNet x2] as passive
+    [Active check\nchallenges, Face Mesh V2] as active
+    [ModelManifest\nmodels.json] as manifest
     [ONNX Runtime, CPU] as ort
   }
 }
 
-sbi --> providers : STREAM (multipart JPEG)
-providers --> streamer : frame stream
+sbi --> providers : STREAM, RCAPTURE
+providers --> streamer : frames
 streamer --> adapter : JPEG bytes
 adapter --> session : frames, device events
-config --> session : policy per workflow
-session --> detector
+controllers --> service : scan
+config --> service : policy
+service --> session : open, capture check
 session --> passive
 session --> active
-detector --> ort
 passive --> ort
 active --> ort
-session --> controllers : state, feedback, result
-controllers --> providers : RCAPTURE only after PASSED
-session --> audit : events without image
+manifest --> ort : verified models
+session ..> controllers : updates
+controllers --> pane
+pane --> model
+session ..> auditlistener : events, no image
+auditlistener --> audit
 @enduml
