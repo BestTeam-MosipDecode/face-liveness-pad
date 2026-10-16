@@ -1,8 +1,8 @@
 # Developer setup on Windows
 
-How to build and run the MOSIP Registration Client used by this project on a Windows workstation.
+How to build the liveness engine and the modified MOSIP Registration Client on a Windows workstation, and how to run them.
 
-Status on 7 October 2026: sections 1 to 3 are verified on the team's reference machine. Sections 4 to 7 come from the MOSIP documentation and from the client source code. They will be verified and completed once the team has access to the MOSIP Collab environment.
+Status on 16 October 2026: sections 1 to 4 were verified from a clean checkout of both repositories on the team's reference machine (Windows 11, JDK 11.0.32, Maven 3.9.9), and section 8 on the same machine. Sections 5 to 7 come from the MOSIP documentation and from the client source code: they need a MOSIP environment and a registered machine, and will be verified once the team has access to the MOSIP Collab environment.
 
 ## 1. Prerequisites
 
@@ -13,6 +13,7 @@ Status on 7 October 2026: sections 1 to 3 are verified on the team's reference m
 | JDK | 11 | Eclipse Temurin 11.0.32 |
 | Maven | 3.x | 3.9.9 |
 | Git | any recent version | 2.47 |
+| Python | 3.10, only for the tools of `training/` and `mock-sbi/scripts/` | 3.10 |
 
 Check the TPM from a terminal. No administrator rights are needed.
 
@@ -30,33 +31,52 @@ $env:Path = "$env:JAVA_HOME\bin;" + $env:Path
 java -version
 ```
 
+All commands below are for PowerShell. In PowerShell, keep the quotes around Maven options that contain a dot, such as `"-Dgpg.skip"`: without them, PowerShell splits the option at the dot and Maven stops with `Unknown lifecycle phase ".skip"`.
+
 ## 2. Get the sources
 
+The work is split across two repositories: this one, which holds the liveness engine, the simulated device and the documentation, and the team's fork of the Registration Client, which holds the client changes on the `feature/face-liveness` branch.
+
 ```powershell
-git clone https://github.com/BestTeam-MosipDecode/registration-client.git
-cd registration-client
-git switch feature/face-liveness
+git clone https://github.com/BestTeam-MosipDecode/face-liveness-pad.git
+git clone -c core.longpaths=true --branch feature/face-liveness https://github.com/BestTeam-MosipDecode/registration-client.git
 ```
+
+Some paths of the Registration Client are longer than the 260 characters Windows allows by default once the folder of the clone is added. Without `-c core.longpaths=true`, the clone ends with `Filename too long` and `unable to checkout working tree`. Cloning into a short folder, for example `C:\mosip`, also avoids it.
 
 `feature/face-liveness` starts from `master`, which holds the 1.2.0.2 release. The only differences between `master` and the `v1.2.0.2` tag are the README and the issue templates.
 
-## 3. Build
+## 3. Build the liveness engine
+
+The client depends on the engine, `io.mosip.registration:liveness-engine:0.1.0-SNAPSHOT`, which is not published in any public repository. Build it and install it into the local Maven repository first. From `face-liveness-pad/liveness-engine`:
+
+```powershell
+mvn clean install
+```
+
+The build runs the tests of the engine, 186 of them, and takes about one minute. The first build downloads ONNX Runtime for Java, about 90 MB. The engine embeds its four models and checks them at startup against `models.json`.
+
+## 4. Build the Registration Client
 
 From `registration-client/registration`:
 
 ```powershell
-mvn clean install -Dgpg.skip -DskipTests
+mvn clean install "-Dgpg.skip" -DskipTests
 ```
 
-The reactor builds six projects: the parent POM, `registration-api`, `registration-api-stub-impl`, `registration-services`, `registration-client` and `registration-test`. All MOSIP dependencies of this release are published on Maven Central. The build takes five to ten minutes on the reference machine once the local Maven repository is populated.
+The reactor builds six projects: the parent POM, `registration-api`, `registration-api-stub-impl`, `registration-services`, `registration-client` and `registration-test`. All MOSIP dependencies of this release are published on Maven Central. From a clean checkout with a populated local Maven repository, the build takes about five minutes on the reference machine.
+
+`registration-client/target/lib` then holds the libraries of the client, among them `liveness-engine-0.1.0-SNAPSHOT.jar` (6 MB, models included) and `onnxruntime-1.19.2.jar` (89 MB, with its native libraries).
+
+If the build stops with `Could not find artifact io.mosip.registration:liveness-engine`, the engine was not installed: go back to section 3.
 
 If the build stops with `Failed to delete ...\target`, the Java language server of an open IDE was writing into that folder while Maven was cleaning it. Run the command again from the module that failed, for example:
 
 ```powershell
-mvn clean install -Dgpg.skip -DskipTests -rf :registration-services
+mvn clean install "-Dgpg.skip" -DskipTests -rf :registration-services
 ```
 
-## 4. Select the MOSIP environment
+## 5. Select the MOSIP environment
 
 The target environment is set in `registration/registration-services/src/main/resources/props/mosip-application.properties`:
 
@@ -75,7 +95,7 @@ git update-index --skip-worktree registration/registration-services/src/main/res
 
 The host name to use for Collab is not given in the public Collab guide. It will be added here when access is granted.
 
-## 5. Register the machine on Collab
+## 6. Register the machine on Collab
 
 The Registration Client only talks to a MOSIP server that knows the TPM public key of the machine. For Collab, the procedure is described in the [Registration Client Collab Guide](https://docs.mosip.io/1.2.0/id-lifecycle-management/identity-issuance/registration-client/test/collab-reg-client-setup-guide):
 
@@ -86,7 +106,7 @@ The Registration Client only talks to a MOSIP server that knows the TPM public k
 
 Credentials and the WireGuard configuration never go into a repository.
 
-## 6. Run the client from the IDE
+## 7. Run the client from the IDE
 
 Main class: `io.mosip.registration.controller.Initialization`, in the `registration-client` module. It sets the logging configuration, then starts `ClientApplication` with its preloader.
 
@@ -105,15 +125,27 @@ According to the [MOSIP developers guide](https://docs.mosip.io/1.2.0/id-lifecyc
 
 `Initialization` loads `lib/logback.xml` relative to the working directory. The file exists in `registration-client/registration/lib`, so the working directory of the run configuration should be `registration-client/registration`. To be confirmed at the first run.
 
-## 7. Simulated biometric device
+## 8. Simulated face device
 
-The Collab guide provides a ready-to-use Mock MDS: download the archive linked in the guide, extract it, then start `run_reg.bat`. The client discovers the device on the local ports reserved for SBI.
+`face-liveness-pad/mock-sbi` is a simulated L0/L1 face device that speaks SBI like a real one, with a `static` mode (fixed image, as the MOSIP mock device) and a `webcam` mode (frames of the workstation camera). Its build, its modes and the Windows steps are in [../mock-sbi/README.md](../mock-sbi/README.md). In short, from the root of `face-liveness-pad`:
 
-This project will ship its own simulated device, with a webcam mode and a replay mode. It will be documented in `mock-sbi.md`.
+```powershell
+python mock-sbi\scripts\fetch_assets.py
+cd mock-sbi
+mvn -DskipTests "-Dgpg.skip" clean install
+cd target
+.\run_reg.bat
+```
+
+The device listens on the first free port from 4501, where the client discovers it. `python mock-sbi\scripts\check_device.py`, from the root of the repository, calls it the way the client does and checks each answer.
+
+## 9. Face liveness settings
+
+Face liveness is on by default, with the defaults of the engine, as soon as the face is captured (`mosip.registration.face_enable_flag=Y`). Its settings are configuration keys of the client, synchronised from the server like the other client settings. [configuration.md](configuration.md) lists every key, its default, its allowed values, the per-workflow overrides and a snippet for `registration-default.properties` on the server side. Liveness keys should not be made changeable locally on a workstation (section 1 of that document).
 
 ## Not covered yet
 
-First login, operator onboarding and a complete face capture. These steps need a registered machine and will be written after the first successful run.
+First login, operator onboarding and a complete face capture in the client. These steps need a registered machine and will be written after the first successful run.
 
 ## References
 

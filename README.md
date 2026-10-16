@@ -15,15 +15,15 @@ This applies to three workflows: resident face capture, operator authentication 
 
 ## Status
 
-Work in progress. Target: Registration Client 1.2.0.2 (desktop, Java 11).
+Target: Registration Client 1.2.0.2 (desktop, Java 11). Submission for MOSIP Decode 2026 on 26 October 2026.
 
-| Component | Folder | Status |
+| Component | Where | Status |
 | --- | --- | --- |
-| Reference pipeline in Python | `training/` | Classifiers exported to ONNX, face detector and landmark model chosen and packaged, reference code for detection, crop and landmarks |
-| Liveness engine in Java | `liveness-engine/` | Maven skeleton, four ONNX models and golden vectors packaged |
-| Simulated L0/L1 device | `mock-sbi/` | Not started |
-| Registration Client integration | fork of `mosip/registration-client` | Not started |
-| Documentation | `docs/` | Setup guide, architecture, decision flow, workflows, security and privacy, ISO/IEC 30107 alignment, screen mock-ups |
+| Liveness engine in Java | `liveness-engine/` | Passive and active checks, session state machine, captured image check, model check at startup, public API. 186 tests |
+| Registration Client integration | [fork of `mosip/registration-client`](https://github.com/BestTeam-MosipDecode/registration-client), branch `feature/face-liveness` | Configuration keys, stream to engine, audit events, resident face capture gated on liveness, status pane of the screens. In progress: operator and supervisor authentication, exception process after the last attempt |
+| Simulated L0/L1 device | `mock-sbi/` | `static` and `webcam` modes. `replay` mode to come |
+| Reference pipeline in Python | `training/` | Models exported to ONNX and checked, reference detection, crop and landmarks, evaluation script, capture tools. Team captures in progress |
+| Documentation | `docs/` | Design documents as built, setup guide, screen mock-ups, messages in three languages, test plan. Test results to come |
 
 ## Repository structure
 
@@ -44,7 +44,31 @@ No face image, video or public dataset is stored in this repository.
 
 ## Getting started
 
-The build and run instructions for the Registration Client on Windows are in [docs/dev-setup-windows.md](docs/dev-setup-windows.md).
+On Windows, with JDK 11 and Maven 3. The steps, the errors to expect and how to run the client are in [docs/dev-setup-windows.md](docs/dev-setup-windows.md).
+
+1. Clone both repositories. The client needs long paths on Windows:
+
+   ```powershell
+   git clone https://github.com/BestTeam-MosipDecode/face-liveness-pad.git
+   git clone -c core.longpaths=true --branch feature/face-liveness https://github.com/BestTeam-MosipDecode/registration-client.git
+   ```
+
+2. Build and install the engine first, from `face-liveness-pad/liveness-engine`:
+
+   ```powershell
+   mvn clean install
+   ```
+
+3. Build the client, from `registration-client/registration`:
+
+   ```powershell
+   mvn clean install "-Dgpg.skip" -DskipTests
+   ```
+
+4. Start the simulated face device: [mock-sbi/README.md](mock-sbi/README.md).
+5. Run the client against a MOSIP environment: sections 5 to 7 of [docs/dev-setup-windows.md](docs/dev-setup-windows.md).
+
+The Python tools (model export, evaluation, captures) are described in [training/README.md](training/README.md). The design documents are listed in [docs/README.md](docs/README.md).
 
 ## Contributing
 
