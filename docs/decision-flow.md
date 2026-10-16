@@ -1,6 +1,6 @@
 # Decision flow
 
-Status on 7 October 2026: design, first version. This document specifies how a liveness session reaches its decision. It is the reference for the engine issues: preprocessing (#11), detection, quality and passive score (#12), challenges (#13), session state machine (#14) and tests (#15). Thresholds and limits marked "to calibrate" will be set from the team captures (#5 and #7).
+Status on 16 October 2026: implemented in the engine (#56, #59, #60, #66 to #68, #74, #77). The exception process of section 7.1 was confirmed by the coordinator on 15 October 2026. The smile factor (section 5.3) is provisional, and removing `SMILE` from the default challenge types is under discussion in #5. This document specifies how a liveness session reaches its decision. It is the reference for the engine issues: preprocessing (#11), detection, quality and passive score (#12), challenges (#13), session state machine (#14) and tests (#15). Thresholds and limits marked "to calibrate" will be set from the team captures (#5 and #7).
 
 Values in this document follow the configuration keys of the project plan, with the prefix `mosip.registration.face.liveness.`. This document adds two keys and a capture check operation to the engine API. The coordinator approved them on 7 October 2026, together with the attempt counting rule of section 7 and the exception process for residents of section 7.1.
 
