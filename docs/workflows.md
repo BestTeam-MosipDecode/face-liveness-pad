@@ -66,6 +66,8 @@ The screen starts the face stream. When the user asks for the scan, the controll
 | Comparison | Unchanged. A face that is live but does not match keeps the existing message of the client |
 | Last attempt failed | Block. No exception path for authentication |
 
+At login, each failed liveness attempt also counts as a failed login in the existing counter of the client (`mosip.registration.invalid_login_count`), which is stored in the local database and locks the account: restarting the client gives no new attempts. The attempts of the supervisor are kept in memory, since an operator session is needed first. The authentication scan ends when its screen is left, and its comparison must start within the capture timeout of the client (`mosip.registration.capture_time_out`) and a margin.
+
 Liveness comes before the comparison: an attacker learns nothing about whether a photo would have matched.
 
 ## 3. Online and offline
