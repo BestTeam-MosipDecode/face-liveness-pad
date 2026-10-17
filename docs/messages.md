@@ -33,6 +33,8 @@ Files `messages_en.properties`, `messages_fr.properties`, `messages_ar.propertie
 | `LIVENESS_RETRY_AVAILABLE` | Attempt {0} of {1}. You can try again. | Tentative {0} sur {1}. Vous pouvez réessayer. | After a failure, attempts left |
 | `LIVENESS_MAX_ATTEMPTS` | Face verification could not be completed. Please follow the exception process. | La vérification du visage n'a pas pu aboutir. Veuillez suivre la procédure d'exception. | Resident, attempts exhausted |
 | `LIVENESS_EXCEPTION_INFO` | The face is captured once more without a liveness decision. A supervisor must authenticate before the registration is submitted. | Le visage est capturé une dernière fois sans décision de vivacité. Un superviseur devra s'authentifier avant la soumission de l'enregistrement. | Under the band, exception process |
+| `LIVENESS_EXCEPTION_CAPTURED` | Face captured under the exception process | Visage capturé selon la procédure d'exception | Resident, face captured under the exception process |
+| `LIVENESS_EXCEPTION_SUPERVISOR` | A supervisor must authenticate before the registration is submitted. | Un superviseur devra s'authentifier avant la soumission de l'enregistrement. | Under the band, face captured under the exception process |
 | `LIVENESS_MAX_ATTEMPTS_AUTH` | Face verification could not be completed. Use another sign-in method or contact your supervisor. | La vérification du visage n'a pas pu aboutir. Utilisez un autre mode de connexion ou contactez votre superviseur. | Authentication, attempts exhausted |
 | `LIVENESS_MAX_ATTEMPTS_BLOCKED` | Face verification could not be completed. Please contact your supervisor. | La vérification du visage n'a pas pu aboutir. Veuillez contacter votre superviseur. | Resident, attempts exhausted, when `on_max_attempts` is `BLOCK` |
 | `LIVENESS_TIP_LOOK_CAMERA` | Look directly at the camera | Regardez directement la caméra | Tip |
@@ -91,6 +93,8 @@ Text of `messages_ar.properties` and `labels_ar.properties`, for reading. Head t
 | `LIVENESS_RETRY_AVAILABLE` | المحاولة {0} من {1}. يمكنك المحاولة مرة أخرى. |
 | `LIVENESS_MAX_ATTEMPTS` | تعذّر إكمال التحقق من الوجه. يُرجى اتباع إجراء الاستثناء. |
 | `LIVENESS_EXCEPTION_INFO` | يُلتقط الوجه مرة أخرى دون قرار بشأن الحيوية. يجب أن يصادق المشرف قبل إرسال التسجيل. |
+| `LIVENESS_EXCEPTION_CAPTURED` | تم التقاط الوجه وفق إجراء الاستثناء |
+| `LIVENESS_EXCEPTION_SUPERVISOR` | يجب أن يصادق المشرف قبل إرسال التسجيل. |
 | `LIVENESS_MAX_ATTEMPTS_AUTH` | تعذّر إكمال التحقق من الوجه. استخدم طريقة أخرى لتسجيل الدخول أو اتصل بالمشرف. |
 | `LIVENESS_MAX_ATTEMPTS_BLOCKED` | تعذّر إكمال التحقق من الوجه. يُرجى الاتصال بالمشرف. |
 | `LIVENESS_TIP_LOOK_CAMERA` | انظر مباشرة إلى الكاميرا |
@@ -141,6 +145,8 @@ LIVENESS_GENERIC_FAILURE=Face verification could not be completed. Please try ag
 LIVENESS_RETRY_AVAILABLE=Attempt {0} of {1}. You can try again.
 LIVENESS_MAX_ATTEMPTS=Face verification could not be completed. Please follow the exception process.
 LIVENESS_EXCEPTION_INFO=The face is captured once more without a liveness decision. A supervisor must authenticate before the registration is submitted.
+LIVENESS_EXCEPTION_CAPTURED=Face captured under the exception process
+LIVENESS_EXCEPTION_SUPERVISOR=A supervisor must authenticate before the registration is submitted.
 LIVENESS_MAX_ATTEMPTS_AUTH=Face verification could not be completed. Use another sign-in method or contact your supervisor.
 LIVENESS_MAX_ATTEMPTS_BLOCKED=Face verification could not be completed. Please contact your supervisor.
 LIVENESS_TIP_LOOK_CAMERA=Look directly at the camera
@@ -176,6 +182,8 @@ LIVENESS_GENERIC_FAILURE=La v\u00e9rification du visage n'a pas pu \u00eatre ter
 LIVENESS_RETRY_AVAILABLE=Tentative {0} sur {1}. Vous pouvez r\u00e9essayer.
 LIVENESS_MAX_ATTEMPTS=La v\u00e9rification du visage n'a pas pu aboutir. Veuillez suivre la proc\u00e9dure d'exception.
 LIVENESS_EXCEPTION_INFO=Le visage est captur\u00e9 une derni\u00e8re fois sans d\u00e9cision de vivacit\u00e9. Un superviseur devra s'authentifier avant la soumission de l'enregistrement.
+LIVENESS_EXCEPTION_CAPTURED=Visage captur\u00E9 selon la proc\u00E9dure d'exception
+LIVENESS_EXCEPTION_SUPERVISOR=Un superviseur devra s'authentifier avant la soumission de l'enregistrement.
 LIVENESS_MAX_ATTEMPTS_AUTH=La v\u00e9rification du visage n'a pas pu aboutir. Utilisez un autre mode de connexion ou contactez votre superviseur.
 LIVENESS_MAX_ATTEMPTS_BLOCKED=La v\u00e9rification du visage n'a pas pu aboutir. Veuillez contacter votre superviseur.
 LIVENESS_TIP_LOOK_CAMERA=Regardez directement la cam\u00e9ra
@@ -211,6 +219,8 @@ LIVENESS_GENERIC_FAILURE=\u062A\u0639\u0630\u0651\u0631 \u0625\u0643\u0645\u0627
 LIVENESS_RETRY_AVAILABLE=\u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 {0} \u0645\u0646 {1}. \u064A\u0645\u0643\u0646\u0643 \u0627\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0645\u0631\u0629 \u0623\u062E\u0631\u0649.
 LIVENESS_MAX_ATTEMPTS=\u062A\u0639\u0630\u0651\u0631 \u0625\u0643\u0645\u0627\u0644 \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0648\u062C\u0647. \u064A\u064F\u0631\u062C\u0649 \u0627\u062A\u0628\u0627\u0639 \u0625\u062C\u0631\u0627\u0621 \u0627\u0644\u0627\u0633\u062A\u062B\u0646\u0627\u0621.
 LIVENESS_EXCEPTION_INFO=\u064A\u064F\u0644\u062A\u0642\u0637 \u0627\u0644\u0648\u062C\u0647 \u0645\u0631\u0629 \u0623\u062E\u0631\u0649 \u062F\u0648\u0646 \u0642\u0631\u0627\u0631 \u0628\u0634\u0623\u0646 \u0627\u0644\u062D\u064A\u0648\u064A\u0629. \u064A\u062C\u0628 \u0623\u0646 \u064A\u0635\u0627\u062F\u0642 \u0627\u0644\u0645\u0634\u0631\u0641 \u0642\u0628\u0644 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u062A\u0633\u062C\u064A\u0644.
+LIVENESS_EXCEPTION_CAPTURED=\u062A\u0645 \u0627\u0644\u062A\u0642\u0627\u0637 \u0627\u0644\u0648\u062C\u0647 \u0648\u0641\u0642 \u0625\u062C\u0631\u0627\u0621 \u0627\u0644\u0627\u0633\u062A\u062B\u0646\u0627\u0621
+LIVENESS_EXCEPTION_SUPERVISOR=\u064A\u062C\u0628 \u0623\u0646 \u064A\u0635\u0627\u062F\u0642 \u0627\u0644\u0645\u0634\u0631\u0641 \u0642\u0628\u0644 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u062A\u0633\u062C\u064A\u0644.
 LIVENESS_MAX_ATTEMPTS_AUTH=\u062A\u0639\u0630\u0651\u0631 \u0625\u0643\u0645\u0627\u0644 \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0648\u062C\u0647. \u0627\u0633\u062A\u062E\u062F\u0645 \u0637\u0631\u064A\u0642\u0629 \u0623\u062E\u0631\u0649 \u0644\u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062F\u062E\u0648\u0644 \u0623\u0648 \u0627\u062A\u0635\u0644 \u0628\u0627\u0644\u0645\u0634\u0631\u0641.
 LIVENESS_MAX_ATTEMPTS_BLOCKED=\u062A\u0639\u0630\u0651\u0631 \u0625\u0643\u0645\u0627\u0644 \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0648\u062C\u0647. \u064A\u064F\u0631\u062C\u0649 \u0627\u0644\u0627\u062A\u0635\u0627\u0644 \u0628\u0627\u0644\u0645\u0634\u0631\u0641.
 LIVENESS_TIP_LOOK_CAMERA=\u0627\u0646\u0638\u0631 \u0645\u0628\u0627\u0634\u0631\u0629 \u0625\u0644\u0649 \u0627\u0644\u0643\u0627\u0645\u064A\u0631\u0627
