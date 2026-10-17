@@ -14,7 +14,7 @@ The liveness configuration follows the same path. A small provider in the client
 
 - **Offline.** The client uses the values of its last synchronisation. Liveness behaves the same online and offline.
 - **Missing key.** On a first installation, or with a server that does not know the keys yet, the engine applies the defaults it ships with (`liveness-defaults.properties` inside the engine JAR, #7). These defaults are the values of the table below.
-- **Invalid value.** A value that cannot be read or breaks a rule of section 3 is ignored. The engine default applies and the client writes a warning to its log, with the key and the value. A wrong setting can therefore never weaken liveness below the defaults.
+- **Invalid value.** A value that cannot be read or breaks a rule of section 3 is ignored. The engine default applies and the client writes a warning to its log, with the key and the value. One exception: a value of `on_max_attempts` that cannot be read gives `BLOCK`, not the default `EXCEPTION` of residents, so that it never opens the exception process. A wrong setting can therefore never weaken liveness below the defaults.
 - **Local override.** Liveness keys should not be added to the list of keys permitted for local change. Otherwise, anyone with access to the settings of a machine could disable liveness or lower its thresholds on that machine ([security-privacy.md](security-privacy.md), section 2.3).
 
 ## 2. Keys
