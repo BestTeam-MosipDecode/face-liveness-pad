@@ -162,7 +162,7 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 - Dispositif simulé en mode replay (`replay_scenarios.py`) : avec les réglages de l'issue, 8 essais sur 32, à cause du script (flux demandé pour 10 s et observé 12 s). Avec une observation de 8 s, 24 sur 24 pour les flux, en SBI 0.9.5 et 1.0 ; déconnexion correcte ; image figée correcte côté dispositif, mais refusée par la règle du script. Cinq corrections du script et deux du test signalées sur l'issue n° 29.
 - Le dispositif écrit chaque réponse en entier dans son journal, donc les enregistrements signés du visage rejoué. `replay_scenarios.log` a été supprimé après chaque lancement.
 - Avast a arrêté le dispositif et mis son JAR en quarantaine sans afficher d'alerte (faux positif), et son analyse HTTPS a fait échouer les téléchargements de Maven (`PKIX path building failed`). Les deux contournements sont dans `docs/dev-setup-windows.md`.
-- Décision en attente : traitement du masque en papier (limite connue documentée, ou contrôle dédié plus tard), demandée par PrinceSpecial sur l'issue n° 7. Elisée y reviendra.
+- Masque en papier et deuxième sujet : décisions d'Elisée du 19 octobre, voir Décisions.
 
 ## Nettoyage de l'historique et vérification des commits (13 octobre)
 
@@ -361,6 +361,8 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 
 - 15 octobre. Après la dernière tentative ratée d'un résident : procédure d'exception de la section 7.1 de `docs/decision-flow.md` (option A), décidée par Elisée. L'opérateur continue sous exception, le dossier est marqué et audité, un superviseur s'authentifie à la soumission. Le marquage dans le paquet reste provisoire en attendant la réponse des mentors (Q15). Demandé à Tobi3h dans la Pull Request n° 6 du fork, après la correction de sécurité de la capture et l'authentification opérateur et superviseur (n° 23).
 - 16 octobre. Tant que l'authentification du superviseur par le visage ne passe pas par la vérification de vivacité (#23), le visage n'est pas proposé au superviseur pour valider un dossier marqué en exception : mot de passe ou empreinte seulement. Décidé par Elisée à la relecture de la Pull Request n° 9 du fork, qui doit aussi corriger le contrôle du superviseur (casse de l'identifiant, rôle) et la perte possible du marquage.
+- 19 octobre. Masque en papier porté par une autre personne : limite connue, documentée avec son taux sur le premier sujet (option 1 proposée par PrinceSpecial sur l'issue n° 7), sans changement du code ni des seuils avant la soumission. Un contrôle dédié reste une piste pour plus tard. Décidé par Elisée.
+- 19 octobre. Pas de deuxième sujet enregistré : les résultats de l'issue n° 7 sont publiés comme préliminaires, sur un seul sujet, avec les seuils 0,85 et 0,30 conservés (toujours provisoires). Décidé par Elisée.
 
 ## Blocages
 
