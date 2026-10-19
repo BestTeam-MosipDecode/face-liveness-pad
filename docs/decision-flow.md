@@ -97,7 +97,7 @@ The session keeps the scored frames of the current track whose timestamp is with
 
 The median makes the decision robust to a single badly scored frame. With the defaults, a decision needs at least half a second of good frames.
 
-The two thresholds are provisional. They will be calibrated on the team captures (#7) and validated by the coordinator before they are written as defaults.
+The two thresholds are provisional. On 19 October 2026 the coordinator kept 0.85 and 0.30 (#7): the captures of the first subject support them, but with a single subject there is no held-out evaluation, so the published figures are preliminary.
 
 If no decision is reached within `passive.timeout_ms` after the first frame (added key, default 20 000 ms), the attempt fails with the guidance code given most often during that time: `NO_FACE`, `MULTIPLE_FACES` or `LOW_QUALITY`.
 
@@ -250,8 +250,8 @@ Every event of the engine carries the workflow, the attempt number, the duration
 | Key | Default | Used in |
 | --- | --- | --- |
 | `enabled` | `true` | Section 7 |
-| `passive.threshold.pass` | `0.85`, to calibrate | Section 4 |
-| `passive.threshold.attack` | `0.30`, to calibrate | Sections 4, 5.4, 5.5, 6 |
+| `passive.threshold.pass` | `0.85`, provisional (#7) | Section 4 |
+| `passive.threshold.attack` | `0.30`, provisional (#7) | Sections 4, 5.4, 5.5, 6 |
 | `passive.min_frames` | `5` | Sections 4, 5.4 |
 | `passive.window_ms` | `3000` | Section 4 |
 | `frame.sampling_ms` | `100` | Sections 3.1, 5.3 |
