@@ -1,6 +1,6 @@
 # Security and privacy
 
-Status on 16 October 2026: the controls below are implemented in the engine and in the resident face capture, unless marked otherwise. Operator and supervisor authentication follow in #23. This document lists what the liveness feature protects, the attacks it addresses, the controls in place or planned, the limits that remain, and how personal data is handled. It relies on [decision-flow.md](decision-flow.md) and [workflows.md](workflows.md).
+Status on 19 October 2026: the controls below are implemented in the engine and in the three workflows of the client, unless marked otherwise. This document lists what the liveness feature protects, the attacks it addresses, the controls in place or planned, the limits that remain, and how personal data is handled. It relies on [decision-flow.md](decision-flow.md) and [workflows.md](workflows.md).
 
 ## 1. What is protected
 
@@ -33,7 +33,7 @@ Status on 16 October 2026: the controls below are implemented in the engine and 
 | A capture response with several face records, a live one and another image | The response is accepted only when it holds exactly one face record, and that image goes through the check above. Any other count ends the attempt as an invalid capture | Client, `LivenessCapture` |
 | Forged image returned by a fake device | The client already validates the signature of `RCAPTURE` responses against the device trust domain (`MosipDeviceSpecificationHelper.validateJWTResponse`). This validation stays untouched in production | Existing client |
 | Many attempts until one passes by chance | Maximum number of attempts per capture or authentication. Every failure after the first analysed frame counts, device errors included, so unplugging the device does not reset the counter | Section 7 |
-| Operator using the resident exception process to bypass liveness | The registration is marked as soon as the operator continues under exception. At submission, a supervisor must authenticate: another user than the operator, compared without regard to case, with the supervisor role. Until the supervisor's face goes through liveness (#23), the face is not offered for this authentication. The capture is audited (`REG-EVT-112`) and marked in the packet for review on the server side. In progress in registration-client#9 | Section 7.1 |
+| Operator using the resident exception process to bypass liveness | The registration is marked as soon as the operator continues under exception. At submission, a supervisor must authenticate: another user than the operator, compared without regard to case, with the supervisor role. The supervisor's face goes through liveness; when liveness is disabled for the supervisor, the face is not offered for this authentication. The capture is audited (`REG-EVT-112`) and marked in the packet for review on the server side | Section 7.1 |
 | Learning from the screen how close a photo came to passing | A detected attack shows the same generic message as an engine error. No score, measure or model data on screen unless the diagnostic mode is enabled | Section 8 |
 | Liveness bypassed for authentication after failed attempts | No exception path for authentication: the face is refused | Section 7.1 |
 

@@ -1,6 +1,6 @@
 # Architecture
 
-Status on 16 October 2026: the engine and the resident face capture are implemented. Operator and supervisor authentication (#23) and the exception process after the last attempt of a resident are in progress. The client changes are on the `feature/face-liveness` branch of the team's fork of `registration-client`, based on release 1.2.0.2.
+Status on 19 October 2026: the engine and the three workflows are implemented: resident face capture with the exception process after the last attempt, operator and supervisor face authentication. The check on screen with the simulated device and a MOSIP environment is still to do. The client changes are on the `feature/face-liveness` branch of the team's fork of `registration-client`, based on release 1.2.0.2.
 
 ## 1. Context
 
@@ -77,10 +77,10 @@ The passive classifier and its preprocessing are described in [../training/READM
 | Workflow | Class in `registration-client` | Point of integration | Status |
 | --- | --- | --- | --- |
 | Resident face capture | `GenericBiometricsController` | Liveness scan before `rCaptureTaskService()`, which runs only after `PASSED`. Captured image checked inside the capture task | Implemented (registration-client#6, pane in #8) |
-| Exception process after the last attempt of a resident | `GenericBiometricsController`, reviewer authentication of `AuthenticationController` | "Continue under exception": one capture without a liveness decision, liveness exception mark, supervisor authentication at submission, not by face until #23 | In progress (registration-client#9) |
-| Operator login by face | `LoginController` | A `PASSED` session before the face is captured and matched | In progress (#23) |
-| Operator and supervisor authentication | `AuthenticationController`, `BaseController.captureAndValidateFace(...)` | Liveness before the capture, captured image checked before `authValidator(...)`. The supervisor policy for reviewers | In progress (#23) |
-| End of day approval by the supervisor | `EODAuthenticationController` | Same entry point, with the supervisor policy | In progress (#23) |
+| Exception process after the last attempt of a resident | `GenericBiometricsController`, reviewer authentication of `AuthenticationController` | "Continue under exception": one capture without a liveness decision, liveness exception mark, supervisor authentication at submission, by face only when liveness is enabled for the supervisor | Implemented (registration-client#9, #13) |
+| Operator login by face | `LoginController` | A `PASSED` session before the face is captured and matched. Failed liveness attempts count as failed logins | Implemented (registration-client#10) |
+| Operator and supervisor authentication | `AuthenticationController`, `BaseController.captureAndValidateFace(...)` | Liveness before the capture, captured image checked before `authValidator(...)`. The supervisor policy for reviewers | Implemented (registration-client#10) |
+| End of day approval by the supervisor | `EODAuthenticationController` | Same entry point, with the supervisor policy | Implemented (registration-client#10) |
 
 Other modalities (fingerprints, iris) and the exception photo keep their behaviour. With liveness disabled by configuration, the client behaves as release 1.2.0.2 and the engine is never loaded.
 

@@ -6,7 +6,7 @@
 | [architecture.md](architecture.md) | Components as built, frame flow, threads, integration points, online and offline behaviour | Updated on 16 October 2026 |
 | [PROGRESS.md](PROGRESS.md) | Internal work log of the team, in French | Updated at each step |
 | [decision-flow.md](decision-flow.md) | Session states, frame processing, passive and active rules, captured image check, attempts, feedback codes, audit events, parameters | Implemented in the engine |
-| [workflows.md](workflows.md) | Sequence diagrams of resident capture and of operator and supervisor authentication, changes at each step | Resident capture implemented, authentication in progress |
+| [workflows.md](workflows.md) | Sequence diagrams of resident capture and of operator and supervisor authentication, changes at each step | Implemented in the three workflows |
 | [ui/README.md](ui/README.md) | Screen mock-ups of the three workflows, user flow, design rules, contrast | Implemented by `LivenessStatusPane` |
 | [configuration.md](configuration.md) | Configuration keys, defaults, allowed values, validation, per-workflow overrides, snippet for `registration-default.properties` | Implemented by `LivenessConfigProvider` |
 | [messages.md](messages.md) | Texts of the feature in English, French and Arabic, lines for the message and label files | In the client. Arabic to be read by an Arabic speaker |

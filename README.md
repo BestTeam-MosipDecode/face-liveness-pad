@@ -20,7 +20,7 @@ Target: Registration Client 1.2.0.2 (desktop, Java 11). Submission for MOSIP Dec
 | Component | Where | Status |
 | --- | --- | --- |
 | Liveness engine in Java | `liveness-engine/` | Passive and active checks, session state machine, captured image check, model check at startup, public API. 186 tests |
-| Registration Client integration | [fork of `mosip/registration-client`](https://github.com/BestTeam-MosipDecode/registration-client), branch `feature/face-liveness` | Configuration keys, stream to engine, audit events, resident face capture gated on liveness, status pane of the screens. In progress: operator and supervisor authentication, exception process after the last attempt |
+| Registration Client integration | [fork of `mosip/registration-client`](https://github.com/BestTeam-MosipDecode/registration-client), branch `feature/face-liveness` | Configuration keys, stream to engine, audit events, resident face capture gated on liveness with the exception process after the last attempt, operator and supervisor face authentication gated on liveness, status pane on the capture and authentication screens, signature check of the engine jar. Left: the check on screen with the simulated device and a MOSIP environment |
 | Simulated L0/L1 device | `mock-sbi/` | `static` and `webcam` modes. `replay` mode to come |
 | Reference pipeline in Python | `training/` | Models exported to ONNX and checked, reference detection, crop and landmarks, evaluation script, capture tools. Team captures in progress |
 | Documentation | `docs/` | Design documents as built, setup guide, screen mock-ups, messages in three languages, test plan. Test results to come |
