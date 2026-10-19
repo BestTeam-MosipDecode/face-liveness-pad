@@ -323,7 +323,7 @@ training\.venv\Scripts\python.exe training\scripts\demo_active.py --rounds 5 --l
 `scripts/evaluate.py` scores the team captures (`captures/<subject>/<type>/<sequence>/`, see "Capture sessions") and proposes the passive thresholds:
 
 1. subjects are split into a calibration set and a test set, with no subject in both (`--test-subjects`, or a seeded half split);
-2. on the calibration set, the attack threshold is the largest value that keeps bona fide sequences rejected as attacks at or below `--target-bpcer` (default 1 %), and the pass threshold the smallest value that keeps attacks accepted at or below `--target-apcer` (default 0 %), on the median score of each sequence;
+2. on the calibration set, the attack threshold is the midpoint between the highest attack median allowed by `--target-apcer` (default 0 %) and the lowest bona fide median allowed by `--target-bpcer` (default 1 %), rounded to 0.05 and kept between 0.10 and 0.50; the pass threshold is the smallest value above the highest allowed attack median, rounded up to 0.05 plus 0.05, and at least 0.05 above the attack threshold. Both are computed on the median score of each sequence. The action sequences are left out (`--exclude-types`), as a turned head scores low on purpose; `--no-split` gives preliminary figures when a single subject is available;
 3. on the test set, each sequence is replayed through the passive window (section 4 of `docs/decision-flow.md`), giving APCER per attack type and its maximum, BPCER, ACER, the share of sequences sent to the active check, the equal error rate and the mean time per frame;
 4. the DET curve is written to `training/results/chart_det.png` and the Markdown table is printed (`--markdown` writes it to a file) for `docs/test-results.md`.
 

@@ -50,6 +50,9 @@ from liveness.passive import (ATTACK, ATTACK_THRESHOLD, CHALLENGE, PASS_THRESHOL
 from liveness.yunet import YuNet, classifier_box  # noqa: E402
 
 BONA_FIDE_TYPES = ("bona_fide", "action_blink", "action_smile", "action_turn_left", "action_turn_right")
+# The action sequences calibrate the active check (#5): a turned head scores low on purpose, so they are left out
+# of the passive evaluation unless --include-types says otherwise.
+DEFAULT_EXCLUDED = ("action_blink", "action_smile", "action_turn_left", "action_turn_right")
 RESULTS_DIR = REPO_ROOT / "training" / "results"
 DEFAULT_CACHE = RESULTS_DIR / "frame_scores.csv"
 CACHE_FIELDS = ["subject", "type", "sequence", "frame", "t_ms", "faces", "tip", "score", "ms"]
@@ -166,18 +169,26 @@ def sequence_score(sequence):
 
 
 def propose_thresholds(calibration, target_apcer, target_bpcer):
-    bona = np.array([sequence_score(s) for s in calibration if is_bona_fide(s["type"]) and sequence_score(s) is not None])
-    attacks = np.array([sequence_score(s) for s in calibration
-                        if not is_bona_fide(s["type"]) and sequence_score(s) is not None])
+    """Propose the attack and pass thresholds from the sequence medians of the calibration set.
+
+    The attack threshold sits between the attacks and the bona fide presentations: the midpoint between the
+    highest attack median that the APCER target allows and the lowest bona fide median that the BPCER target
+    allows, rounded to 0.05 and kept within 0.10 and 0.50, so that a genuine person is rarely called an attack.
+    The pass threshold is the smallest value, rounded up to 0.05, above the highest attack median that the APCER
+    target allows, and at least 0.05 above the attack threshold: an attack must not pass without a challenge.
+    """
+    bona = np.sort([sequence_score(s) for s in calibration if is_bona_fide(s["type"]) and sequence_score(s) is not None])
+    attacks = np.sort([sequence_score(s) for s in calibration
+                       if not is_bona_fide(s["type"]) and sequence_score(s) is not None])
     if not len(bona) or not len(attacks):
         print("warning: the calibration set has no scored bona fide or attack sequence, default thresholds kept")
         return PASS_THRESHOLD, ATTACK_THRESHOLD
-    candidates = np.round(np.arange(0.0, 1.0001, 0.01), 2)
-    attack_threshold = max((t for t in candidates if np.mean(bona <= t) <= target_bpcer), default=0.0)
-    pass_threshold = min((t for t in candidates if np.mean(attacks >= t) <= target_apcer), default=1.0)
-    if pass_threshold <= attack_threshold:
-        pass_threshold = min(1.0, round(attack_threshold + 0.01, 2))
-    return float(pass_threshold), float(attack_threshold)
+    # Highest attack median once the allowed share of attacks is ignored, lowest bona fide median likewise.
+    attack_top = float(attacks[max(0, int(np.ceil(len(attacks) * (1 - target_apcer))) - 1)])
+    bona_bottom = float(bona[min(len(bona) - 1, int(np.floor(len(bona) * target_bpcer)))])
+    attack_threshold = min(0.5, max(0.1, round((attack_top + bona_bottom) / 2 * 20) / 20))
+    pass_threshold = max(attack_threshold + 0.05, min(1.0, np.ceil(attack_top * 20 + 1e-9) / 20 + 0.05))
+    return float(round(pass_threshold, 2)), float(round(attack_threshold, 2))
 
 
 def metrics(test, pass_threshold, attack_threshold):
@@ -257,11 +268,14 @@ def percent(value):
 def markdown(report):
     m = report["metrics"]
     lines = [
-        "Calibration subjects: {}. Test subjects: {}.".format(", ".join(report["calibration"]), ", ".join(report["test"])),
+        "Calibration subjects: {}. Test subjects: {}.{}".format(
+            ", ".join(report["calibration"]), ", ".join(report["test"]),
+            " **No held-out subject: preliminary figures.**" if report["calibration"] == report["test"] else ""),
         "",
-        "Proposed thresholds: pass {:.2f}, attack {:.2f} (targets on calibration: APCER {}, BPCER {}).".format(
+        "Proposed thresholds: pass {:.2f}, attack {:.2f} (targets on calibration: APCER {}, BPCER {}).{}".format(
             report["pass_threshold"], report["attack_threshold"], percent(report["target_apcer"]),
-            percent(report["target_bpcer"])),
+            percent(report["target_bpcer"]),
+            " Types left out: {}.".format(", ".join("`{}`".format(t) for t in report["excluded"])) if report["excluded"] else ""),
         "",
         "| Presentation type | Sequences | APCER (accepted as live) | Sent to the active check |",
         "| --- | --- | --- | --- |",
@@ -298,6 +312,10 @@ def main():
     parser.add_argument("--step", type=int, default=1, help="score one frame out of this number")
     parser.add_argument("--test-subjects", help="comma-separated pseudonyms of the test subjects")
     parser.add_argument("--seed", type=int, default=2026, help="seed of the subject split when none is given")
+    parser.add_argument("--exclude-types", default=",".join(DEFAULT_EXCLUDED),
+                        help="comma-separated capture types left out of the evaluation (default: the action sequences)")
+    parser.add_argument("--no-split", action="store_true",
+                        help="calibrate and report on the same subjects: preliminary figures only, no held-out subject")
     parser.add_argument("--target-apcer", type=float, default=0.0)
     parser.add_argument("--target-bpcer", type=float, default=0.01)
     parser.add_argument("--max-yaw-deg", type=float, default=quality.MAX_YAW_DEG)
@@ -319,11 +337,18 @@ def main():
         if args.score_only:
             print("{} frames scored, written to {}: share this file, it holds no image".format(len(rows), args.cache))
             return
-    all_sequences = group_sequences(rows)
+    excluded = {t for t in args.exclude_types.split(",") if t}
+    all_sequences = [s for s in group_sequences(rows) if s["type"] not in excluded]
+    if excluded:
+        print("types left out: {}".format(", ".join(sorted(excluded))))
 
-    calibration_subjects, test_subjects = split_subjects(
-        {s["subject"] for s in all_sequences},
-        args.test_subjects.split(",") if args.test_subjects else None, args.seed)
+    subjects = {s["subject"] for s in all_sequences}
+    if args.no_split:
+        calibration_subjects = test_subjects = sorted(subjects)
+        print("warning: --no-split, the test subjects are the calibration subjects: preliminary figures only")
+    else:
+        calibration_subjects, test_subjects = split_subjects(
+            subjects, args.test_subjects.split(",") if args.test_subjects else None, args.seed)
     calibration = [s for s in all_sequences if s["subject"] in calibration_subjects]
     test = [s for s in all_sequences if s["subject"] in test_subjects]
 
@@ -338,7 +363,7 @@ def main():
         print("DET curve written to {}".format(args.det))
 
     report = {
-        "calibration": calibration_subjects, "test": test_subjects,
+        "calibration": calibration_subjects, "test": test_subjects, "excluded": sorted(excluded),
         "pass_threshold": pass_threshold, "attack_threshold": attack_threshold,
         "target_apcer": args.target_apcer, "target_bpcer": args.target_bpcer,
         "metrics": metrics(test, pass_threshold, attack_threshold), "eer": eer,
