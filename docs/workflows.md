@@ -1,6 +1,6 @@
 # Workflows
 
-Status on 16 October 2026: the resident face capture is implemented as described in section 1.2 (registration-client#6, screen pane in #8). Operator and supervisor authentication (#23) and the exception process after the last attempt of a resident are in progress. This document shows how liveness fits into the three face workflows of Registration Client 1.2.0.2: resident face capture, operator authentication and supervisor authentication. It completes [architecture.md](architecture.md), which lists the integration points, and [decision-flow.md](decision-flow.md), which specifies the rules of a liveness session. It is the reference for the integration issues #20 to #26.
+Status on 19 October 2026: the three workflows are implemented as described below: resident face capture with the exception process (registration-client#6, #8, #9, #13), operator and supervisor authentication (registration-client#10). They are not yet checked on screen with a MOSIP environment. This document shows how liveness fits into the three face workflows of Registration Client 1.2.0.2: resident face capture, operator authentication and supervisor authentication. It completes [architecture.md](architecture.md), which lists the integration points, and [decision-flow.md](decision-flow.md), which specifies the rules of a liveness session. It is the reference for the integration issues #20 to #26.
 
 Class names and line numbers refer to the `feature/face-liveness` branch of the team's `registration-client` fork, identical to release 1.2.0.2 on 7 October 2026.
 
@@ -86,4 +86,4 @@ For operator and supervisor authentication, the person in front of the camera al
 ## 5. Points to confirm
 
 1. With the simulated device: the stream keeps running while `RCAPTURE` is in progress, so that the session can follow the face until the capture (#16, #17).
-2. For the login: where to place the captured image check, in `SessionContext.create(...)` or in `LoginController` (#23).
+2. For the login: where to place the captured image check. Settled in registration-client#10: `LivenessAuthGate.accept` runs in `SessionContext.validateFace`, between the capture and the comparison.
