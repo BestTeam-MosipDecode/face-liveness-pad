@@ -153,6 +153,10 @@ An antivirus can take the device for a threat: it opens a local server, loads a 
 
 Face liveness is on by default, with the defaults of the engine, as soon as the face is captured (`mosip.registration.face_enable_flag=Y`). Its settings are configuration keys of the client, synchronised from the server like the other client settings. [configuration.md](configuration.md) lists every key, its default, its allowed values, the per-workflow overrides and a snippet for `registration-default.properties` on the server side. Liveness keys should not be made changeable locally on a workstation (section 1 of that document).
 
+## 10. Demo without a MOSIP environment
+
+[../demo/README.md](../demo/README.md) builds and starts a standalone application that runs the liveness check end to end with the engine, the status pane and the message files of the modified client, and the simulated device in webcam mode. It needs sections 3, 4 and 8, not a MOSIP environment.
+
 ## Not covered yet
 
 First login, operator onboarding and a complete face capture in the client. These steps need a registered machine and will be written after the first successful run.
