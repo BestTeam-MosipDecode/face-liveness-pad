@@ -142,3 +142,16 @@ DET curve: not run.
 | Stream kept running during `RCAPTURE` | not run |
 | Capture response signature validated by the client | not run |
 | Device unavailable and reconnection handled | not run |
+
+### 5.1 Device-level scenarios, automated
+
+`mock-sbi/scripts/replay_scenarios.py` starts the simulated device in `replay` mode on a recorded sequence, calls it as the Registration Client does (MOSIPDINFO, MOSIPDISC, STREAM, RCAPTURE), checks the stream and the capture against the expected behaviour and stops the device, once per SBI specification version and per device configuration. Run of 19 October 2026 on sequences built from the sample images of the reference project (no team capture yet; one image repeated 30 times at 10 frames per second, 3 s long), observation of 6 s, JDK 11, Windows 11:
+
+| Scenario | Expected | SBI 0.9.5, recorded timestamps | SBI 0.9.5, 5 frames per second | SBI 1.0, recorded timestamps | SBI 1.0, 5 frames per second |
+| --- | --- | --- | --- | --- | --- |
+| Frozen image (`end=hold`) | frames stop changing, RCAPTURE succeeds | pass | pass | pass | pass |
+| Disconnection (`end=stop`) | stream ends after the sequence | pass | pass | pass | pass |
+| Corrupted frames (`corrupt.every=3`) | incomplete JPEG frames on the stream | pass (31 of 95) | pass | pass | pass |
+| Live face, photo, screen, replayed video, no face, two faces | engine decision on the replayed frames | to run on the team sequences | | | |
+
+The two specification versions supported by Registration Client 1.2.0.2 are echoed in the RCAPTURE response with an ISO/IEC 19794-5 record. The engine decisions on replayed sequences are measured by `ReplayBenchmarkTest` of the engine (section 4) once the team sequences are available.
