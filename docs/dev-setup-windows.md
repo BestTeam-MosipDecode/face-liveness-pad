@@ -2,7 +2,7 @@
 
 How to build the liveness engine and the modified MOSIP Registration Client on a Windows workstation, and how to run them.
 
-Status on 16 October 2026: sections 1 to 4 were verified from a clean checkout of both repositories on the team's reference machine (Windows 11, JDK 11.0.32, Maven 3.9.9), and section 8 on the same machine. Sections 5 to 7 come from the MOSIP documentation and from the client source code: they need a MOSIP environment and a registered machine, and will be verified once the team has access to the MOSIP Collab environment.
+Status on 16 October 2026: sections 1 to 4 were verified from a clean checkout of both repositories on the team's reference machine (Windows 11, JDK 11.0.32, Maven 3.9.9), and section 8 on the same machine. Sections 5 to 7 come from the MOSIP documentation and from the client source code: they need a MOSIP environment and a registered machine, and will be verified once the team has access to the MOSIP Collab environment. The notes on antivirus software in sections 1 and 8 come from the runs of 19 October on the same machine.
 
 ## 1. Prerequisites
 
@@ -32,6 +32,14 @@ java -version
 ```
 
 All commands below are for PowerShell. In PowerShell, keep the quotes around Maven options that contain a dot, such as `"-Dgpg.skip"`: without them, PowerShell splits the option at the dot and Maven stops with `Unknown lifecycle phase ".skip"`.
+
+If a download stops with `PKIX path building failed` and `unable to find valid certification path to requested target`, an antivirus that scans HTTPS traffic is presenting its own certificate to Maven. Windows trusts that certificate, the JDK does not. On the reference machine the antivirus is Avast, and `curl` reached Maven Central while Maven could not. Let Maven use the Windows certificate store for the current session:
+
+```powershell
+$env:MAVEN_OPTS = "-Djavax.net.ssl.trustStoreType=Windows-ROOT"
+```
+
+Then run the same build command again with `-U` added once: Maven remembers a failed download and does not retry it otherwise.
 
 ## 2. Get the sources
 
@@ -127,7 +135,7 @@ According to the [MOSIP developers guide](https://docs.mosip.io/1.2.0/id-lifecyc
 
 ## 8. Simulated face device
 
-`face-liveness-pad/mock-sbi` is a simulated L0/L1 face device that speaks SBI like a real one, with a `static` mode (fixed image, as the MOSIP mock device) and a `webcam` mode (frames of the workstation camera). Its build, its modes and the Windows steps are in [../mock-sbi/README.md](../mock-sbi/README.md). In short, from the root of `face-liveness-pad`:
+`face-liveness-pad/mock-sbi` is a simulated L0/L1 face device that speaks SBI like a real one, with a `static` mode (fixed image, as the MOSIP mock device), a `webcam` mode (frames of the workstation camera) and a `replay` mode (recorded sequences). Its build, its modes and the Windows steps are in [../mock-sbi/README.md](../mock-sbi/README.md). In short, from the root of `face-liveness-pad`:
 
 ```powershell
 python mock-sbi\scripts\fetch_assets.py
@@ -138,6 +146,8 @@ cd target
 ```
 
 The device listens on the first free port from 4501, where the client discovers it. `python mock-sbi\scripts\check_device.py`, from the root of the repository, calls it the way the client does and checks each answer.
+
+An antivirus can take the device for a threat: it opens a local server, loads a private test key and signs its answers. On the reference machine, the behaviour shield of Avast stopped the device during a replay run and moved `mock-mds-1.2.0.2.jar` to quarantine without showing any dialog. The next start then fails with `Could not find or load main class io.mosip.mock.sbi.test.TestMockSBI`. Add an exception for the build folder, `face-liveness-pad\mock-sbi\target\*`, in the antivirus settings, then build the device again.
 
 ## 9. Face liveness settings
 
