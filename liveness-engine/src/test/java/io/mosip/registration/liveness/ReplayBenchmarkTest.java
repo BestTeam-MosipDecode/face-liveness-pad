@@ -31,7 +31,9 @@ import io.mosip.registration.liveness.api.LivenessMetrics;
 import io.mosip.registration.liveness.api.LivenessPolicy;
 import io.mosip.registration.liveness.api.LivenessSession;
 import io.mosip.registration.liveness.api.LivenessUpdate;
+import io.mosip.registration.liveness.api.SessionState;
 import io.mosip.registration.liveness.api.Workflow;
+import io.mosip.registration.liveness.active.ChallengeType;
 import io.mosip.registration.liveness.platform.desktop.ImageIoFrameDecoder;
 
 /**
@@ -42,6 +44,11 @@ import io.mosip.registration.liveness.platform.desktop.ImageIoFrameDecoder;
  * outside the repository. The test runs only with {@code -Dliveness.replay=<folder>[;<folder>...]} and is skipped
  * otherwise. Frames are submitted at their recorded timestamps, so the session skips frames as it would on a
  * device stream at the same rate. Nothing is written.
+ *
+ * <p>A folder whose type is {@code action_blink}, {@code action_turn_left} or {@code action_turn_right} runs the
+ * active check: the pass threshold is raised to 1.0 so that the passive check sends the session to a challenge, and
+ * the challenge pool holds the recorded action only. The row then also gives the time from the start of the
+ * challenge to the decision.
  */
 class ReplayBenchmarkTest {
 
@@ -55,8 +62,9 @@ class ReplayBenchmarkTest {
         com.sun.management.OperatingSystemMXBean os =
                 (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
         try (LivenessEngine engine = LivenessEngine.create(new ImageIoFrameDecoder())) {
-            System.out.println("| Sequence | Frames | Analysed | Decision | Time to decision | Mean analysis | CPU | Heap |");
-            System.out.println("| --- | --- | --- | --- | --- | --- | --- | --- |");
+            System.out.println("| Sequence | Frames | Updates | Check | Decision | Time to decision | Challenge time "
+                    + "| Mean analysis | CPU | Heap |");
+            System.out.println("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |");
             for (String folder : property.split(";")) {
                 replay(engine, Paths.get(folder.trim()), os);
             }
@@ -84,16 +92,29 @@ class ReplayBenchmarkTest {
         CountDownLatch finished = new CountDownLatch(1);
         AtomicReference<LivenessUpdate> last = new AtomicReference<>();
         AtomicReference<Long> decisionMs = new AtomicReference<>();
+        AtomicReference<Long> challengeStartMs = new AtomicReference<>();
         long[] analysed = new long[1];
         long start = System.nanoTime();
-        LivenessPolicy policy = LivenessPolicy.builder().activeEnabled(false).maxAttempts(1).build();
+        ChallengeType action = actionOf(folder);
+        LivenessPolicy.Builder builder = LivenessPolicy.builder().maxAttempts(1);
+        if (action == null) {
+            builder.activeEnabled(false);
+        } else {
+            builder.passThreshold(1.0).minChallenges(1).challengeTypes(Collections.singleton(action));
+        }
+        LivenessPolicy policy = builder.build();
         LivenessEventListener listener = new LivenessEventListener() {
             @Override
             public void onUpdate(LivenessUpdate update) {
                 last.set(update);
                 analysed[0]++;
-                if (update.finished() && decisionMs.get() == null) {
-                    decisionMs.set((System.nanoTime() - start) / 1_000_000);
+                long now = (System.nanoTime() - start) / 1_000_000;
+                if (update.state() == SessionState.ACTIVE_CHALLENGE && challengeStartMs.get() == null) {
+                    challengeStartMs.set(now);
+                }
+                boolean decided = update.state() == SessionState.PASSED || update.state() == SessionState.FAILED;
+                if (decided && decisionMs.get() == null) {
+                    decisionMs.set(now);
                     finished.countDown();
                 }
             }
@@ -123,12 +144,34 @@ class ReplayBenchmarkTest {
         long heapMb = (runtime.totalMemory() - runtime.freeMemory()) / (1024 * 1024);
         LivenessUpdate update = last.get();
         LivenessMetrics m = engine.metrics();
-        System.out.printf("| `%s/%s` | %d | %d updates | %s | %s | %.1f ms | %.0f %% of one core | %d MB |%n",
+        String challenge = "none";
+        if (challengeStartMs.get() != null) {
+            challenge = decisionMs.get() == null ? "not decided" : (decisionMs.get() - challengeStartMs.get()) + " ms";
+        }
+        System.out.printf("| `%s/%s` | %d | %d | %s | %s | %s | %s | %.1f ms | %.0f %% of one core | %d MB |%n",
                 folder.getParent().getFileName(), folder.getFileName(), frames.size(), analysed[0],
+                action == null ? "passive" : "active " + action,
                 update == null ? "none" : update.state() + (update.failureReason().isPresent()
                         ? " " + update.failureReason().get() : ""),
-                decisionMs.get() == null ? "none" : decisionMs.get() + " ms", m.meanAnalysisMs(), cpuPercent,
-                heapMb);
+                decisionMs.get() == null ? "none" : decisionMs.get() + " ms", challenge, m.meanAnalysisMs(),
+                cpuPercent, heapMb);
+    }
+
+    /** The recorded action of an {@code action_*} sequence folder, or null for the passive check. */
+    static ChallengeType actionOf(Path folder) {
+        String type = folder.getParent() == null ? "" : folder.getParent().getFileName().toString();
+        switch (type) {
+            case "action_blink":
+                return ChallengeType.BLINK;
+            case "action_smile":
+                return ChallengeType.SMILE;
+            case "action_turn_left":
+                return ChallengeType.TURN_LEFT;
+            case "action_turn_right":
+                return ChallengeType.TURN_RIGHT;
+            default:
+                return null;
+        }
     }
 
     private static double[] readTimestamps(Path metadata, int count) throws IOException {
