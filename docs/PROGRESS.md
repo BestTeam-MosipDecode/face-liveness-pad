@@ -363,6 +363,7 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - 16 octobre. Tant que l'authentification du superviseur par le visage ne passe pas par la vérification de vivacité (#23), le visage n'est pas proposé au superviseur pour valider un dossier marqué en exception : mot de passe ou empreinte seulement. Décidé par Elisée à la relecture de la Pull Request n° 9 du fork, qui doit aussi corriger le contrôle du superviseur (casse de l'identifiant, rôle) et la perte possible du marquage.
 - 19 octobre. Masque en papier porté par une autre personne : limite connue, documentée avec son taux sur le premier sujet (option 1 proposée par PrinceSpecial sur l'issue n° 7), sans changement du code ni des seuils avant la soumission. Un contrôle dédié reste une piste pour plus tard. Décidé par Elisée.
 - 19 octobre. Pas de deuxième sujet enregistré : les résultats de l'issue n° 7 sont publiés comme préliminaires, sur un seul sujet, avec les seuils 0,85 et 0,30 conservés (toujours provisoires). Décidé par Elisée.
+- 19 octobre. Sans accès Collab, la vidéo (issue n° 36) et la démonstration en direct reposent sur une application autonome, `demo/` : le moteur, le panneau d'état et les messages du client modifié, le dispositif simulé en webcam par SBI. Les plans du vrai client s'ajouteront si l'accès arrive avant le 21 octobre. Le pitch (issue n° 37) est monté en diapositives exportables en .pptx ou PDF, après `docs/pitch-outline.md`. Décidé par Elisée.
 
 ## Blocages
 
