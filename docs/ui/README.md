@@ -44,6 +44,34 @@ Source: [../diagrams/ui-flow.puml](../diagrams/ui-flow.puml)
 
 ![Operator authentication in French](a02-operator-challenge-fr.png)
 
+## Status pane of the client
+
+The images of [pane/](pane/) are rendered from the component of the client, `LivenessStatusPane` of the fork, with its stylesheet and the message and label files of the client, in English ([pane/en](pane/en)), French ([pane/fr](pane/fr)) and Arabic ([pane/ar](pane/ar), right to left). They show every state of the session that the pane displays. The camera preview is not part of the pane, so no face appears. Each update is the first of three attempts.
+
+| Image | Workflow | State | Message keys |
+| --- | --- | --- | --- |
+| p01-checking | Resident | Passive check | `LIVENESS_CHECKING`, `LIVENESS_PASSIVE_HINT` |
+| p02-guidance-lighting | Resident | Frame that cannot be used, with a tip | `LIVENESS_TIP_LIGHTING` |
+| p03-hold-still | Resident | Baseline before the first of two challenges | `LIVENESS_HOLD_STILL`, `LIVENESS_INSTRUCTION_SOON` |
+| p04-challenge-blink | Resident | First challenge | `LIVENESS_CHALLENGE_BLINK` |
+| p05-challenge-turn | Resident | Second challenge | `LIVENESS_CHALLENGE_TURN_LEFT` |
+| p06-success | Resident | Liveness verified | `LIVENESS_SUCCESS`, `LIVENESS_SUCCESS_HINT` |
+| p07-failed-retry | Resident | Challenge timed out, new attempt possible | `LIVENESS_FAILED`, `LIVENESS_RETRY_AVAILABLE` |
+| p08-attack-generic | Resident | Attack detected: generic message | `LIVENESS_GENERIC_FAILURE`, `LIVENESS_RETRY_AVAILABLE` |
+| p09-max-attempts-exception | Resident | Attempts exhausted, exception process allowed | `LIVENESS_MAX_ATTEMPTS`, `LIVENESS_EXCEPTION_INFO` |
+| p10-device-unavailable | Resident | Face device error | `LIVENESS_DEVICE_UNAVAILABLE`, `LIVENESS_TIP_DEVICE` |
+| p11-diagnostic | Resident | Passive check with the diagnostic mode on | `LIVENESS_CHECKING`, `LIVENESS_PASSIVE_HINT` |
+| p12-exception-captured | Resident | Face captured under the exception process | `LIVENESS_EXCEPTION_CAPTURED`, `LIVENESS_EXCEPTION_SUPERVISOR` |
+| p13-max-attempts-blocked | Resident | Attempts exhausted, exception process not allowed | `LIVENESS_MAX_ATTEMPTS_BLOCKED` |
+| p14-operator-checking | Operator | Passive check | `LIVENESS_CHECKING`, `LIVENESS_AUTH_HINT` |
+| p15-operator-challenge | Operator | Single challenge | `LIVENESS_CHALLENGE_BLINK` |
+| p16-supervisor-verified | Supervisor | Liveness verified | `LIVENESS_SUCCESS` |
+| p17-max-attempts-auth | Operator | Attempts exhausted: another sign-in method | `LIVENESS_MAX_ATTEMPTS_AUTH` |
+
+![Challenge instruction rendered by the client pane](pane/en/p04-challenge-blink.png)
+
+![Attempt failed, in Arabic](pane/ar/p07-failed-retry.png)
+
 ## Design rules
 
 - **The client's look.** Roboto, the blues of the client stylesheet (`#005BAA` for titles and outlined buttons, `#004887` for the bar and the main buttons), its greys and borders. The liveness elements sit in the existing biometric screen: list of modalities, preview, capture details, `Back` and `Next`.
@@ -84,3 +112,11 @@ python docs/ui/render_mockups.py --chrome "C:/Program Files/Google/Chrome/Applic
 ```
 
 The script runs Chrome in headless mode with a temporary profile and writes one PNG per screen in this folder.
+
+The images of the status pane come from [RenderPane.java](RenderPane.java), run by a PowerShell script from the root of `face-liveness-pad`, with JDK 11 and the fork of the client next to this repository:
+
+```powershell
+.\docs\ui\render_pane.ps1
+```
+
+The script compiles the pane, its status model and its messages from the sources of the fork with the renderer, then writes one PNG per state and language in [pane/](pane/). It needs the engine in the local Maven repository and the client built once ([../dev-setup-windows.md](../dev-setup-windows.md), sections 3 and 4).
