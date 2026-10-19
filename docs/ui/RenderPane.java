@@ -102,6 +102,7 @@ public final class RenderPane {
 		r.render("p16-supervisor-verified", Workflow.SUPERVISOR, p -> p.show(update(SessionState.PASSED,
 				FeedbackCode.SUCCESS, null, null, 1, null, false, null, 0, 0)));
 		r.render("p17-max-attempts-auth", Workflow.OPERATOR, p -> p.showMaxAttempts(false));
+		r.render("p18-max-attempts-supervisor", Workflow.SUPERVISOR, p -> p.showMaxAttempts(false));
 	}
 
 	private static LivenessUpdate passive(FeedbackCode feedback, GuidanceTip tip, double progress) {

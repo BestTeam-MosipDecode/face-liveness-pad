@@ -67,6 +67,7 @@ The images of [pane/](pane/) are rendered from the component of the client, `Liv
 | p15-operator-challenge | Operator | Single challenge | `LIVENESS_CHALLENGE_BLINK` |
 | p16-supervisor-verified | Supervisor | Liveness verified | `LIVENESS_SUCCESS` |
 | p17-max-attempts-auth | Operator | Attempts exhausted: another sign-in method | `LIVENESS_MAX_ATTEMPTS_AUTH` |
+| p18-max-attempts-supervisor | Supervisor | Attempts exhausted: another sign-in method, no advice to contact a supervisor | `LIVENESS_MAX_ATTEMPTS_SUPERVISOR` |
 
 ![Challenge instruction rendered by the client pane](pane/en/p04-challenge-blink.png)
 
