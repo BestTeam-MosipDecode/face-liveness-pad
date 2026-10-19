@@ -2,11 +2,11 @@
 
 Suivi de travail interne du projet Face Liveness / PAD (MOSIP Decode 2026, sujet 04).
 Plan de référence : `PLAN_FACE_LIVENESS.md`, à la racine du workspace `mosip_decode/` (hors dépôt).
-Dernière mise à jour : 15 octobre 2026.
+Dernière mise à jour : 19 octobre 2026.
 
 ## Étape en cours
 
-Campagne de captures de l'équipe (issue n° 7) : sujet S10 terminé le 15 octobre, fichier de scores transmis en privé à Temitayo. Volontaires S12 et suivants possibles jusqu'au 20 octobre. La phase 0 est terminée, sauf la fin de l'étape 0.4 qui attend l'accès à l'environnement Collab.
+Mesures et tests (issues n° 7 et n° 27 à 30), puis documentation finale, démonstration et soumission (issues n° 33 à 38). Le moteur et les trois parcours du client sont fusionnés sur `feature/face-liveness` dans le fork. Premières mesures faites le 19 octobre sur les séquences S10 (voir la section dédiée). La vérification à l'écran et la fin de l'étape 0.4 attendent toujours l'accès à l'environnement Collab.
 
 ## Terminé
 
@@ -153,6 +153,16 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 - Paquets manquants de `training/.venv` installés sur le poste d'Elisée (matplotlib, pandas, scikit-learn, scipy), avec son accord.
 - Facteur du sourire passé de 1,10 à 1,06 par la Pull Request n° 61 : valeur provisoire, à valider par Elisée après les mesures de l'équipe.
 - 15 octobre : sujet S10 enregistré sur le poste d'Elisée, 36 séquences sous les trois éclairages, avec un outil de séance local rangé sous `captures/` et ignoré par Git (enchaînement des séquences, contrôle des trous d'enregistrement et du sens des rotations, fabrication des supports imprimés). Masques portés par un volontaire signataire du formulaire, faute d'autre membre disponible : écart à la section 3.2 du plan de test, noté dans le registre local. Fichier de scores envoyé en privé à Temitayo, avec les observations sur le masque, le sourire et le sens des rotations. Aucun chiffre par sujet n'est publié ici.
+
+## Mesures sur les séquences S10 (issues n° 28, 29 et 30, 19 octobre)
+
+À la demande de PrinceSpecial (issue n° 29), lancées sur le poste d'Elisée depuis `main` (`1d95604`), avec son accord. Seuls les tableaux sont publiés, dans le commentaire de l'issue n° 29 ; les images et les journaux du dispositif restent sur le poste.
+
+- Moteur (`ReplayBenchmarkTest`, une séquence par type, trois éclairages) : environ 56 ms par image analysée en moyenne sur 551 images, sous l'objectif de 100 ms ; la première séquence de chaque lancement est plus lente (73 à 114 ms). Photos, écrans et vidéo rejetés 15 fois sur 15. Masque en papier accepté en contre-jour, sans décision sous les deux autres éclairages. Défis : rotation à droite 3 sur 3, à gauche 2 sur 3, clignement 1 sur 3 (temps écoulé en lumière normale et faible), à analyser par PrinceSpecial.
+- Dispositif simulé en mode replay (`replay_scenarios.py`) : avec les réglages de l'issue, 8 essais sur 32, à cause du script (flux demandé pour 10 s et observé 12 s). Avec une observation de 8 s, 24 sur 24 pour les flux, en SBI 0.9.5 et 1.0 ; déconnexion correcte ; image figée correcte côté dispositif, mais refusée par la règle du script. Cinq corrections du script et deux du test signalées sur l'issue n° 29.
+- Le dispositif écrit chaque réponse en entier dans son journal, donc les enregistrements signés du visage rejoué. `replay_scenarios.log` a été supprimé après chaque lancement.
+- Avast a arrêté le dispositif et mis son JAR en quarantaine sans afficher d'alerte (faux positif), et son analyse HTTPS a fait échouer les téléchargements de Maven (`PKIX path building failed`). Les deux contournements sont dans `docs/dev-setup-windows.md`.
+- Décision en attente : traitement du masque en papier (limite connue documentée, ou contrôle dédié plus tard), demandée par PrinceSpecial sur l'issue n° 7. Elisée y reviendra.
 
 ## Nettoyage de l'historique et vérification des commits (13 octobre)
 
@@ -354,7 +364,7 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 
 ## Blocages
 
-- Accès Collab. Elisée a envoyé le formulaire de demande, puis un e-mail à `decode@mosip.io` le 7 octobre à 14 h 25. Réponse de MOSIP Decode (Pragya, Community Manager) le 7 octobre à 21 h 58 : la demande est transmise aux mentors du sujet 04, Varaniya et Jana, pour vérifier l'accès Collab et aider à la mise en route du client. En attente de leur retour au 8 octobre. À l'AMA du 14 octobre, Varaniya annonce l'envoi des accès par e-mail le jour même. Toujours aucun accès le 15 octobre après-midi : relance à faire par e-mail, et démonstration autonome (moteur, dispositif simulé, écran de capture) envisagée en solution de repli. Sans enregistrement de la machine, sans identifiants et sans accès WireGuard, le client ne peut pas se synchroniser avec le serveur. La fin de l'étape 0.4 attend cet accès. Les étapes 0.5, 0.6 et 0.8 n'en dépendent pas.
+- Accès Collab. Elisée a envoyé le formulaire de demande, puis un e-mail à `decode@mosip.io` le 7 octobre à 14 h 25. Réponse de MOSIP Decode (Pragya, Community Manager) le 7 octobre à 21 h 58 : la demande est transmise aux mentors du sujet 04, Varaniya et Jana, pour vérifier l'accès Collab et aider à la mise en route du client. En attente de leur retour au 8 octobre. À l'AMA du 14 octobre, Varaniya annonce l'envoi des accès par e-mail le jour même. Toujours aucun accès le 15 octobre après-midi : relance à faire par e-mail, et démonstration autonome (moteur, dispositif simulé, écran de capture) envisagée en solution de repli. Sans enregistrement de la machine, sans identifiants et sans accès WireGuard, le client ne peut pas se synchroniser avec le serveur. La fin de l'étape 0.4 attend cet accès. Les étapes 0.5, 0.6 et 0.8 n'en dépendent pas. Identifiants d'opérateur reçus par e-mail le 16 octobre (gardés hors dépôt) ; Elisée a répondu en demandant la configuration WireGuard et le nom d'hôte de l'environnement, toujours attendus le 19 octobre.
 
 ## Écarts relevés par rapport au plan
 
@@ -372,7 +382,7 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - Q1 (close, 7 octobre) : base = 1.2.0.2.
 - Q2 (close, 7 octobre) : date limite = 26 octobre 2026, 19 h 29 à Cotonou.
 - Q9 (close, 7 octobre) : calendrier resserré et périmètre réduit validés.
-- Q3 (ouverte, étape 0.4) : accès Collab demandé, promis par e-mail pour le 14 octobre au soir. À la réception : nom d'hôte de l'environnement, identifiants, configuration WireGuard, tous hors dépôt.
+- Q3 (ouverte, étape 0.4) : accès Collab demandé. Identifiants reçus le 16 octobre ; nom d'hôte de l'environnement et configuration WireGuard toujours attendus le 19 octobre, tous hors dépôt.
 - Q0 (close, 7 octobre) : JDK 21.0.3 et Maven 3.9.6 non installés, ils ne servent pas à la 1.2.0.2.
 - Q4 (close, 7 octobre) : membres, comptes GitHub et répartition reçus (voir Équipe).
 - Q10 (close, 7 octobre) : issues et étiquettes créées, phase 1 répartie.
