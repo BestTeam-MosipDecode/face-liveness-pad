@@ -16,9 +16,14 @@ public final class FaceFrameSources {
 	public static final String KEY_WEBCAM_WIDTH = "mosip.mock.sbi.face.webcam.width";
 	public static final String KEY_WEBCAM_HEIGHT = "mosip.mock.sbi.face.webcam.height";
 	public static final String KEY_WEBCAM_JPEG_QUALITY = "mosip.mock.sbi.face.webcam.jpeg.quality";
+	public static final String KEY_REPLAY_FOLDER = "mosip.mock.sbi.face.replay.folder";
+	public static final String KEY_REPLAY_FPS = "mosip.mock.sbi.face.replay.fps";
+	public static final String KEY_REPLAY_END = "mosip.mock.sbi.face.replay.end";
+	public static final String KEY_REPLAY_CORRUPT_EVERY = "mosip.mock.sbi.face.replay.corrupt.every";
 
 	public static final String SOURCE_STATIC = "static";
 	public static final String SOURCE_WEBCAM = "webcam";
+	public static final String SOURCE_REPLAY = "replay";
 
 	private FaceFrameSources() {
 	}
@@ -38,6 +43,12 @@ public final class FaceFrameSources {
 						intValue(KEY_WEBCAM_WIDTH, 640),
 						intValue(KEY_WEBCAM_HEIGHT, 480),
 						intValue(KEY_WEBCAM_JPEG_QUALITY, 90));
+			case SOURCE_REPLAY:
+				return new ReplayFrameSource(
+						java.nio.file.Paths.get(value(KEY_REPLAY_FOLDER, "")),
+						Double.parseDouble(value(KEY_REPLAY_FPS, "0").trim()),
+						ReplayFrameSource.End.valueOf(value(KEY_REPLAY_END, "loop").trim().toUpperCase()),
+						intValue(KEY_REPLAY_CORRUPT_EVERY, 0));
 			default:
 				throw new IllegalArgumentException("Unknown value for " + KEY_SOURCE + ": " + source);
 		}

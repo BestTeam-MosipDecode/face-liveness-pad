@@ -46,6 +46,14 @@ public class WebcamFrameSource implements FaceFrameSource {
 		this.jpegQuality = jpegQuality;
 	}
 
+	/**
+	 * On Windows the default backend, Media Foundation, takes about 20 s to open some cameras and
+	 * the Registration Client gives up after 10 s; DirectShow opens them in about one second.
+	 */
+	static int backend() {
+		return System.getProperty("os.name", "").startsWith("Windows") ? Videoio.CAP_DSHOW : Videoio.CAP_ANY;
+	}
+
 	private static synchronized void loadNative() {
 		if (!nativeLoaded) {
 			nu.pattern.OpenCV.loadLocally();
@@ -56,7 +64,7 @@ public class WebcamFrameSource implements FaceFrameSource {
 	@Override
 	public void prepare() throws Exception {
 		loadNative();
-		VideoCapture probe = new VideoCapture(index);
+		VideoCapture probe = new VideoCapture(index, backend());
 		try {
 			if (!probe.isOpened())
 				throw new IllegalStateException("Webcam " + index + " cannot be opened");
@@ -71,7 +79,7 @@ public class WebcamFrameSource implements FaceFrameSource {
 		if (running)
 			return;
 		loadNative();
-		capture = new VideoCapture(index);
+		capture = new VideoCapture(index, backend());
 		if (!capture.isOpened()) {
 			capture = null;
 			throw new IllegalStateException("Webcam " + index + " cannot be opened");
