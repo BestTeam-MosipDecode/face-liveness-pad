@@ -1,6 +1,6 @@
 # Alignment with ISO/IEC 30107
 
-Status on 7 October 2026: first version. This document maps the project to the two parts of ISO/IEC 30107 cited by the problem statement:
+Status on 19 October 2026: the protocol of section 4 was run on a single subject, so the results are preliminary (sections 4.1 and 5). This document maps the project to the two parts of ISO/IEC 30107 cited by the problem statement:
 
 - ISO/IEC 30107-1:2023, *Biometric presentation attack detection, Part 1: Framework* (second edition, 2023-08);
 - ISO/IEC 30107-3:2023, *Biometric presentation attack detection, Part 3: Testing and reporting* (second edition, 2023-01).
@@ -95,7 +95,7 @@ The introduction of Part 3 stresses that PAD error rates depend on the set of at
 | Replayed video | Video of the person, including blinks and head movements, on a phone or tablet | Random challenges |
 | Paper mask | Printed face with cut-out eyes or mouth, worn | Classifier and challenges |
 
-Each species is presented under three lighting conditions (normal, low light, backlight), by several attack presenters, against several subjects of different skin tones. The exact counts are fixed in `test-plan.md` (#6).
+Each species is presented under three lighting conditions (normal, low light, backlight). The test plan aims at several attack presenters and several subjects of different skin tones; the exact counts are fixed in `test-plan.md` (#6). For the submission, one subject was recorded, with one sequence per species and lighting condition, and the paper mask was worn by another person than the subject (#7).
 
 ### 4.2 Reporting
 
@@ -110,7 +110,7 @@ For each level of evaluation (PAD subsystem, full system), `test-results.md` giv
 
 1. **No PAD result in a standard data format.** ISO/IEC 30107-2 defines how to convey PAD approach and results, integrated in the ISO/IEC 39794 series. The project records the result in the audit trail of the client, not in the biometric record. This could be added if MOSIP packets adopt those formats.
 2. **Concealer attacks and non-conformant presentations not tested** (clauses 8.2 and 9).
-3. **Small evaluation set.** The number of subjects and artefacts of a four-person team does not reach the statistical significance discussed in the introduction of Part 3. The results show behaviour on a defined set, not a general error rate.
+3. **Small evaluation set.** One subject and three presentations per species do not reach the statistical significance discussed in the introduction of Part 3, and leave no subject out of the calibration. The results show behaviour on a defined set, not a general error rate, and are published as preliminary.
 4. **No independent tester.** The team that built the feature also tests it. The test roles of Annex C are filled by the same people.
 
 ## 6. Sources
