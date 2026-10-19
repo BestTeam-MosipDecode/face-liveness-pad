@@ -19,6 +19,7 @@
 | [test-results.md](test-results.md) | PAD metrics, functional test results, performance | Skeleton. Filled after the team captures (#7) |
 | [consent/consent-form.md](consent/consent-form.md) | Consent form signed by each subject before the team captures | In use |
 | [pitch-outline.md](pitch-outline.md) | Plan and content of the pitch deck: 14 slides with speaker notes, and the source of each figure | Draft for the deck (#37) |
+| [demo-script.md](demo-script.md) | Minute-by-minute script of the demonstration video and plan of the live demonstration | Ready for the recording (#36) |
 
 Folders: `diagrams/` holds the PlantUML sources and their SVG renders, `ui/` the screen mock-ups, `consent/` the consent form used for the team's own face captures. Signed forms are not stored in the repository.
 
