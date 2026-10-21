@@ -23,6 +23,11 @@ public interface FaceFrameSource {
 	/** Returns the next frame as JPEG bytes, or null when no frame is available. */
 	byte[] nextFrame();
 
+	/** False when the source gives no more frame, as an unplugged device: the capture then fails. */
+	default boolean available() {
+		return true;
+	}
+
 	/** Releases the source. Called when the stream or the capture ends. */
 	void close();
 }
