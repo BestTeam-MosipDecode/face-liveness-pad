@@ -165,7 +165,7 @@ After `PASSED`, the session keeps following the face on the stream until the cli
 
 The engine API of the project plan has no operation for this check. Issue #10 adds one to the session, for example `CaptureCheck checkCapture(FaceFrame captured)`.
 
-Whether the stream keeps running during `RCAPTURE` depends on the device. The simulated device in webcam mode keeps sending frames during `RCAPTURE` and ends the stream when the capture completes (measured on 21 October 2026, see `docs/mock-sbi.md`). The client removes its frame listener when it sends `RCAPTURE`, so the last face followed before the capture is the reference, whether the stream stops or not.
+Whether the stream keeps running during `RCAPTURE` depends on the device. The simulated device in webcam mode keeps sending frames during `RCAPTURE` and ends the stream when the capture completes (measured on 21 October 2026, see `docs/mock-sbi.md`). The client keeps passing these frames to the session, which goes on following the face, and does not count the end of the stream as an interruption once the capture request is sent (`LivenessFrameSource.captureRequested`). The reference for check 5 is therefore the last face followed before the stream ends.
 
 ## 7. Attempts and end of session
 
