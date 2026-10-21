@@ -109,7 +109,7 @@ public final class DemoApp extends Application {
 	private final Label status = new Label("Verifying the models...");
 	private final ListView<String> audit = new ListView<>();
 	private final CheckBox activeBox = new CheckBox("Active check (challenges)");
-	private final CheckBox alwaysChallengeBox = new CheckBox("Always ask for a challenge");
+	private final CheckBox passivePassBox = new CheckBox("Allow a passive pass (0.85)");
 	private final Spinner<Integer> challengesSpinner = new Spinner<>(1, 4, 2);
 	private final Spinner<Integer> attemptsSpinner = new Spinner<>(1, 10, 3);
 	private final CheckBox exceptionBox = new CheckBox("Exception process after the last attempt (resident)");
@@ -216,11 +216,11 @@ public final class DemoApp extends Application {
 	private TitledPane settings() {
 		activeBox.setSelected(true);
 		exceptionBox.setSelected(true);
-		alwaysChallengeBox.disableProperty().bind(activeBox.selectedProperty().not());
+		passivePassBox.disableProperty().bind(activeBox.selectedProperty().not());
 		challengesSpinner.disableProperty().bind(activeBox.selectedProperty().not());
 		challengesSpinner.setPrefWidth(70);
 		attemptsSpinner.setPrefWidth(70);
-		for (CheckBox box : new CheckBox[] { activeBox, alwaysChallengeBox, exceptionBox, diagnosticBox }) {
+		for (CheckBox box : new CheckBox[] { activeBox, passivePassBox, exceptionBox, diagnosticBox }) {
 			box.selectedProperty().addListener((observable, before, after) -> updateConfiguration());
 		}
 		challengesSpinner.valueProperty().addListener((observable, before, after) -> updateConfiguration());
@@ -230,14 +230,14 @@ public final class DemoApp extends Application {
 		grid.setHgap(10);
 		grid.setVgap(6);
 		grid.add(activeBox, 0, 0, 2, 1);
-		grid.add(alwaysChallengeBox, 0, 1, 2, 1);
+		grid.add(passivePassBox, 0, 1, 2, 1);
 		grid.add(new Label("Challenges per attempt"), 0, 2);
 		grid.add(challengesSpinner, 1, 2);
 		grid.add(new Label("Attempts"), 0, 3);
 		grid.add(attemptsSpinner, 1, 3);
 		grid.add(exceptionBox, 0, 4, 2, 1);
 		grid.add(diagnosticBox, 0, 5, 2, 1);
-		Label note = new Label("Applied at the next start. Other settings keep the defaults of the engine.");
+		Label note = new Label("Applied at the next start. Without a passive pass, every session asks for the challenges.");
 		note.setStyle("-fx-text-fill: #666666;");
 		grid.add(note, 0, 6, 2, 1);
 		TitledPane settings = new TitledPane("Settings", grid);
@@ -247,7 +247,7 @@ public final class DemoApp extends Application {
 	}
 
 	private DemoSettings currentSettings() {
-		return new DemoSettings().activeEnabled(activeBox.isSelected()).alwaysChallenge(alwaysChallengeBox.isSelected())
+		return new DemoSettings().activeEnabled(activeBox.isSelected()).passivePass(passivePassBox.isSelected())
 				.minChallenges(challengesSpinner.getValue()).maxAttempts(attemptsSpinner.getValue())
 				.exceptionAfterLastAttempt(exceptionBox.isSelected()).diagnostic(diagnosticBox.isSelected());
 	}
