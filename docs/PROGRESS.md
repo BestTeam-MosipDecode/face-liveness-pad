@@ -2,11 +2,11 @@
 
 Suivi de travail interne du projet Face Liveness / PAD (MOSIP Decode 2026, sujet 04).
 Plan de référence : `PLAN_FACE_LIVENESS.md`, à la racine du workspace `mosip_decode/` (hors dépôt).
-Dernière mise à jour : 19 octobre 2026.
+Dernière mise à jour : 21 octobre 2026.
 
 ## Étape en cours
 
-Mesures et tests (issues n° 7 et n° 27 à 30), puis documentation finale, démonstration et soumission (issues n° 33 à 38). Le moteur et les trois parcours du client sont fusionnés sur `feature/face-liveness` dans le fork. Premières mesures faites le 19 octobre sur les séquences S10 (voir la section dédiée). La vérification à l'écran et la fin de l'étape 0.4 attendent toujours l'accès à l'environnement Collab.
+Mesures et tests (issues n° 7 et n° 27 à 30), puis documentation finale, démonstration et soumission (issues n° 33 à 38). Le moteur et les trois parcours du client sont fusionnés sur `feature/face-liveness` dans le fork. Premières mesures faites le 19 octobre sur les séquences S10 (voir la section dédiée). Depuis le 21 octobre, le tunnel Collab fonctionne et le client démarre sur l'environnement ; la première connexion bloque sur l'enregistrement de la machine, signalé à MOSIP (voir la section Collab).
 
 ## Terminé
 
@@ -163,6 +163,20 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 - Le dispositif écrit chaque réponse en entier dans son journal, donc les enregistrements signés du visage rejoué. `replay_scenarios.log` a été supprimé après chaque lancement.
 - Avast a arrêté le dispositif et mis son JAR en quarantaine sans afficher d'alerte (faux positif), et son analyse HTTPS a fait échouer les téléchargements de Maven (`PKIX path building failed`). Les deux contournements sont dans `docs/dev-setup-windows.md`.
 - Masque en papier et deuxième sujet : décisions d'Elisée du 19 octobre, voir Décisions.
+
+## Collab et réponses de MOSIP (21 octobre)
+
+- Configuration WireGuard reçue de Varaniya par e-mail le 21 octobre, gardée hors dépôt : elle contient une clé privée. Tunnel installé et activé par Elisée.
+- Nom d'hôte confirmé : `api-internal.collab.mosip.net`, une adresse privée joignable par le tunnel. `https://api-internal.collab.mosip.net/v1/syncdata/actuator/health` répond `UP`. Aucune version du client n'est publiée sur Collab : la vérification de mise à jour échoue en 404, sans bloquer.
+- Client modifié configuré en local sans commit (`mosip-application.properties` marqué `skip-worktree`), lancé depuis un dossier hors des dépôts, `regclient-collab/`, où il écrit sa base, ses journaux et ses paquets. Option `-Djavax.net.ssl.trustStoreType=Windows-ROOT` nécessaire à cause de l'analyse HTTPS d'Avast. Premier démarrage en deux minutes environ, le temps de créer la clé TPM et la base chiffrée.
+- Première connexion refusée à la demande de jeton : `KER-SYN-AUTH-001`, Invalid Request. Vérifié sur le poste : le client signe avec les clés TPM envoyées à MOSIP (mêmes index que `tpmdetails.txt`, nom de machine `ELISEE`), et l'horloge est à l'heure. Demande envoyée à MOSIP par e-mail et sur le forum : vérifier l'enregistrement et l'activation de la machine, et son rattachement au centre du compte d'opérateur.
+- Réponses de Varaniya sur le forum, le 21 octobre, aux questions d'Elisée du 20 octobre :
+  - Collab : l'accès est fourni, signaler tout problème ;
+  - démonstration : MOSIP compte sur une démonstration sur Collab, l'application de démo reste la solution de repli ;
+  - cartes étudiantes : dans le même dossier Drive que les autres éléments de la soumission ;
+  - pitch final : date et format communiqués aux équipes présélectionnées après la date limite ; présentation du deck, puis démonstration en direct de préférence, ou enregistrée.
+- Les réponses aux autres questions envoyées par e-mail (Q15, Q16) sont promises pour la semaine suivante, donc après la date limite.
+- L'AMA du mercredi 21 octobre est reportée au jeudi 22 octobre, de 12 h 30 à 13 h 30 à Cotonou (annonce du forum du 21 octobre).
 
 ## Nettoyage de l'historique et vérification des commits (13 octobre)
 
@@ -367,7 +381,7 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 
 ## Blocages
 
-- Accès Collab. Elisée a envoyé le formulaire de demande, puis un e-mail à `decode@mosip.io` le 7 octobre à 14 h 25. Réponse de MOSIP Decode (Pragya, Community Manager) le 7 octobre à 21 h 58 : la demande est transmise aux mentors du sujet 04, Varaniya et Jana, pour vérifier l'accès Collab et aider à la mise en route du client. En attente de leur retour au 8 octobre. À l'AMA du 14 octobre, Varaniya annonce l'envoi des accès par e-mail le jour même. Toujours aucun accès le 15 octobre après-midi : relance à faire par e-mail, et démonstration autonome (moteur, dispositif simulé, écran de capture) envisagée en solution de repli. Sans enregistrement de la machine, sans identifiants et sans accès WireGuard, le client ne peut pas se synchroniser avec le serveur. La fin de l'étape 0.4 attend cet accès. Les étapes 0.5, 0.6 et 0.8 n'en dépendent pas. Identifiants d'opérateur reçus par e-mail le 16 octobre (gardés hors dépôt) ; Elisée a répondu en demandant la configuration WireGuard et le nom d'hôte de l'environnement, toujours attendus le 19 octobre.
+- Accès Collab. Elisée a envoyé le formulaire de demande, puis un e-mail à `decode@mosip.io` le 7 octobre à 14 h 25. Réponse de MOSIP Decode (Pragya, Community Manager) le 7 octobre à 21 h 58 : la demande est transmise aux mentors du sujet 04, Varaniya et Jana, pour vérifier l'accès Collab et aider à la mise en route du client. En attente de leur retour au 8 octobre. À l'AMA du 14 octobre, Varaniya annonce l'envoi des accès par e-mail le jour même. Toujours aucun accès le 15 octobre après-midi : relance à faire par e-mail, et démonstration autonome (moteur, dispositif simulé, écran de capture) envisagée en solution de repli. Sans enregistrement de la machine, sans identifiants et sans accès WireGuard, le client ne peut pas se synchroniser avec le serveur. La fin de l'étape 0.4 attend cet accès. Les étapes 0.5, 0.6 et 0.8 n'en dépendent pas. Identifiants d'opérateur reçus par e-mail le 16 octobre (gardés hors dépôt) ; Elisée a répondu en demandant la configuration WireGuard et le nom d'hôte de l'environnement. Configuration WireGuard reçue le 21 octobre : tunnel et client fonctionnent jusqu'à la connexion, refusée avec `KER-SYN-AUTH-001` (enregistrement de la machine à vérifier par MOSIP, voir la section Collab).
 
 ## Écarts relevés par rapport au plan
 
@@ -385,7 +399,7 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - Q1 (close, 7 octobre) : base = 1.2.0.2.
 - Q2 (close, 7 octobre) : date limite = 26 octobre 2026, 19 h 29 à Cotonou.
 - Q9 (close, 7 octobre) : calendrier resserré et périmètre réduit validés.
-- Q3 (ouverte, étape 0.4) : accès Collab demandé. Identifiants reçus le 16 octobre ; nom d'hôte de l'environnement et configuration WireGuard toujours attendus le 19 octobre, tous hors dépôt.
+- Q3 (ouverte, étape 0.4) : accès Collab. Identifiants reçus le 16 octobre, configuration WireGuard le 21 octobre, tous hors dépôt ; nom d'hôte confirmé, `api-internal.collab.mosip.net`. Reste l'enregistrement de la machine, refusé à la connexion (`KER-SYN-AUTH-001`), demandé à MOSIP le 21 octobre.
 - Q0 (close, 7 octobre) : JDK 21.0.3 et Maven 3.9.6 non installés, ils ne servent pas à la 1.2.0.2.
 - Q4 (close, 7 octobre) : membres, comptes GitHub et répartition reçus (voir Équipe).
 - Q10 (close, 7 octobre) : issues et étiquettes créées, phase 1 répartie.
