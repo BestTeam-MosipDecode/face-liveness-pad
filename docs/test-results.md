@@ -243,7 +243,15 @@ End of sequence, at 30 frames per second so that the 99-frame sequence ends afte
 | Disconnection (`end=stop`) | the stream ends after the sequence | pass, ended after 3.4 s | pass, ended after 3.4 s |
 | Frozen image (`end=hold`) | the last frame repeats | fail on the verdict, see below | fail on the verdict |
 
-The frozen stream behaved as specified (the last frame kept coming after 3.3 s), but the verdict of that run expected one distinct frame over the whole observation. The review of that run (#29, 19 October) also found that the STREAM request asked for a 10 s timeout, so observations longer than 10 s saw the stream end, and that RCAPTURE still returned a record after `end=stop`. All three are fixed after that run: the verdict now looks at the last 1.5 s of the observation, the STREAM timeout follows the observation, and an unplugged replay refuses the capture. These two end cases are to be run again on the S10 sequences.
+The frozen stream behaved as specified (the last frame kept coming after 3.3 s), but the verdict of that run expected one distinct frame over the whole observation. The review of that run (#29, 19 October) also found that the STREAM request asked for a 10 s timeout, so observations longer than 10 s saw the stream end, and that RCAPTURE still returned a record after `end=stop`. All three are fixed after that run: the verdict now looks at the last 1.5 s of the observation, the STREAM timeout follows the observation, and an unplugged replay refuses the capture and stays unplugged for the following requests until the device restarts. Check of the fixes on 21 October, on the sequences built from the sample images (Windows 11, JDK 11), observation of 12 s at 30 frames per second:
+
+| Scenario | Expected | 0.9.5 | 1.0 |
+| --- | --- | --- | --- |
+| Observation longer than 10 s | the stream lasts the whole observation | pass, 378 frames in 12 s | pass, 374 frames |
+| Frozen image (`end=hold`) | the last frame repeats at the end | pass | pass |
+| Disconnection (`end=stop`) | the stream ends after the sequence and RCAPTURE gives no record | pass: ended after 1.0 s, RCAPTURE error 710 | pass: same |
+
+The two end cases can be run again on the S10 sequences with the same command for completeness; the fixes do not depend on the content of the frames.
 
 "No face" and "two faces" sequences are not part of the capture protocol and were not recorded. Their engine behaviour (guidance `NO_FACE` and `MULTIPLE_FACES`, then `FACE_CONTINUITY_LOST` during a challenge) is covered by the session tests of the engine (`SessionCorePassiveTest`, `SessionCoreActiveTest`, #15).
 
