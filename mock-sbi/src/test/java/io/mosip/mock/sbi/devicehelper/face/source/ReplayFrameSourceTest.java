@@ -100,8 +100,10 @@ class ReplayFrameSourceTest {
 		byte[] first = source.nextFrame();
 		assertNotNull(first);
 		assertEquals(0, first[0]);
+		assertEquals(true, source.available());
 		Thread.sleep(600);
 		assertNull(source.nextFrame());
+		assertEquals(false, source.available());
 		source.close();
 		assertNull(source.nextFrame());
 	}

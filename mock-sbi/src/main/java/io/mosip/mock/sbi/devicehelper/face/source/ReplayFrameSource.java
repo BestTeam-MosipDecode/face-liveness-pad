@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
  * due at the current time, so a stream at 30 requests per second sees each frame about three times and
  * a slow stream skips frames, as a camera would. Frames are read once, at {@link #prepare()}.
  *
- * Failure simulation: {@code end = STOP} returns no frame once the sequence is over, as an unplugged
- * device; {@code corruptEvery = N} truncates every Nth returned frame to a few bytes.
+ * Failure simulation: {@code end = STOP} returns no frame and no capture once the sequence is over, as an
+ * unplugged device; {@code corruptEvery = N} truncates every Nth returned frame to a few bytes.
  */
 public class ReplayFrameSource implements FaceFrameSource {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ReplayFrameSource.class);
@@ -137,6 +137,12 @@ public class ReplayFrameSource implements FaceFrameSource {
 		if (corruptEvery > 0 && served % corruptEvery == 0)
 			return Arrays.copyOf(frame, Math.min(CORRUPT_LENGTH, frame.length));
 		return frame;
+	}
+
+	/** False once the sequence is over with {@code end = STOP}: the device then behaves as unplugged. */
+	@Override
+	public boolean available() {
+		return open && indexAt(System.currentTimeMillis() - startMs) >= 0;
 	}
 
 	/** Index of the frame due at {@code elapsedMs}, or -1 when the sequence is over and {@code end} is STOP. */

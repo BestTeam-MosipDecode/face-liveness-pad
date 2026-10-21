@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -63,13 +64,13 @@ class ReplayBenchmarkTest {
                 (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
         try (LivenessEngine engine = LivenessEngine.create(new ImageIoFrameDecoder())) {
             System.out.println("| Sequence | Frames | Updates | Check | Decision | Time to decision | Challenge time "
-                    + "| Mean analysis | CPU | Heap |");
+                    + "| Mean analysis of the sequence | CPU | Heap |");
             System.out.println("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |");
             for (String folder : property.split(";")) {
                 replay(engine, Paths.get(folder.trim()), os);
             }
             LivenessMetrics m = engine.metrics();
-            System.out.printf("%nEngine metrics: %d frames analysed, mean analysis %.1f ms, %d sessions, retry rate %.2f, "
+            System.out.printf(Locale.ROOT, "%nEngine metrics: %d frames analysed, mean analysis %.1f ms, %d sessions, retry rate %.2f, "
                     + "failure rate %.2f%n", m.framesAnalysed(), m.meanAnalysisMs(), m.sessions(), m.retryRate(),
                     m.failureRate());
         }
@@ -124,6 +125,7 @@ class ReplayBenchmarkTest {
             }
         };
 
+        LivenessMetrics before = engine.metrics();
         System.gc();
         long cpuBefore = os.getProcessCpuTime();
         long wallBefore = System.nanoTime();
@@ -144,16 +146,19 @@ class ReplayBenchmarkTest {
         long heapMb = (runtime.totalMemory() - runtime.freeMemory()) / (1024 * 1024);
         LivenessUpdate update = last.get();
         LivenessMetrics m = engine.metrics();
+        long sequenceFrames = m.framesAnalysed() - before.framesAnalysed();
+        double sequenceMs = sequenceFrames == 0 ? 0 : (m.meanAnalysisMs() * m.framesAnalysed()
+                - before.meanAnalysisMs() * before.framesAnalysed()) / sequenceFrames;
         String challenge = "none";
         if (challengeStartMs.get() != null) {
             challenge = decisionMs.get() == null ? "not decided" : (decisionMs.get() - challengeStartMs.get()) + " ms";
         }
-        System.out.printf("| `%s/%s` | %d | %d | %s | %s | %s | %s | %.1f ms | %.0f %% of one core | %d MB |%n",
+        System.out.printf(Locale.ROOT, "| `%s/%s` | %d | %d | %s | %s | %s | %s | %.1f ms | %.0f %% of one core | %d MB |%n",
                 folder.getParent().getFileName(), folder.getFileName(), frames.size(), analysed[0],
                 action == null ? "passive" : "active " + action,
                 update == null ? "none" : update.state() + (update.failureReason().isPresent()
                         ? " " + update.failureReason().get() : ""),
-                decisionMs.get() == null ? "none" : decisionMs.get() + " ms", challenge, m.meanAnalysisMs(),
+                decisionMs.get() == null ? "none" : decisionMs.get() + " ms", challenge, sequenceMs,
                 cpuPercent, heapMb);
     }
 

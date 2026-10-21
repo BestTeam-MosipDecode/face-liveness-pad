@@ -17,9 +17,11 @@ Scenarios come from a JSON file::
      {"name": "corrupted frames", "folder": "...", "corrupt_every": 3, "expect": "corrupted"},
      {"name": "frozen image", "folder": "...", "end": "hold", "expect": "frozen"}]
 
-``expect`` is ``stream`` (frames change and RCAPTURE succeeds), ``frozen`` (frames stop changing),
-``stream-ends`` (the stream closes before the requested time) or ``corrupted`` (some frames are not complete
-JPEG files). Each scenario runs once per SBI specification version given with ``--spec`` (default 0.9.5 and
+``expect`` is ``stream`` (frames change and RCAPTURE succeeds), ``frozen`` (the frames of the last 1.5 s of the
+observation are identical: choose ``--fps`` so that the sequence ends within the observation), ``stream-ends``
+(the stream closes before the requested time and RCAPTURE gives no record) or ``corrupted`` (some frames are not
+complete JPEG files). The device log holds the signed face records of the replayed frames: it is deleted at the
+end unless ``--keep-log`` is given. Each scenario runs once per SBI specification version given with ``--spec`` (default 0.9.5 and
 1.0, the two versions supported by Registration Client 1.2.0.2) and once per device configuration given
 with ``--fps`` (default: recorded timestamps, then a fixed 5 frames per second).
 
@@ -93,14 +95,22 @@ def stop_device(process):
         process.kill()
 
 
+# The device closes a stream when its request timeout expires: ask for more than the observation.
+STREAM_TIMEOUT_MARGIN_S = 5
+# A frozen stream repeats one frame over the last part of the observation, after the end of the sequence.
+FROZEN_TAIL_S = 1.5
+
+
 def stream_observation(port, device_id, seconds):
-    """Frames seen on the stream for ``seconds``: count, distinct frames, incomplete JPEGs, early end."""
-    body = json.dumps({"deviceId": device_id, "deviceSubId": "0", "timeout": "10000"}).encode()
+    """Frames seen on the stream for ``seconds``: count, distinct frames, incomplete JPEGs, early end, and whether
+    the frames of the last ``FROZEN_TAIL_S`` seconds are all identical."""
+    timeout_ms = int((seconds + STREAM_TIMEOUT_MARGIN_S) * 1000)
+    body = json.dumps({"deviceId": device_id, "deviceSubId": "0", "timeout": str(timeout_ms)}).encode()
     sock = socket.create_connection((check_device.HOST, port), timeout=10)
     sock.sendall(b"STREAM /stream HTTP/1.1\r\nHost: 127.0.0.1\r\nContent-Length: "
                  + str(len(body)).encode() + b"\r\n\r\n" + body)
     stream = sock.makefile("rb")
-    frames, distinct, incomplete, ended = 0, set(), 0, False
+    frames, distinct, incomplete, ended, seen = 0, set(), 0, False, []
     start = time.monotonic()
     while time.monotonic() - start < seconds:
         try:
@@ -112,11 +122,14 @@ def stream_observation(port, device_id, seconds):
             break
         frames += 1
         distinct.add(hash(frame))
+        seen.append((time.monotonic() - start, hash(frame)))
         if not (frame.startswith(b"\xff\xd8") and frame.rstrip(b"\r\n").endswith(b"\xff\xd9")):
             incomplete += 1
     sock.close()
+    elapsed = time.monotonic() - start
+    tail = [h for t, h in seen if t >= elapsed - FROZEN_TAIL_S]
     return {"frames": frames, "distinct": len(distinct), "incomplete": incomplete, "ended": ended,
-            "seconds": time.monotonic() - start}
+            "seconds": elapsed, "frozen_tail": len(tail) > 1 and len(set(tail)) == 1}
 
 
 def capture_result(port, device_id, spec_version):
@@ -152,9 +165,10 @@ def verdict(expect, observation, capture):
         return observation["distinct"] > 1 and observation["incomplete"] == 0 and not observation["ended"] \
             and capture.startswith("ISO record")
     if expect == "frozen":
-        return observation["distinct"] == 1 and not observation["ended"]
+        return observation["frozen_tail"] and not observation["ended"]
     if expect == "stream-ends":
-        return observation["ended"]
+        # An unplugged device sends no more frame and gives no capture.
+        return observation["ended"] and not capture.startswith("ISO record")
     if expect == "corrupted":
         return observation["incomplete"] > 0
     raise ValueError("unknown expectation {}".format(expect))
@@ -174,7 +188,8 @@ def run_scenario(scenario, spec_version, fps, args, log):
     ok = verdict(scenario["expect"], observation, capture)
     seen = "{} frames, {} distinct, {} incomplete{}".format(
         observation["frames"], observation["distinct"], observation["incomplete"],
-        ", stream ended after {:.1f} s".format(observation["seconds"]) if observation["ended"] else "")
+        ", stream ended after {:.1f} s".format(observation["seconds"]) if observation["ended"]
+        else (", frozen at the end" if observation["frozen_tail"] else ""))
     return ok, seen, capture
 
 
@@ -188,15 +203,19 @@ def main():
     parser.add_argument("--fps", nargs="+", default=["0", "5"],
                         help="device configurations: replay rates, 0 for the recorded timestamps")
     parser.add_argument("--markdown", type=Path, help="write the table to this file")
+    parser.add_argument("--keep-log", action="store_true",
+                        help="keep replay_scenarios.log: it holds the signed face records sent by the device")
     args = parser.parse_args()
 
-    scenarios = json.loads(args.scenarios.read_text(encoding="utf-8"))
+    # utf-8-sig also reads the BOM that Windows PowerShell 5.1 writes with Set-Content -Encoding utf8.
+    scenarios = json.loads(args.scenarios.read_text(encoding="utf-8-sig"))
     if not (args.device / JAR).exists():
         sys.exit("device not built: {} not found".format(args.device / JAR))
     rows = ["| Scenario | SBI version | Device configuration | Expected | Observed on the stream | RCAPTURE | Result |",
             "| --- | --- | --- | --- | --- | --- | --- |"]
     failures = 0
-    with open(args.device / "replay_scenarios.log", "w", encoding="utf-8") as log:
+    log_path = args.device / "replay_scenarios.log"
+    with open(log_path, "w", encoding="utf-8") as log:
         for scenario in scenarios:
             for spec_version in args.spec:
                 for fps in args.fps:
@@ -210,6 +229,8 @@ def main():
                         scenario["name"], spec_version, config, scenario["expect"], seen, capture, "pass" if ok else "FAIL")
                     rows.append(row)
                     print(row, flush=True)
+    if not args.keep_log:
+        log_path.unlink()
     table = "\n".join(rows)
     if args.markdown:
         args.markdown.write_text(table + "\n", encoding="utf-8")

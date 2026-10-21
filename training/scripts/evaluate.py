@@ -226,7 +226,7 @@ def equal_error_rate(apcer, bpcer):
     return float((apcer[index] + bpcer[index]) / 2)
 
 
-def plot_det(apcer, bpcer, path):
+def plot_det(apcer, bpcer, path, title="DET curve, passive check, test subjects"):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -240,7 +240,7 @@ def plot_det(apcer, bpcer, path):
     axis.set_yticks(norm.ppf(ticks), ["{:g}%".format(t * 100) for t in ticks])
     axis.set_xlabel("APCER")
     axis.set_ylabel("BPCER")
-    axis.set_title("DET curve, passive check, test subjects")
+    axis.set_title(title)
     axis.grid(True, alpha=0.3)
     figure.tight_layout()
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -359,7 +359,8 @@ def main():
     if len(bona) and len(attacks):
         _, apcer_curve, bpcer_curve = det_points(bona, attacks)
         eer = equal_error_rate(apcer_curve, bpcer_curve)
-        plot_det(apcer_curve, bpcer_curve, args.det)
+        title = "DET curve, passive check, " + ("one subject (preliminary)" if args.no_split else "test subjects")
+        plot_det(apcer_curve, bpcer_curve, args.det, title)
         print("DET curve written to {}".format(args.det))
 
     report = {

@@ -78,6 +78,9 @@ public class SBIFaceHelper extends SBIDeviceHelper {
 
 	@Override
 	public int getBioCapture(boolean isUsedForAuthenication) throws Exception {
+		// An unplugged replay gives no capture: the request ends with the timeout error of the device.
+		if (frameSource != null && !frameSource.available())
+			return -1;
 		byte [] isoData = null;
 
 		String seedName = "";
