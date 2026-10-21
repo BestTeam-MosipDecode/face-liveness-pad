@@ -47,7 +47,7 @@ MOSIP-Decode-2026_Best_Team_PS04/
 ├── 05_Tests/              test plan, test results, test data
 ├── 06_Documentation/      PDF exports of docs/: setup guide, engine API, configuration,
 │                          decision flow, workflows, security and privacy, ISO/IEC 30107 alignment
-└── 07_Student_IDs/        one file per member, as the guidelines require
+└── 07_Student_IDs/        one file per member, in this folder as MOSIP confirmed on 21 October
 ```
 
 ## Mandatory items of the guidelines
@@ -61,9 +61,13 @@ MOSIP-Decode-2026_Best_Team_PS04/
 | Usage and installation instructions | `README.md`, `docs/dev-setup-windows.md`, `demo/README.md` |
 | API documentation | `docs/engine-api.md` (engine), `docs/mock-sbi.md` and `mock-sbi/README.md` (SBI calls used) |
 | Git repository with version control history | The two repositories |
-| College or university credentials | `07_Student_IDs/` |
+| College or university credentials | `07_Student_IDs/`, in the shared folder as MOSIP confirmed on 21 October |
 
 Optional items: design mock-ups (`docs/ui/`), architecture diagram (`docs/diagrams/`), test cases and results (`docs/test-plan.md`, `docs/test-results.md`).
+
+## Final pitch
+
+MOSIP answered on 21 October, on the community forum, that the date and the format of the final pitch are sent to the shortlisted teams after the submission deadline, during the evaluation (1 to 6 November). The pitch is the deck, then a live demonstration of the working solution, preferred, or a recorded demo. The live demonstration uses the modified client on Collab if the environment accepts our machine by then, otherwise the demo application (`demo/`), with the video as fallback.
 
 ## Test data
 
