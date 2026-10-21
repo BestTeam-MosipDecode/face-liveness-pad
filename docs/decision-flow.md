@@ -90,14 +90,14 @@ The session keeps the scored frames of the current track whose timestamp is with
 
 | Aggregate score | Decision |
 | --- | --- |
-| `s >= passive.threshold.pass` (default 0.85) | `PASSED`, subject to the check of the captured image |
+| `s >= passive.threshold.pass` (default 1.00, so that no session passes on the passive score alone) | `PASSED`, subject to the check of the captured image |
 | `s <= passive.threshold.attack` (default 0.30) | `FAILED`, reason `PAD_ATTACK_DETECTED` |
 | Between the two, active check enabled (`active.enabled`, default true) | `ACTIVE_CHALLENGE` |
 | Between the two, active check disabled | `FAILED`, reason `LIVENESS_BELOW_THRESHOLD` |
 
 The median makes the decision robust to a single badly scored frame. With the defaults, a decision needs at least half a second of good frames.
 
-The two thresholds are provisional. On 19 October 2026 the coordinator kept 0.85 and 0.30 (#7): the captures of the first subject support them, but with a single subject there is no held-out evaluation, so the published figures are preliminary.
+On 21 October 2026, after the second subject (#7), the coordinator set the pass threshold to 1.00 by default for the three workflows: a glossy print of that subject scored 0.999, above part of the live faces, so every session now goes through the challenges. The attack threshold stays 0.30 and still rejects clear attacks at once. Both remain configurable per workflow, and the published figures are preliminary (two subjects).
 
 If no decision is reached within `passive.timeout_ms` after the first frame (added key, default 20 000 ms), the attempt fails with the guidance code given most often during that time: `NO_FACE`, `MULTIPLE_FACES` or `LOW_QUALITY`.
 
@@ -250,8 +250,8 @@ Every event of the engine carries the workflow, the attempt number, the duration
 | Key | Default | Used in |
 | --- | --- | --- |
 | `enabled` | `true` | Section 7 |
-| `passive.threshold.pass` | `0.85`, provisional (#7) | Section 4 |
-| `passive.threshold.attack` | `0.30`, provisional (#7) | Sections 4, 5.4, 5.5, 6 |
+| `passive.threshold.pass` | `1.00`: every session goes to the challenges (#7, 21 October 2026) | Section 4 |
+| `passive.threshold.attack` | `0.30` (#7) | Sections 4, 5.4, 5.5, 6 |
 | `passive.min_frames` | `5` | Sections 4, 5.4 |
 | `passive.window_ms` | `3000` | Section 4 |
 | `frame.sampling_ms` | `100` | Sections 3.1, 5.3 |
