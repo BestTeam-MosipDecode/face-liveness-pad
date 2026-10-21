@@ -130,7 +130,7 @@ Measures come from the Face Mesh V2 landmarks (`training/liveness/face_mesh.py`)
 | `TURN_LEFT` | Position of the nose tip between the cheek edges, 0.5 when facing the camera | It rises to at least baseline + 0.15, then comes back within 0.08 of the baseline | It falls to baseline - 0.15 or lower (turn to the right) |
 | `TURN_RIGHT` | Same | It falls to at most baseline - 0.15, then comes back within 0.08 of the baseline | It rises to baseline + 0.15 or higher (turn to the left) |
 
-When a person turns the head to their left, in a non-mirrored image, the nose tip moves towards the left cheek edge and the measure rises. This direction is to be confirmed on frames from the simulated device (#17).
+When a person turns the head to their left, in a non-mirrored image, the nose tip moves towards the left cheek edge and the measure rises. Checked live on 21 October 2026 with the simulated device in webcam mode (Windows 11, integrated camera, demo with the pass threshold at 1.00): `TURN_LEFT` passed 2 times out of 2 and `TURN_RIGHT` 2 out of 3 when the person turned to their own left or right, and no turn ended in `CHALLENGE_FAILED`, which a reversed direction gives at once. The third `TURN_RIGHT` ended in `CHALLENGE_TIMEOUT`. The frames of the device and the sign of the measure therefore agree for the person in front of the camera.
 
 A blink lasts 100 to 400 ms. At 100 ms between analysed frames, it covers one to four frames. `frame.sampling_ms` must therefore stay at 100 ms or below, and the time to analyse one frame must stay below it. On the reference machine, the three models take 50 to 70 ms per frame in Python.
 
@@ -295,5 +295,5 @@ These values are fixed in the engine for now. They can become configuration keys
 ## 11. Points to confirm
 
 1. With the mentors: how the face liveness exception travels in the packet to the server (section 7.1).
-2. On frames of the simulated device (#16, #17): that they are not mirrored, and the direction of the head-turn measure. The stream during `RCAPTURE` is settled (section 6).
+2. On frames of the simulated device (#16, #17): settled on 21 October 2026. The head-turn direction matches the person in front of the camera (section 5.3), and the stream during `RCAPTURE` is described in section 6.
 3. Lighting, sharpness and yaw bounds, action factors and passive thresholds, from the team captures (#5, #7).
