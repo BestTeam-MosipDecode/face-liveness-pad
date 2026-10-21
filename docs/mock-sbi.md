@@ -60,6 +60,7 @@ Content-Length:<n>\r\n
 - **Frame source.** One fixed JPEG, `Biometric Devices/Face/Stream Image/0.jpeg` (490 x 360), read again from disk for every frame.
 - **Rate.** About 30 frames per second (`Thread.sleep(30)` between frames).
 - **End of stream.** At the request timeout, after a successful `RCAPTURE`, or when the client closes the socket. The service then writes a second HTTP response on the same socket, which the client ignores.
+- **Stream during `RCAPTURE`.** Measured in webcam mode on 21 October 2026 (Windows 11, JDK 11): frames keep coming while `RCAPTURE` runs, and the stream ends with the capture. Without `RCAPTURE`, a 20 s stream runs to its timeout. The client keeps passing the frames received during `RCAPTURE` to the liveness session; after the capture request, the end of the stream is not counted as an interruption (`LivenessFrameSource.captureRequested`).
 
 The client reads this stream in `Streamer.retrieveNextImage` (`registration-client/.../controller/device/Streamer.java`):
 
