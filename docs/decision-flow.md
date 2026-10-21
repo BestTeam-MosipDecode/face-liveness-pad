@@ -163,7 +163,7 @@ After `PASSED`, the session keeps following the face on the stream until the cli
 
 The engine API of the project plan has no operation for this check. Issue #10 adds one to the session, for example `CaptureCheck checkCapture(FaceFrame captured)`.
 
-Whether the stream keeps running during `RCAPTURE` depends on the device. This is to be verified with the simulated device (#16, #17). If the stream stops, the last face followed before the capture is the reference.
+Whether the stream keeps running during `RCAPTURE` depends on the device. The simulated device in webcam mode keeps sending frames during `RCAPTURE` and ends the stream when the capture completes (measured on 21 October 2026, see `docs/mock-sbi.md`). The client removes its frame listener when it sends `RCAPTURE`, so the last face followed before the capture is the reference, whether the stream stops or not.
 
 ## 7. Attempts and end of session
 
@@ -293,5 +293,5 @@ These values are fixed in the engine for now. They can become configuration keys
 ## 11. Points to confirm
 
 1. With the mentors: how the face liveness exception travels in the packet to the server (section 7.1).
-2. On frames of the simulated device (#16, #17): that they are not mirrored, the direction of the head-turn measure, and whether the stream keeps running during `RCAPTURE`.
+2. On frames of the simulated device (#16, #17): that they are not mirrored, and the direction of the head-turn measure. The stream during `RCAPTURE` is settled (section 6).
 3. Lighting, sharpness and yaw bounds, action factors and passive thresholds, from the team captures (#5, #7).
