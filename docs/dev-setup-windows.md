@@ -62,7 +62,7 @@ The client depends on the engine, `io.mosip.registration:liveness-engine:0.1.0-S
 mvn clean install
 ```
 
-The build runs the tests of the engine, 186 of them, and takes about one minute. The first build downloads ONNX Runtime for Java, about 90 MB. The engine embeds its four models and checks them at startup against `models.json`.
+The build runs the tests of the engine, 188 of them, and takes about one minute. The first build downloads ONNX Runtime for Java, about 90 MB. The engine embeds its four models and checks them at startup against `models.json`.
 
 ## 4. Build the Registration Client
 
