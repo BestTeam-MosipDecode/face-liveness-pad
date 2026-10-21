@@ -103,7 +103,7 @@ class QualityAndWindowTest {
 
     @Test
     void windowDecisions() {
-        PassiveWindow window = new PassiveWindow();
+        PassiveWindow window = new PassiveWindow(0.85, 0.30, 5, 3000);
         for (int i = 0; i < 4; i++) {
             window.add(i * 100, 0.9);
             assertEquals(Decision.PENDING, window.decision());

@@ -52,7 +52,7 @@ class DefaultLivenessSessionTest {
 
     @Test
     void framesAreDecodedThenAnalysed() {
-        DefaultLivenessSession session = session(f.core(LivenessPolicy.defaults()));
+        DefaultLivenessSession session = session(f.core(SessionFixture.PASSIVE));
         f.analyzer.then(SessionFixture.noFace());
         session.submit(FRAME, 100);
         assertEquals(FeedbackCode.NO_FACE, session.current().feedback());
@@ -61,7 +61,7 @@ class DefaultLivenessSessionTest {
 
     @Test
     void anUndecodableFrameIsCountedOnly() {
-        SessionCore core = f.core(LivenessPolicy.defaults());
+        SessionCore core = f.core(SessionFixture.PASSIVE);
         session(core).submit(new byte[0], 100);
         assertEquals(1, core.invalidFrames());
         assertEquals(0, f.analyzer.calls());
@@ -69,7 +69,7 @@ class DefaultLivenessSessionTest {
 
     @Test
     void captureAndRetryGoThroughTheWorker() {
-        DefaultLivenessSession session = session(f.core(LivenessPolicy.defaults()));
+        DefaultLivenessSession session = session(f.core(SessionFixture.PASSIVE));
         for (int i = 1; i <= 5; i++) {
             f.analyzer.then(scored(LIVE));
             session.submit(FRAME, 100 * i);
@@ -82,7 +82,7 @@ class DefaultLivenessSessionTest {
 
     @Test
     void deviceEventsReachTheSession() {
-        DefaultLivenessSession session = session(f.core(LivenessPolicy.defaults()));
+        DefaultLivenessSession session = session(f.core(SessionFixture.PASSIVE));
         session.deviceEvent(DeviceEvent.UNAVAILABLE, 10);
         assertEquals(FeedbackCode.DEVICE_ERROR, session.current().feedback());
     }
@@ -102,7 +102,7 @@ class DefaultLivenessSessionTest {
                 }
             }
         };
-        SessionCore core = new SessionCore(Workflow.SUPERVISOR, LivenessPolicy.defaults(), f.analyzer, f.clock,
+        SessionCore core = new SessionCore(Workflow.SUPERVISOR, SessionFixture.PASSIVE, f.analyzer, f.clock,
             new Random(3), "1.1.0", listener, f.metrics);
         DefaultLivenessSession session = new DefaultLivenessSession(Workflow.SUPERVISOR, core,
             new FrameWorker(executor, 100), DECODER, "1.1.0", executor::shutdownNow);
@@ -120,7 +120,7 @@ class DefaultLivenessSessionTest {
 
     @Test
     void closeStopsTheSession() {
-        DefaultLivenessSession session = session(f.core(LivenessPolicy.defaults()));
+        DefaultLivenessSession session = session(f.core(SessionFixture.PASSIVE));
         session.close();
         session.close();
         assertEquals(1, closes.get());
@@ -134,7 +134,7 @@ class DefaultLivenessSessionTest {
 
     @Test
     void aCaptureCanBeCheckedFromDecodedPixels() {
-        DefaultLivenessSession session = session(f.core(LivenessPolicy.defaults()));
+        DefaultLivenessSession session = session(f.core(SessionFixture.PASSIVE));
         for (int i = 1; i <= 5; i++) {
             f.analyzer.then(scored(LIVE));
             session.submit(FRAME, 100 * i);

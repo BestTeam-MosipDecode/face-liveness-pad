@@ -76,7 +76,7 @@ class SessionCoreActiveTest {
 
     @Test
     void aChallengeNotPerformedInTimeFails() {
-        SessionCore core = activeCore(LivenessPolicy.builder()
+        SessionCore core = activeCore(SessionFixture.policy()
             .challengeTypes(BLINK_ONLY.challengeTypes()).minChallenges(1).challengeTimeoutMs(1000).build());
         LivenessUpdate u;
         int frames = 0;
@@ -118,7 +118,7 @@ class SessionCoreActiveTest {
 
     @Test
     void afterPassedAnotherFaceEndsTheAttempt() {
-        SessionCore core = f.core(LivenessPolicy.defaults());
+        SessionCore core = f.core(SessionFixture.PASSIVE);
         f.frames(core, 5, scored(LIVE));
         LivenessUpdate u = f.frame(core, scoredAt(FAR_BOX, LIVE));
         assertEquals(SessionState.FAILED, u.state());
@@ -127,14 +127,14 @@ class SessionCoreActiveTest {
 
     @Test
     void afterPassedTwoFacesEndTheAttempt() {
-        SessionCore core = f.core(LivenessPolicy.defaults());
+        SessionCore core = f.core(SessionFixture.PASSIVE);
         f.frames(core, 5, scored(LIVE));
         assertEquals(FailureReason.FACE_CONTINUITY_LOST, f.frame(core, twoFaces()).failureReason().get());
     }
 
     @Test
     void afterPassedAShortLossOfTheFaceIsTolerated() {
-        SessionCore core = f.core(LivenessPolicy.defaults());
+        SessionCore core = f.core(SessionFixture.PASSIVE);
         f.frames(core, 5, scored(LIVE));
         LivenessUpdate lost = f.frames(core, 5, noFace());
         assertEquals(SessionState.PASSED, lost.state());
@@ -147,7 +147,7 @@ class SessionCoreActiveTest {
 
     @Test
     void afterPassedALongLossOfTheFaceEndsTheAttempt() {
-        SessionCore core = f.core(LivenessPolicy.defaults());
+        SessionCore core = f.core(SessionFixture.PASSIVE);
         f.frames(core, 5, scored(LIVE));
         assertEquals(SessionState.PASSED, f.frames(core, 10, noFace()).state(), "1000 ms without a face");
         LivenessUpdate u = f.frame(core, noFace());
@@ -167,7 +167,7 @@ class SessionCoreActiveTest {
 
     @Test
     void updatesGiveThePositionOfTheChallenge() {
-        SessionCore core = f.core(LivenessPolicy.builder().challengeTypes(BLINK_ONLY.challengeTypes()).minChallenges(2)
+        SessionCore core = f.core(SessionFixture.policy().challengeTypes(BLINK_ONLY.challengeTypes()).minChallenges(2)
             .build());
         LivenessUpdate passive = f.frame(core, scored(AMBIGUOUS));
         assertEquals(0, passive.challengeIndex());

@@ -74,7 +74,7 @@ session.retry();
 
 | Builder method | Configuration key (`mosip.registration.face.liveness.` + key) | Default |
 | --- | --- | --- |
-| `passThreshold` | `passive.threshold.pass` | 0.85 |
+| `passThreshold` | `passive.threshold.pass` | 1.00: no passive pass, every session that is not an attack goes to the active check (#7) |
 | `attackThreshold` | `passive.threshold.attack` | 0.30 |
 | `minFrames` | `passive.min_frames` | 5 |
 | `windowMs` | `passive.window_ms` | 3000 |

@@ -44,7 +44,7 @@ class SessionCorePassiveTest {
 
     @Test
     void startsInInit() {
-        SessionCore core = f.core(LivenessPolicy.defaults());
+        SessionCore core = f.core(SessionFixture.PASSIVE);
         LivenessUpdate u = core.current();
         assertEquals(SessionState.INIT, u.state());
         assertEquals(FeedbackCode.CHECKING, u.feedback());
@@ -53,8 +53,22 @@ class SessionCorePassiveTest {
     }
 
     @Test
+    void theDefaultPolicySendsALiveFaceToTheChallengesAndStillRejectsAnAttack() {
+        // Decision of 21 October (#7): pass threshold 1.00 by default for the three workflows.
+        assertEquals(1.0, LivenessPolicy.defaults().passThreshold());
+        SessionCore live = f.core(LivenessPolicy.defaults());
+        assertEquals(SessionState.ACTIVE_CHALLENGE, f.frames(live, 5, scored(LIVE)).state());
+
+        SessionFixture g = new SessionFixture();
+        SessionCore attack = g.core(LivenessPolicy.defaults());
+        LivenessUpdate rejected = g.frames(attack, 5, scored(SPOOF));
+        assertEquals(SessionState.FAILED, rejected.state());
+        assertEquals(FailureReason.PAD_ATTACK_DETECTED, rejected.failureReason().get());
+    }
+
+    @Test
     void aLiveFacePassesWithoutAction() {
-        SessionCore core = f.core(LivenessPolicy.defaults());
+        SessionCore core = f.core(SessionFixture.PASSIVE);
         LivenessUpdate first = f.frame(core, scored(LIVE));
         assertEquals(SessionState.PASSIVE_CHECK, first.state());
         assertEquals(FeedbackCode.CHECKING, first.feedback());
@@ -77,7 +91,7 @@ class SessionCorePassiveTest {
 
     @Test
     void aPhotoIsAnAttack() {
-        SessionCore core = f.core(LivenessPolicy.defaults());
+        SessionCore core = f.core(SessionFixture.PASSIVE);
         LivenessUpdate u = f.frames(core, 5, scored(SPOOF));
         assertEquals(SessionState.FAILED, u.state());
         assertEquals(FeedbackCode.FAILED, u.feedback());
@@ -93,7 +107,7 @@ class SessionCorePassiveTest {
 
     @Test
     void anAmbiguousScoreFailsWhenTheActiveCheckIsDisabled() {
-        SessionCore core = f.core(LivenessPolicy.builder().activeEnabled(false).build());
+        SessionCore core = f.core(SessionFixture.policy().activeEnabled(false).build());
         LivenessUpdate u = f.frames(core, 5, scored(AMBIGUOUS));
         assertEquals(SessionState.FAILED, u.state());
         assertEquals(FailureReason.LIVENESS_BELOW_THRESHOLD, u.failureReason().get());
@@ -112,7 +126,7 @@ class SessionCorePassiveTest {
 
     @Test
     void guidanceFramesDoNotCount() {
-        SessionCore core = f.core(LivenessPolicy.defaults());
+        SessionCore core = f.core(SessionFixture.PASSIVE);
         assertEquals(FeedbackCode.NO_FACE, f.frame(core, noFace()).feedback());
         assertEquals(FeedbackCode.MULTIPLE_FACES, f.frame(core, twoFaces()).feedback());
         LivenessUpdate dark = f.frame(core, lowQuality(Tip.LIGHTING));
@@ -125,7 +139,7 @@ class SessionCorePassiveTest {
 
     @Test
     void anotherFaceStartsANewWindow() {
-        SessionCore core = f.core(LivenessPolicy.defaults());
+        SessionCore core = f.core(SessionFixture.PASSIVE);
         f.frames(core, 4, scored(LIVE));
         LivenessUpdate moved = f.frame(core, scoredAt(FAR_BOX, LIVE));
         assertEquals(SessionState.PASSIVE_CHECK, moved.state());
@@ -135,7 +149,7 @@ class SessionCorePassiveTest {
 
     @Test
     void noDecisionInTimeFailsWithTheMostFrequentGuidance() {
-        SessionCore core = f.core(LivenessPolicy.builder().passiveTimeoutMs(1000).build());
+        SessionCore core = f.core(SessionFixture.policy().passiveTimeoutMs(1000).build());
         f.frames(core, 3, noFace());
         LivenessUpdate u = f.frames(core, 8, lowQuality(Tip.LIGHTING));
         assertEquals(SessionState.PASSIVE_CHECK, u.state(), "t = 1100, 1000 ms after the first frame");
@@ -147,7 +161,7 @@ class SessionCorePassiveTest {
 
     @Test
     void anUnreadableFrameChangesNothing() {
-        SessionCore core = f.core(LivenessPolicy.defaults());
+        SessionCore core = f.core(SessionFixture.PASSIVE);
         core.onFrame(null, 100);
         assertEquals(1, core.invalidFrames());
         assertEquals(SessionState.INIT, core.current().state());
@@ -157,7 +171,7 @@ class SessionCorePassiveTest {
 
     @Test
     void anEngineErrorFailsTheAttempt() {
-        SessionCore core = f.core(LivenessPolicy.defaults());
+        SessionCore core = f.core(SessionFixture.PASSIVE);
         LivenessUpdate u = f.frame(core, t -> {
             throw new IllegalStateException("onnx");
         });
@@ -169,7 +183,7 @@ class SessionCorePassiveTest {
 
     @Test
     void theLastAttemptEndsTheSession() {
-        SessionCore core = f.core(LivenessPolicy.builder().maxAttempts(1).build());
+        SessionCore core = f.core(SessionFixture.policy().maxAttempts(1).build());
         LivenessUpdate u = f.frames(core, 5, scored(SPOOF));
         assertEquals(FeedbackCode.MAX_ATTEMPTS_EXCEEDED, u.feedback());
         assertTrue(u.finished());
@@ -192,20 +206,20 @@ class SessionCorePassiveTest {
                 throw new IllegalStateException("client bug");
             }
         };
-        SessionCore core = new SessionCore(Workflow.OPERATOR, LivenessPolicy.defaults(), f.analyzer, f.clock,
+        SessionCore core = new SessionCore(Workflow.OPERATOR, SessionFixture.PASSIVE, f.analyzer, f.clock,
             new Random(1), "1.1.0", throwing, f.metrics);
         assertEquals(SessionState.PASSED, f.frames(core, 5, scored(LIVE)).state());
     }
 
     @Test
     void theScoreIsShownOnlyInDiagnosticMode() {
-        SessionCore core = f.core(LivenessPolicy.builder().diagnostic(true).build());
+        SessionCore core = f.core(SessionFixture.policy().diagnostic(true).build());
         assertEquals(LIVE, f.frame(core, scored(LIVE)).diagnosticScore().getAsDouble());
     }
 
     @Test
     void countsAttemptsAndFailures() {
-        SessionCore core = f.core(LivenessPolicy.defaults());
+        SessionCore core = f.core(SessionFixture.PASSIVE);
         f.frames(core, 5, scored(SPOOF));
         assertEquals(5, f.metrics.snapshot().framesAnalysed());
         assertEquals(1.0, f.metrics.snapshot().failureRate());

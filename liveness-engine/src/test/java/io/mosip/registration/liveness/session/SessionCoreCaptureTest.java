@@ -44,7 +44,7 @@ class SessionCoreCaptureTest {
     }
 
     private void rejects(ScriptedAnalyzer.Step capture, FailureReason reason) {
-        SessionCore core = passedCore(LivenessPolicy.defaults());
+        SessionCore core = passedCore(SessionFixture.PASSIVE);
         f.analyzer.then(capture);
         CaptureCheck check = core.checkCapture(IMAGE);
         assertFalse(check.accepted());
@@ -55,7 +55,7 @@ class SessionCoreCaptureTest {
 
     @Test
     void acceptsAConsistentCapture() {
-        SessionCore core = passedCore(LivenessPolicy.defaults());
+        SessionCore core = passedCore(SessionFixture.PASSIVE);
         f.analyzer.then(scored(LIVE));
         CaptureCheck check = core.checkCapture(IMAGE);
         assertTrue(check.accepted());
@@ -75,14 +75,14 @@ class SessionCoreCaptureTest {
 
     @Test
     void acceptsACaptureOfAnotherResolution() {
-        SessionCore core = passedCore(LivenessPolicy.defaults());
+        SessionCore core = passedCore(SessionFixture.PASSIVE);
         f.analyzer.then(t -> TestAnalyses.scored(t, new FaceBox(440, 280, 400, 400), LIVE));
         assertTrue(core.checkCapture(new BgrImage(1280, 960, new byte[1280 * 960 * 3])).accepted());
     }
 
     @Test
     void refusesAnUnreadableCapture() {
-        SessionCore core = passedCore(LivenessPolicy.defaults());
+        SessionCore core = passedCore(SessionFixture.PASSIVE);
         int calls = f.analyzer.calls();
         assertEquals(FailureReason.INVALID_FRAME, core.checkCapture(null).failureReason().get());
         assertEquals(calls, f.analyzer.calls());
@@ -124,7 +124,7 @@ class SessionCoreCaptureTest {
 
     @Test
     void refusesACaptureBeforePassed() {
-        SessionCore core = f.core(LivenessPolicy.defaults());
+        SessionCore core = f.core(SessionFixture.PASSIVE);
         CaptureCheck check = core.checkCapture(IMAGE);
         assertEquals(FailureReason.FACE_CONTINUITY_LOST, check.failureReason().get());
         assertEquals(SessionState.INIT, core.current().state());
@@ -142,7 +142,7 @@ class SessionCoreCaptureTest {
 
     @Test
     void retryStartsANewAttempt() {
-        SessionCore core = f.core(LivenessPolicy.defaults());
+        SessionCore core = f.core(SessionFixture.PASSIVE);
         f.frames(core, 5, scored(SPOOF));
         assertTrue(core.retry());
         LivenessUpdate u = core.current();
@@ -158,15 +158,15 @@ class SessionCoreCaptureTest {
 
     @Test
     void retryIsRefusedOutsideAFailure() {
-        SessionCore core = f.core(LivenessPolicy.defaults());
+        SessionCore core = f.core(SessionFixture.PASSIVE);
         assertFalse(core.retry());
         f.frame(core, scored(LIVE));
         assertFalse(core.retry());
         SessionFixture g = new SessionFixture();
-        SessionCore exhausted = g.core(LivenessPolicy.builder().maxAttempts(1).build());
+        SessionCore exhausted = g.core(SessionFixture.policy().maxAttempts(1).build());
         g.frames(exhausted, 5, scored(SPOOF));
         assertFalse(exhausted.retry());
-        SessionCore succeeded = passedCore(LivenessPolicy.defaults());
+        SessionCore succeeded = passedCore(SessionFixture.PASSIVE);
         f.analyzer.then(scored(LIVE));
         assertTrue(succeeded.checkCapture(IMAGE).accepted());
         assertFalse(succeeded.retry());
@@ -174,7 +174,7 @@ class SessionCoreCaptureTest {
 
     @Test
     void aDeviceErrorBeforeTheFirstFrameUsesNoAttempt() {
-        SessionCore core = f.core(LivenessPolicy.defaults());
+        SessionCore core = f.core(SessionFixture.PASSIVE);
         core.onDeviceEvent(DeviceEvent.UNAVAILABLE, 50);
         LivenessUpdate u = core.current();
         assertEquals(SessionState.INIT, u.state());
@@ -190,7 +190,7 @@ class SessionCoreCaptureTest {
 
     @Test
     void aDeviceErrorDuringAnAttemptFailsIt() {
-        SessionCore core = f.core(LivenessPolicy.defaults());
+        SessionCore core = f.core(SessionFixture.PASSIVE);
         f.frame(core, scored(LIVE));
         core.onDeviceEvent(DeviceEvent.STREAM_INTERRUPTED, 150);
         LivenessUpdate u = core.current();
@@ -204,7 +204,7 @@ class SessionCoreCaptureTest {
 
     @Test
     void aDeviceErrorOnTheLastAttemptEndsTheSession() {
-        SessionCore core = f.core(LivenessPolicy.builder().maxAttempts(1).build());
+        SessionCore core = f.core(SessionFixture.policy().maxAttempts(1).build());
         f.frame(core, scored(LIVE));
         core.onDeviceEvent(DeviceEvent.CONNECTION_FAILED, 150);
         assertEquals(FeedbackCode.MAX_ATTEMPTS_EXCEEDED, core.current().feedback());

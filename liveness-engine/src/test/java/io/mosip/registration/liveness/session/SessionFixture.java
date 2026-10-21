@@ -35,9 +35,22 @@ final class SessionFixture {
     static final double LIVE = 0.9;
     static final double AMBIGUOUS = 0.5;
     static final double SPOOF = 0.05;
+    /**
+     * Pass threshold of these tests: a LIVE score passes on the passive check. The default became 1.00 on 21 October
+     * (#7), which sends every session to the active check; the tests of the passive pass and of what follows it keep
+     * 0.85, and {@code SessionCorePassiveTest} checks the default.
+     */
+    static final double PASS = 0.85;
+    /** The defaults with the pass threshold of these tests. */
+    static final LivenessPolicy PASSIVE = policy().build();
     /** One blink challenge, so that the drawing is known. */
-    static final LivenessPolicy BLINK_ONLY = LivenessPolicy.builder()
+    static final LivenessPolicy BLINK_ONLY = policy()
         .challengeTypes(EnumSet.of(ChallengeType.BLINK)).minChallenges(1).build();
+
+    /** A builder with the pass threshold of these tests. */
+    static LivenessPolicy.Builder policy() {
+        return LivenessPolicy.builder().passThreshold(PASS);
+    }
 
     final ScriptedAnalyzer analyzer = new ScriptedAnalyzer();
     final ManualClock clock = new ManualClock();

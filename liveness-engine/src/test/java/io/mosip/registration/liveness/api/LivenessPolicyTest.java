@@ -23,7 +23,7 @@ class LivenessPolicyTest {
     @Test
     void defaultsFollowTheDecisionFlow() {
         LivenessPolicy p = LivenessPolicy.defaults();
-        assertEquals(0.85, p.passThreshold());
+        assertEquals(1.00, p.passThreshold());
         assertEquals(0.30, p.attackThreshold());
         assertEquals(5, p.minFrames());
         assertEquals(3000, p.windowMs());
