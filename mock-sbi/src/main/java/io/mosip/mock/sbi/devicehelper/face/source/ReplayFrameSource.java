@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * a slow stream skips frames, as a camera would. Frames are read once, at {@link #prepare()}.
  *
  * Failure simulation: {@code end = STOP} returns no frame and no capture once the sequence is over, as an
- * unplugged device; {@code corruptEvery = N} truncates every Nth returned frame to a few bytes.
+ * unplugged device, and stays so for the following streams and captures until the device restarts; {@code corruptEvery = N} truncates every Nth returned frame to a few bytes.
  */
 public class ReplayFrameSource implements FaceFrameSource {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ReplayFrameSource.class);
@@ -51,6 +51,8 @@ public class ReplayFrameSource implements FaceFrameSource {
 	private long startMs;
 	private long served;
 	private volatile boolean open;
+	// Set once a STOP sequence is over: the device stays unplugged until it restarts, whatever is opened next.
+	private volatile boolean unplugged;
 
 	public ReplayFrameSource(Path folder, double fps, End end, int corruptEvery) {
 		this.folder = folder;
@@ -129,9 +131,9 @@ public class ReplayFrameSource implements FaceFrameSource {
 	public byte[] nextFrame() {
 		if (!open)
 			return null;
-		int index = indexAt(System.currentTimeMillis() - startMs);
-		if (index < 0)
+		if (!available())
 			return null;
+		int index = indexAt(System.currentTimeMillis() - startMs);
 		served++;
 		byte[] frame = frames.get(index);
 		if (corruptEvery > 0 && served % corruptEvery == 0)
@@ -142,7 +144,9 @@ public class ReplayFrameSource implements FaceFrameSource {
 	/** False once the sequence is over with {@code end = STOP}: the device then behaves as unplugged. */
 	@Override
 	public boolean available() {
-		return open && indexAt(System.currentTimeMillis() - startMs) >= 0;
+		if (open && !unplugged && indexAt(System.currentTimeMillis() - startMs) < 0)
+			unplugged = true;
+		return open && !unplugged;
 	}
 
 	/** Index of the frame due at {@code elapsedMs}, or -1 when the sequence is over and {@code end} is STOP. */

@@ -104,6 +104,10 @@ class ReplayFrameSourceTest {
 		Thread.sleep(600);
 		assertNull(source.nextFrame());
 		assertEquals(false, source.available());
+		// Opening it again, as a capture request does, does not plug the device back in.
+		source.open();
+		assertNull(source.nextFrame());
+		assertEquals(false, source.available());
 		source.close();
 		assertNull(source.nextFrame());
 	}
