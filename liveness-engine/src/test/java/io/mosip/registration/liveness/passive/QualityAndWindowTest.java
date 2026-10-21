@@ -126,6 +126,15 @@ class QualityAndWindowTest {
     }
 
     @Test
+    void aPassThresholdOfOneNeverPassesWithoutTheActiveCheck() {
+        PassiveWindow window = new PassiveWindow(1.0, 0.30, 5, 3000);
+        for (int i = 0; i < 5; i++) {
+            window.add(i * 100, 1.0);
+        }
+        assertEquals(Decision.CHALLENGE, window.decision());
+    }
+
+    @Test
     void oldFramesLeaveTheWindow() {
         PassiveWindow window = new PassiveWindow();
         for (int i = 0; i < 5; i++) {

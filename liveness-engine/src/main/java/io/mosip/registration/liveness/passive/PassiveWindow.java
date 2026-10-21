@@ -14,7 +14,7 @@ import java.util.OptionalDouble;
  * Passive decision over a window of frame scores (section 4 of {@code docs/decision-flow.md}), as in
  * {@code training/liveness/passive.py}. The window keeps the scored frames of the current track from the last
  * {@code passive.window_ms}. Once it holds {@code passive.min_frames} frames, their median is compared with the pass
- * and attack thresholds.
+ * and attack thresholds. A pass threshold of 1.00 never passes: the session goes to the active check.
  */
 public final class PassiveWindow {
 
@@ -84,7 +84,8 @@ public final class PassiveWindow {
         if (!score.isPresent()) {
             return Decision.PENDING;
         }
-        if (score.getAsDouble() >= passThreshold) {
+        // A pass threshold of 1.00 sends every session that is not an attack to the active check.
+        if (passThreshold < 1.0 && score.getAsDouble() >= passThreshold) {
             return Decision.PASSED;
         }
         if (score.getAsDouble() <= attackThreshold) {
