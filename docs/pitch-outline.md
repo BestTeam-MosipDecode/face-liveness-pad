@@ -157,7 +157,7 @@ On the slide:
 
 - Hence the default pass threshold of 1.00: a print or a still screen must also perform the random challenges
 - Footnote: two subjects, three lighting conditions, 67 sequences; preliminary, not a certification result
-- Engine tests: 186; liveness tests of the client services: 89
+- Engine tests: 188; liveness tests of the client services: 89
 
 Speaker notes:
 
@@ -218,7 +218,7 @@ Our work gives MOSIP deployments a liveness and PAD gate that runs on the regist
 | 18 pane states in three languages | `docs/ui/README.md`, "Status pane of the client"; `docs/ui/pane/` |
 | Model licences and sizes, 10.4 MB in total | `docs/architecture.md`, section 9; `THIRD_PARTY_NOTICES.md`; `docs/PROGRESS.md` (issue n° 4) |
 | ONNX Runtime 1.19.2 | `docs/architecture.md`, section 9 |
-| 186 engine tests | `README.md`, status table |
+| 188 engine tests | `README.md`, status table (after #105) |
 | 89 liveness tests of the client services | registration-client#14 description, run of 19 October 2026 |
 | Two subjects at 0.85: live faces 9 of 12 in the pass zone (BPCER 0 %), glossy print 33 %, phone screen 17 %, paper mask 33 % | `docs/test-results.md`, section 1.2.1 (#103) |
 | 15 of 15 attacks in 0.8 to 1.5 s, about 56 ms per frame, machine | Comment of Magloire04 on #29 (19 October 2026) |
