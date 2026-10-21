@@ -90,10 +90,12 @@ The session keeps the scored frames of the current track whose timestamp is with
 
 | Aggregate score | Decision |
 | --- | --- |
-| `s >= passive.threshold.pass` (default 1.00, so that no session passes on the passive score alone) | `PASSED`, subject to the check of the captured image |
+| `s >= passive.threshold.pass`, when the threshold is below 1.00 | `PASSED`, subject to the check of the captured image |
 | `s <= passive.threshold.attack` (default 0.30) | `FAILED`, reason `PAD_ATTACK_DETECTED` |
 | Between the two, active check enabled (`active.enabled`, default true) | `ACTIVE_CHALLENGE` |
 | Between the two, active check disabled | `FAILED`, reason `LIVENESS_BELOW_THRESHOLD` |
+
+A pass threshold of 1.00 never passes: every session that is not an attack goes to the active check (#105). Without this rule, a median of exactly 1.0 would still pass without a challenge. `training/liveness/passive.py` keeps the plain `>=` comparison, which differs from the engine only at a median of exactly 1.0 with the threshold at 1.00.
 
 The median makes the decision robust to a single badly scored frame. With the defaults, a decision needs at least half a second of good frames.
 
