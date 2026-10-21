@@ -14,7 +14,7 @@ PAD subsystem evaluation (ISO/IEC 30107-3, clause 7.3), computed by `training/sc
 | --- | --- |
 | Date | Captures 15 October 2026, scores computed the same day, evaluation 19 October |
 | Model set version | 1.1.0 (`liveness-engine/src/main/resources/models/models.json`) |
-| Thresholds: pass, attack | 0.85 and 0.30, the defaults of the decision flow, kept (decision of the coordinator on #7, 19 October) |
+| Thresholds: pass, attack | Measured at 0.85 and 0.30, the defaults at the time of the captures. After the second subject, the default pass threshold became **1.00** for the three workflows, the attack threshold staying 0.30 (decision of the coordinator on #7, 21 October; see the end of section 1.2.1) |
 | Subjects: calibration split, test split | 1 subject, S10. No held-out subject: `evaluate.py --scores ... --no-split`, figures flagged as preliminary |
 | Skin tone bands (MST 1-3, 4-7, 8-10), subjects per band | Not published: with one subject, the band would describe that person |
 | Cameras and resolutions | Integrated laptop camera, 1280 x 720 requested, 10 frames saved per second |
@@ -70,7 +70,9 @@ Both subjects together, at the defaults:
 | `print_matte`, `screen_laptop`, `replay_video` | 4, 6, 6 | 0 % |
 | `bona_fide` (BPCER) | 12 | 0 %; 9 passed, 3 without a decision |
 
-Calibrated on one subject and tested on the other (`evaluate.py --test-subjects`), the threshold rule finds no pass threshold that keeps every calibration attack out of the pass zone (a glossy print of S30 scores 0.999, above part of the live faces): it proposes a pass threshold of 1.00, which sends every session to the active check. With that setting, no attack sequence of either subject ends in the pass zone (APCER 0 % for the passive check), 9 of the 12 bona fide sequences go to a challenge and 3 stay without a decision. A print or a still screen then has to perform a randomly drawn blink or head turn, which it cannot; that last step is the design of the active check and is not measured on these recordings. The choice between the defaults and this setting is open on #7.
+Calibrated on one subject and tested on the other (`evaluate.py --test-subjects`), the threshold rule finds no pass threshold that keeps every calibration attack out of the pass zone (a glossy print of S30 scores 0.999, above part of the live faces): it proposes a pass threshold of 1.00, which sends every session to the active check. With that setting, no attack sequence of either subject ends in the pass zone (APCER 0 % for the passive check), 9 of the 12 bona fide sequences go to a challenge and 3 stay without a decision. A print or a still screen then has to perform a randomly drawn blink or head turn, which it cannot; that last step is the design of the active check and is not measured on these recordings.
+
+**Decision (#7, 21 October): pass threshold 1.00 by default for the resident, the operator and the supervisor, attack threshold 0.30.** The reason is the APCER measured at 0.85 above: 33 % for glossy prints and 17 % for phone screens, with no pass threshold that separates them from the live faces. At 1.00 the passive check still rejects the clear attacks at once (every print, screen and video of S10, the laptop screens of S30), and every other session ends with the random challenges. Cost: every live person performs the challenges, 2 by default, about 5 s each on the S10 replay (section 4). The paper mask stays a known limitation: its wearer can perform the challenges. The engine applies 1.00 from `LivenessPolicy.defaults()`, and a score of exactly 1.0 never passes on the passive check (#105). The figures of sections 1 and 3 were measured at 0.85 and are kept as the reason for the choice.
 
 ### 1.3 BPCER by condition
 

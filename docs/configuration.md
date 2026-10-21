@@ -24,7 +24,7 @@ Every key starts with `mosip.registration.face.liveness.`, written `…` below.
 | Key | Type | Default | Allowed values | Role |
 | --- | --- | --- | --- | --- |
 | `…enabled` | boolean | `true` | `true`, `false`, `Y`, `N` | Turns liveness on. With `false`, the client keeps its original behaviour |
-| `…passive.threshold.pass` | decimal | `0.85` | 0 to 1, above the attack threshold | Aggregate score from which liveness is verified without a challenge |
+| `…passive.threshold.pass` | decimal | `1.00` | 0 to 1, above the attack threshold | Aggregate score from which liveness is verified without a challenge. At `1.00`, the default, no session passes on the passive score: every session that is not rejected as an attack goes to the active check. The default was 0.85 until 21 October; it was raised after a glossy print scored 0.999 on the team captures (`docs/test-results.md`, section 1.2.1, and #7) |
 | `…passive.threshold.attack` | decimal | `0.30` | 0 to 1, below the pass threshold | Aggregate score at or below which the attempt fails as an attack |
 | `…passive.min_frames` | integer | `5` | 1 to 30 | Scored frames needed for a passive decision |
 | `…passive.window_ms` | integer, ms | `3000` | 500 to 10000 | Time window of the scored frames |
@@ -103,8 +103,8 @@ Ready to paste into the `mosip-config` file of the environment. The values are t
 #------------------------------------------------------------------------------
 #Enable face liveness. Possible values Y, N, true, false
 mosip.registration.face.liveness.enabled=Y
-#Aggregate score from which liveness is verified without a challenge. Possible values 0 to 1, above the attack threshold
-mosip.registration.face.liveness.passive.threshold.pass=0.85
+#Aggregate score from which liveness is verified without a challenge. Possible values 0 to 1, above the attack threshold. 1.00 sends every session to the active check
+mosip.registration.face.liveness.passive.threshold.pass=1.00
 #Aggregate score at or below which the attempt fails as an attack. Possible values 0 to 1, below the pass threshold
 mosip.registration.face.liveness.passive.threshold.attack=0.30
 #Scored frames needed for a passive decision. Possible values 1 to 30

@@ -142,7 +142,7 @@ public final class LivenessPolicy {
     /** Builder of {@link LivenessPolicy}. Each setter refuses an invalid value with an exception. */
     public static final class Builder {
 
-        private double passThreshold = 0.85;
+        private double passThreshold = 1.00;
         private double attackThreshold = 0.30;
         private int minFrames = 5;
         private long windowMs = 3000;

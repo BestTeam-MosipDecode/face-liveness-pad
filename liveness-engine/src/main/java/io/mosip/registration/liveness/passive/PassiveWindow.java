@@ -42,9 +42,9 @@ public final class PassiveWindow {
         this.windowMs = windowMs;
     }
 
-    /** Defaults of section 10: pass 0.85, attack 0.30, 5 frames, 3 000 ms. */
+    /** Defaults of section 10: pass 1.00 (every session that is not an attack goes to the active check), attack 0.30, 5 frames, 3 000 ms. */
     public PassiveWindow() {
-        this(0.85, 0.30, 5, 3000);
+        this(1.00, 0.30, 5, 3000);
     }
 
     /** Starts a new track: the face box changed or the face was lost. */

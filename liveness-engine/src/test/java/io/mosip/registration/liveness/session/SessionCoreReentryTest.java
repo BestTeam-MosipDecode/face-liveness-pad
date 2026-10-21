@@ -52,7 +52,7 @@ class SessionCoreReentryTest {
     @Test
     void aRetryFromTheFailedEventOfTheLastAttemptIsRefused() {
         AtomicReference<Boolean> result = new AtomicReference<>();
-        SessionCore core = retryingOnFailedEvent(LivenessPolicy.builder().maxAttempts(1).build(), result);
+        SessionCore core = retryingOnFailedEvent(SessionFixture.policy().maxAttempts(1).build(), result);
         f.frames(core, 5, scored(SPOOF));
         assertFalse(result.get());
         assertEquals(SessionState.FAILED, core.current().state());
@@ -62,7 +62,7 @@ class SessionCoreReentryTest {
     @Test
     void aRetryFromTheFailedEventLeavesAConsistentSession() {
         AtomicReference<Boolean> result = new AtomicReference<>();
-        SessionCore core = retryingOnFailedEvent(LivenessPolicy.defaults(), result);
+        SessionCore core = retryingOnFailedEvent(SessionFixture.PASSIVE, result);
         f.frames(core, 5, scored(SPOOF));
         assertTrue(result.get());
         assertEquals(SessionState.INIT, core.current().state());
@@ -71,7 +71,7 @@ class SessionCoreReentryTest {
 
     @Test
     void aTimestampThatGoesBackEndsTheAttemptAsAStreamInterruption() {
-        SessionCore core = f.core(LivenessPolicy.defaults());
+        SessionCore core = f.core(SessionFixture.PASSIVE);
         f.frames(core, 2, scored(LIVE));
         int calls = f.analyzer.calls();
         core.onFrame(IMAGE, 50);
@@ -85,7 +85,7 @@ class SessionCoreReentryTest {
 
     @Test
     void anAttemptAfterARestartAcceptsTheNewTimestamps() {
-        SessionCore core = f.core(LivenessPolicy.defaults());
+        SessionCore core = f.core(SessionFixture.PASSIVE);
         f.frames(core, 2, scored(LIVE));
         core.onFrame(IMAGE, 50);
         assertTrue(core.retry());
@@ -95,7 +95,7 @@ class SessionCoreReentryTest {
 
     @Test
     void aClosedSessionNeitherAnalysesNorPublishes() {
-        SessionCore core = f.core(LivenessPolicy.defaults());
+        SessionCore core = f.core(SessionFixture.PASSIVE);
         f.frame(core, scored(LIVE));
         int updates = f.updates.size();
         core.close();
@@ -109,7 +109,7 @@ class SessionCoreReentryTest {
     void closingDuringADeliveryFinishesTheTransition() {
         AtomicReference<SessionCore> self = new AtomicReference<>();
         List<LivenessUpdate> updates = new java.util.ArrayList<>();
-        SessionCore core = new SessionCore(Workflow.RESIDENT, LivenessPolicy.defaults(), f.analyzer, f.clock,
+        SessionCore core = new SessionCore(Workflow.RESIDENT, SessionFixture.PASSIVE, f.analyzer, f.clock,
             new Random(5), "1.1.0", new LivenessEventListener() {
                 @Override
                 public void onUpdate(LivenessUpdate update) {
