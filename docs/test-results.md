@@ -2,7 +2,7 @@
 
 Status on 21 October 2026: sections 1, 3, 4 and 5 hold the measures made on the captures of the first team subject (S10, 15 October), with the scores and replays run on the machine that recorded them; only aggregated figures leave that machine. Section 2 and the client-level rows of sections 3 to 5 need the Registration Client signed in to a MOSIP environment: on 21 October the Collab tunnel works and the client starts, but the first sign-in is refused (`KER-SYN-AUTH-001`, machine registration under review by MOSIP). Values marked "not run" are filled in when the test is done, following [test-plan.md](test-plan.md). No face image appears in this document.
 
-**All figures below come from one subject.** They show that the chain works and where it fails; they are not a statistically meaningful error rate. ISO/IEC 30107-3 asks for many subjects and presentation attack instruments before an APCER or a BPCER can be compared with other systems.
+**Section 1 covers two subjects (S10 on 15 October, S30 on 20 October), the other sections one (S10).** They show that the chain works and where it fails; they are not a statistically meaningful error rate. ISO/IEC 30107-3 asks for many subjects and presentation attack instruments before an APCER or a BPCER can be compared with other systems.
 
 ## 1. Passive model on the team dataset
 
@@ -44,6 +44,33 @@ Frame scores: median 0.996 for the bona fide frames (0.976 for the lowest sequen
 **Paper mask: known limitation.** The passive classifier scores a cut-out paper mask worn by another person as a live face. The mask was accepted once (backlight) and stayed without a decision in the two other sequences, where the head angle check rejected most frames. The active check does not stop it either: the wearer blinks and turns the head through the cut-outs. The decision of the coordinator (#7, 19 October) is to report it with its rate, keep the code and thresholds unchanged before the submission, and describe the controls in place and a dedicated mask check as future work in [security-privacy.md](security-privacy.md).
 
 DET curve of the sequence medians, single threshold: [../training/results/chart_det.png](../training/results/chart_det.png). Equal error rate 3 % with the paper mask, 0 % without it (the lowest bona fide median, 0.976, is far above the highest print, screen or video median, 0.000).
+
+### 1.2.1 Second subject, S30
+
+Score file received on 21 October from the machine that recorded S30 (20 October, 31 sequences: 6 `bona_fide`, 3 per action, 3 `print_glossy`, 3 `screen_phone`, 3 `screen_laptop`, 3 `replay_video`, 1 `print_matte`, no `paper_mask`). Defaults 0.85 and 0.30, same replay of the passive window:
+
+| Type | Sequences | Pass zone | Challenge zone | Attack zone | No decision | Sequence medians |
+| --- | --- | --- | --- | --- | --- | --- |
+| `bona_fide` | 6 | 3 | 0 | 0 | 3 (low light: no face found in most frames) | 0.996 to 0.999 |
+| `print_glossy` | 3 | **2** | 0 | 0 | 1 | **0.998 and 0.999** |
+| `screen_phone` | 3 | **1** | 1 | 0 | 1 | 0.829 and 0.403 |
+| `screen_laptop` | 3 | 0 | 0 | 3 | 0 | 0.10 to 0.18 |
+| `replay_video` | 3 | 0 | 0 | 0 | 3 (4 frames scored in all) | |
+| `print_matte` | 1 | 0 | 0 | 0 | 1 (no face found in any frame) | |
+
+No face was found in 37 % of the S30 frames, against 6 % for S10, and the analysis took 29 ms per frame (another machine). The capture conditions of S30 (distance, resolution, artefacts) are being checked with the person who recorded them (#7).
+
+Both subjects together, at the defaults:
+
+| Type | Sequences | APCER |
+| --- | --- | --- |
+| `print_glossy` | 6 | **33 %** (2 of 6, both S30) |
+| `paper_mask` | 3 | **33 %** (1 of 3, S10) |
+| `screen_phone` | 6 | 17 % (1 of 6, S30) |
+| `print_matte`, `screen_laptop`, `replay_video` | 4, 6, 6 | 0 % |
+| `bona_fide` (BPCER) | 12 | 0 %; 9 passed, 3 without a decision |
+
+Calibrated on one subject and tested on the other (`evaluate.py --test-subjects`), the threshold rule finds no pass threshold that keeps every calibration attack out of the pass zone (a glossy print of S30 scores 0.999, above part of the live faces): it proposes a pass threshold of 1.00, which sends every session to the active check. With that setting, no attack sequence of either subject ends in the pass zone (APCER 0 % for the passive check), 9 of the 12 bona fide sequences go to a challenge and 3 stay without a decision. A print or a still screen then has to perform a randomly drawn blink or head turn, which it cannot; that last step is the design of the active check and is not measured on these recordings. The choice between the defaults and this setting is open on #7.
 
 ### 1.3 BPCER by condition
 
