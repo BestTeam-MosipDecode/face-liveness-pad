@@ -4,7 +4,7 @@ Plan and content of the pitch deck of Best_Team for MOSIP Decode 2026, problem s
 
 - Audience: the MOSIP Decode jury, who know MOSIP and the Registration Client but not our code.
 - Length: 8 to 10 minutes, 14 slides, about 30 seconds per slide, with the live demo on slide 12 (2 to 3 minutes; the video of #36 is the fallback).
-- Rules: every figure comes from a file of this repository or a comment of an issue, listed in "Sources" at the end, with its sample size. The measured results come from one subject and are preliminary. No face image appears on a slide.
+- Rules: every figure comes from a file of this repository or a comment of an issue, listed in "Sources" at the end, with its sample size. The measured results come from two subjects and are preliminary. No face image appears on a slide.
 
 ## Slide 1: Face liveness and PAD for the MOSIP Registration Client
 
@@ -49,15 +49,15 @@ The feature serves the people in a registration centre and the organisations tha
 
 On the slide:
 
-- Passive check first: two MiniFASNet models score the frames of the stream, no action from the user
-- Ambiguous score: an active check starts on its own, with facial actions drawn at random (blink, head turn left or right; smile available by configuration)
+- Passive check first: two MiniFASNet models score the frames of the stream and reject clear attacks at once
+- Then random facial actions in every session: blink, head turn left or right (smile available by configuration)
 - Capture or authentication only after `PASSED`, then the image returned by `RCAPTURE` is checked again
 - Retry policy, then the MOSIP exception process for a resident, another sign-in method for an operator or supervisor
 - Runs inside the client, offline included
 
 Speaker notes:
 
-The decision follows the hybrid approach of the problem statement. The passive check scores the stream frames and decides alone when the score is clearly high or clearly low. In between, the client asks for actions drawn with `SecureRandom`, so a recorded video cannot anticipate them. The capture request leaves only after the session has passed, and the signed image that comes back must match the face that was followed. After the last attempt, a resident goes to the existing MOSIP exception process with a supervisor, while an operator or a supervisor has to use another sign-in method.
+The decision follows the hybrid approach of the problem statement. The passive check scores the stream frames and rejects clear attacks at once. On our second test subject, a glossy print scored as high as a live face, so since 21 October every session also goes through actions drawn with `SecureRandom`, which a print or a still screen cannot perform and a recorded video cannot anticipate. A passive-only pass for clear scores stays a configuration option, per workflow. The capture request leaves only after the session has passed, and the signed image that comes back must match the face that was followed. After the last attempt, a resident goes to the existing MOSIP exception process with a supervisor, while an operator or a supervisor has to use another sign-in method.
 
 ## Slide 5: Architecture
 
@@ -77,14 +77,15 @@ The device side is unchanged: the client keeps its SBI providers and their signa
 On the slide:
 
 - Image: `docs/diagrams/session-states.svg`
-- Score of each frame aggregated by the median over the window; pass threshold 0.85, attack threshold 0.30 (provisional defaults)
+- Score of each frame aggregated by the median over the window; attack threshold 0.30
+- Pass threshold 1.00 by default since 21 October: every session ends with the challenges
 - Quality checks before scoring: one face, size, head angle, lighting, sharpness
 - During the active check the passive score is still computed and the face is followed from frame to frame
 - Every failure after the first analysed frame counts as an attempt, device errors included
 
 Speaker notes:
 
-A session goes from the passive check to the active check only when the median score falls between the two thresholds. Frames that cannot be used, for example with two faces or a turned head, get a guidance message instead of a score. While the user performs an action, the engine keeps scoring the frames and checks that the face is the same one, so a photo slipped in after a live start is caught. A device error also counts as an attempt, so unplugging the camera does not reset the counter. The thresholds are the defaults of our decision flow and stay provisional until more subjects are measured.
+A session that scores at or below the attack threshold is rejected at once. Otherwise it goes to the active check: with the pass threshold at 1.00, the default chosen on 21 October after our second subject, no session passes on the passive score alone. Frames that cannot be used, for example with two faces or a turned head, get a guidance message instead of a score. While the user performs an action, the engine keeps scoring the frames and checks that the face is the same one, so a photo slipped in after a live start is caught. A device error also counts as an attempt, so unplugging the camera does not reset the counter.
 
 ## Slide 7: Three workflows in the Registration Client
 
@@ -142,52 +143,53 @@ Speaker notes:
 
 We kept the stack of the client: Java 11, so the engine loads in the JVM of release 1.2.0.2. All four models run with one runtime, ONNX Runtime, after export from PyTorch and TFLite, with parity checked against the reference implementation in Python. The core of the engine avoids desktop imaging classes, so the same code can move to the Android client, which our design note `docs/android.md` discusses. The simulated device lets anyone run the SBI protocol end to end without hardware, including replayed attacks and device failures.
 
-## Slide 11: Measured results (one subject, preliminary)
+## Slide 11: Measured results (two subjects, preliminary)
 
 On the slide:
 
 | Measure | Result |
 | --- | --- |
-| Live face, passive check | 6 of 6 sequences pass, no challenge needed (BPCER 0 %) |
-| Prints, phone and laptop screens, replayed video | 15 of 15 sequences detected as attacks (APCER 0 %), in 0.8 to 1.5 s |
-| Paper mask worn by another person | 1 of 3 accepted (backlight), 2 of 3 without a decision |
+| Live faces, passive score at 0.85 | 9 of 12 sequences in the pass zone, none rejected (BPCER 0 %); 3 without a decision in low light |
+| Attacks, passive score at 0.85 | glossy print 2 of 6 accepted (33 %), phone screen 1 of 6 (17 %); matte print, laptop screen and video 0 % |
+| Paper mask worn by another person | 1 of 3 accepted (backlight) |
 | Analysis time | about 56 ms per frame, under the 100 ms target (Intel Core i7-8550U, CPU only) |
 | Simulated device scenarios | 24 of 24 stream runs pass, SBI 0.9.5 and 1.0 |
 
-- Footnote: one subject, three lighting conditions, 36 sequences; no held-out subject
+- Hence the default pass threshold of 1.00: a print or a still screen must also perform the random challenges
+- Footnote: two subjects, three lighting conditions, 67 sequences; preliminary, not a certification result
 - Engine tests: 186; liveness tests of the client services: 89
 
 Speaker notes:
 
-These figures come from one team member recorded under normal light, low light and backlight, so they are preliminary and we present them with their sample size. Every live sequence passed on the passive check alone, and every print, screen and replayed video was rejected in about one second. The weak point is the cut-out paper mask worn by another person, which passed once under backlight. On a laptop processor without a graphics card, the analysis takes about 56 ms per frame. The full tables are in `docs/test-results.md` and on issues #7 and #29.
+These figures come from two team members recorded under normal light, low light and backlight, so they are preliminary and we present them with their sample size. No live sequence was rejected. On the first subject every print, screen and replayed video was rejected in about one second, but on the second subject two glossy prints and one phone screen scored like live faces. That is why we changed the default: the passive check still rejects clear attacks, and every session now has to pass random challenges, which a print or a still screen cannot do. The paper mask worn by another person remains the weak point, since its wearer can perform the challenges. On a laptop processor without a graphics card, the analysis takes about 56 ms per frame. The full tables are in docs/test-results.md.
 
 ## Slide 12: Live demo
 
 On the slide:
 
 - Demo application: the real engine, the simulated device in webcam mode over SBI, the real status pane of the client
-- Scene 1, live face: the passive check passes
-- Scene 2, ambiguous case: an active challenge is drawn and verified
-- Scene 3, printed photo then phone screen: rejected with the generic message
+- Scene 1, live face: passive check, then random challenges, then the captured image is checked
+- Scene 2, printed photo then phone screen: refused with the generic message
+- Scene 3, comparison: with a passive pass allowed at 0.85, the same live face passes in a second or two
 - Scene 4: operator and supervisor workflows, attempts exhausted, offline run, configuration
 
 Speaker notes:
 
-The demo runs the same engine and the same status pane as our fork, fed by the simulated device over SBI, as the Registration Client would feed them. We first show a live face accepted on the passive check, then raise the pass threshold to force the ambiguous case and the active challenge. Next, a printed photo and a phone screen are rejected with the generic message. We end with the operator and supervisor workflows, the end of the attempts, a run with the network turned off and the configuration keys. If a MOSIP environment is available on the day, we also show the modified Registration Client; otherwise the demo application stands for it, with the same components.
+The demo runs the same engine and the same status pane as our fork, fed by the simulated device over SBI, as the Registration Client would feed them. We first show a live face: the passive check scores it, the random challenges complete the session, and the captured image is checked. Next, a printed photo and a phone screen are refused with the generic message. For comparison, we allow a passive pass at 0.85: the same face then passes without any action, which is what a glossy print achieved on our second subject. We end with the operator and supervisor workflows, the end of the attempts, a run with the network turned off and the configuration keys. If a MOSIP environment is available on the day, we also show the modified Registration Client; otherwise the demo application stands for it, with the same components.
 
 ## Slide 13: Limits and next steps
 
 On the slide:
 
 - Paper mask worn by another person: known limitation; next step, a dedicated check of mask edges and paper texture
-- One subject so far: record more subjects, then confirm the thresholds on a held-out subject
-- Blink challenge recognised in 1 of 3 recorded sequences: check the timing of the recordings, then calibrate
-- No on-screen check yet on a MOSIP environment; Android covered by a design note only
+- Glossy prints can score like live faces: challenges in every session, about 10 s; next step, a complementary passive signal (moiré, #8)
+- Two subjects so far: record more, then confirm the thresholds on held-out subjects
+- On Collab, sign-in and sync work; onboarding waits for renewed device certificates. Android covered by a design note only
 - Stream injection before the client depends on device integrity (L1 devices), outside PAD
 
 Speaker notes:
 
-We list our limits because the jury will meet them anyway. The cut-out paper mask is the main one: real eyes and a real mouth show through the holes, so the passive classifier scores it like a live face. Our results rest on one subject, so the next step is more subjects and a held-out evaluation before any threshold is called final. The blink challenge needs work on its calibration. Finally, the client changes have not yet been checked on screen against a MOSIP server, and the Android client is covered by a design note only.
+We list our limits because the jury will meet them anyway. The cut-out paper mask is the main one: real eyes and a real mouth show through the holes, so the passive classifier scores it like a live face, and its wearer can perform the challenges. Glossy prints of our second subject also scored like live faces, which the random challenges now stop, at the cost of about ten seconds per session. Our results rest on two subjects, so the next step is more subjects and a held-out evaluation before any threshold is called final. On the MOSIP Collab environment, the modified client signs in and synchronises; the operator onboarding waits for device certificates renewed by MOSIP. The Android client is covered by a design note only.
 
 ## Slide 14: Impact
 
@@ -208,7 +210,7 @@ Our work gives MOSIP deployments a liveness and PAD gate that runs on the regist
 | Figure or fact | Source |
 | --- | --- |
 | Behaviour of release 1.2.0.2 (preview and capture at the same moment) | `docs/architecture.md`, section 1 |
-| Thresholds 0.85 and 0.30, kept provisional | `docs/decision-flow.md`, section 4; decision of 19 October 2026 on #7 |
+| Pass threshold 1.00 by default, attack threshold 0.30 | `docs/decision-flow.md`, section 4; decision of 21 October 2026 on #7 |
 | Default challenges BLINK, TURN_LEFT, TURN_RIGHT; SMILE by configuration | `docs/configuration.md`; `docs/decision-flow.md`, section 5.1 |
 | 17 configuration keys with per-workflow overrides | `docs/configuration.md`; `docs/architecture.md`, section 2.1 |
 | Exception process, `REG-EVT-112`, supervisor rules | `docs/decision-flow.md`, section 7.1; `docs/security-privacy.md`, section 2.2 |
@@ -218,10 +220,11 @@ Our work gives MOSIP deployments a liveness and PAD gate that runs on the regist
 | ONNX Runtime 1.19.2 | `docs/architecture.md`, section 9 |
 | 186 engine tests | `README.md`, status table |
 | 89 liveness tests of the client services | registration-client#14 description, run of 19 October 2026 |
-| 6 of 6 live sequences pass (BPCER 0 %), attacks 0 % accepted, paper mask 1 of 3 | PrinceSpecial's comment on #7 (19 October 2026), preliminary, one subject |
+| Two subjects at 0.85: live faces 9 of 12 in the pass zone (BPCER 0 %), glossy print 33 %, phone screen 17 %, paper mask 33 % | `docs/test-results.md`, section 1.2.1 (#103) |
 | 15 of 15 attacks in 0.8 to 1.5 s, about 56 ms per frame, machine | Comment of Magloire04 on #29 (19 October 2026) |
 | Challenges: turn right 3 of 3, turn left 2 of 3, blink 1 of 3 | Comment on #29 |
 | 24 of 24 device stream runs, SBI 0.9.5 and 1.0 | Comment on #29 |
 | Paper mask as a known limitation | `docs/security-privacy.md`, section 3, item 6 |
-| One subject, 36 sequences, three lighting conditions | `docs/iso-30107-alignment.md`, sections 4.1 and 5; PrinceSpecial's comment on #7 |
+| Two subjects, 67 sequences, three lighting conditions | `docs/test-results.md`, sections 1.1 and 1.2.1 |
+| Sign-in and sync on Collab, onboarding blocked by expired device certificates | `docs/PROGRESS.md`, section on Collab; comment on #27 |
 | Team and roles | `docs/PROGRESS.md`, "Équipe" |
