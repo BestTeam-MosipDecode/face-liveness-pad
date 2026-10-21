@@ -12,8 +12,8 @@ The modified Registration Client needs a MOSIP server and a registered machine t
 
 | Scene | How |
 | --- | --- |
-| Live face, passive check only | Resident workflow, default settings, look at the camera |
-| Ambiguous case, with challenges | Tick "Always ask for a challenge": every attempt goes to the active check (blink, head turns) |
+| Live face | Resident workflow, default settings, look at the camera, then follow the challenges: since 21 October every session goes through them (#7) |
+| Passive pass, for comparison | Tick "Allow a passive pass (0.85)": a clear live face passes on the passive score alone, the former default |
 | Photo or screen attack | Present a printed photo or a phone screen to the camera: the generic failure message, then a new attempt |
 | Attempts exhausted | Resident: "Continue under exception", then the capture without a liveness decision. Operator or supervisor: "Use another sign-in method" |
 | Face device unavailable | Start without the simulated device, or stop it during an attempt |

@@ -19,21 +19,25 @@ import io.mosip.registration.liveness.api.Workflow;
 class DemoSettingsTest {
 
 	@Test
-	void defaultsAreTheEngineDefaults() {
+	void everySessionGoesToTheChallengesByDefault() {
 		LivenessPolicy policy = new DemoSettings().policy();
 		LivenessPolicy defaults = LivenessPolicy.defaults();
-		assertEquals(defaults.passThreshold(), policy.passThreshold());
+		assertEquals(1.0, policy.passThreshold());
+		assertEquals(defaults.attackThreshold(), policy.attackThreshold());
 		assertEquals(defaults.minChallenges(), policy.minChallenges());
 		assertEquals(defaults.maxAttempts(), policy.maxAttempts());
-		assertEquals(defaults.activeEnabled(), policy.activeEnabled());
+		assertTrue(policy.activeEnabled());
 		assertFalse(policy.diagnostic());
 	}
 
 	@Test
-	void alwaysChallengeRaisesThePassThresholdOnlyWithTheActiveCheck() {
-		assertEquals(1.0, new DemoSettings().alwaysChallenge(true).policy().passThreshold());
-		assertEquals(LivenessPolicy.defaults().passThreshold(),
-				new DemoSettings().alwaysChallenge(true).activeEnabled(false).policy().passThreshold());
+	void aPassivePassUsesTheFormerThreshold() {
+		assertEquals(0.85, new DemoSettings().passivePass(true).policy().passThreshold());
+	}
+
+	@Test
+	void withoutTheActiveCheckThePassivePassIsTheOnlyWay() {
+		assertEquals(0.85, new DemoSettings().activeEnabled(false).policy().passThreshold());
 	}
 
 	@Test
@@ -51,6 +55,6 @@ class DemoSettingsTest {
 		assertTrue(lines.contains("mosip.registration.face.liveness.active.min_challenges=1"));
 		assertTrue(lines.contains("mosip.registration.face.liveness.max_attempts=2"));
 		assertTrue(lines.contains("mosip.registration.face.liveness.on_max_attempts=BLOCK"));
-		assertTrue(lines.contains("mosip.registration.face.liveness.passive.threshold.pass=0.85"));
+		assertTrue(lines.contains("mosip.registration.face.liveness.passive.threshold.pass=1.00"));
 	}
 }

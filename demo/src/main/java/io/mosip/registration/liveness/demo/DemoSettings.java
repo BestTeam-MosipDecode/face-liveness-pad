@@ -14,16 +14,19 @@ import io.mosip.registration.liveness.api.Workflow;
 
 /**
  * Settings of the demo, given as the configuration keys of the client (docs/configuration.md), and the engine policy
- * they produce. Every value the demo does not change keeps the default of the engine.
+ * they produce. Every value the demo does not change keeps the default of the engine, except the pass threshold, which
+ * the demo always sets.
  */
 final class DemoSettings {
 
 	static final String PREFIX = "mosip.registration.face.liveness.";
-	/** A pass threshold of 1.0 is never reached, so every attempt goes to the active check. */
-	private static final double ALWAYS_CHALLENGE_THRESHOLD = 1.0;
+	/** Default since 21 October 2026 (#7): every session goes to the active check. */
+	static final double CHALLENGE_EVERY_SESSION = 1.0;
+	/** Former default: a clear live face passes on the passive score alone. */
+	static final double PASSIVE_PASS = 0.85;
 
 	private boolean activeEnabled = true;
-	private boolean alwaysChallenge;
+	private boolean passivePass;
 	private int minChallenges = 2;
 	private int maxAttempts = 3;
 	private boolean exceptionAfterLastAttempt = true;
@@ -34,8 +37,9 @@ final class DemoSettings {
 		return this;
 	}
 
-	DemoSettings alwaysChallenge(boolean value) {
-		alwaysChallenge = value;
+	/** Allows a passive pass for clear scores; without the active check, it is the only way to pass. */
+	DemoSettings passivePass(boolean value) {
+		passivePass = value;
 		return this;
 	}
 
@@ -60,11 +64,10 @@ final class DemoSettings {
 	}
 
 	LivenessPolicy policy() {
-		LivenessPolicy defaults = LivenessPolicy.defaults();
-		LivenessPolicy.Builder builder = LivenessPolicy.builder().activeEnabled(activeEnabled)
-				.minChallenges(minChallenges).maxAttempts(maxAttempts).diagnostic(diagnostic);
-		builder.passThreshold(activeEnabled && alwaysChallenge ? ALWAYS_CHALLENGE_THRESHOLD : defaults.passThreshold());
-		return builder.build();
+		boolean challengeEverySession = activeEnabled && !passivePass;
+		return LivenessPolicy.builder().activeEnabled(activeEnabled).minChallenges(minChallenges)
+				.maxAttempts(maxAttempts).diagnostic(diagnostic)
+				.passThreshold(challengeEverySession ? CHALLENGE_EVERY_SESSION : PASSIVE_PASS).build();
 	}
 
 	/** The exception process follows the last attempt of a resident only, as in the client. */
