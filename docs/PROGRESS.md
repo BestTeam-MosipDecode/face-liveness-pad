@@ -2,7 +2,7 @@
 
 Suivi de travail interne du projet Face Liveness / PAD (MOSIP Decode 2026, sujet 04).
 Plan de référence : `PLAN_FACE_LIVENESS.md`, à la racine du workspace `mosip_decode/` (hors dépôt).
-Dernière mise à jour : 21 octobre 2026.
+Dernière mise à jour : 22 octobre 2026.
 
 ## Étape en cours
 
@@ -180,6 +180,16 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
   - pitch final : date et format communiqués aux équipes présélectionnées après la date limite ; présentation du deck, puis démonstration en direct de préférence, ou enregistrée.
 - Les réponses aux autres questions envoyées par e-mail (Q15, Q16) sont promises pour la semaine suivante, donc après la date limite.
 - L'AMA du mercredi 21 octobre est reportée au jeudi 22 octobre, de 12 h 30 à 13 h 30 à Cotonou (annonce du forum du 21 octobre).
+
+## Démonstration (issue n° 36, 22 octobre)
+
+- Démo reconstruite le 21 octobre avec le moteur de `main` : seuil de passage à 1,00 par défaut.
+- Testée par Elisée le 22 octobre avec la webcam et le dispositif simulé en mode webcam, parcours résident en français, puis opérateur. Les quatre cas prévus donnent le résultat et le message attendus :
+  - visage réel accepté après deux défis, puis capture vérifiée ;
+  - photo ou écran de téléphone refusés avec le message générique, puis nouvelle tentative ;
+  - avec la case « Allow a passive pass (0.85) », le visage passe sans défi, pour la scène de comparaison ;
+  - tentatives épuisées : « Continuer sous exception » pour le résident, autre méthode de connexion pour l'opérateur.
+- Étape suivante : l'enregistrement de la vidéo, d'après `docs/demo-script.md`.
 
 ## Nettoyage de l'historique et vérification des commits (13 octobre)
 
