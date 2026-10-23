@@ -37,6 +37,16 @@ public interface LivenessEngine extends AutoCloseable {
      */
     LivenessSession newSession(Workflow workflow, LivenessPolicy policy, LivenessEventListener listener);
 
+    /**
+     * A scorer of single frames with the models of this engine, for a face device that sends the passive score with
+     * its frames. The quality checks and the head angle limit are those of {@code policy}.
+     *
+     * @throws UnsupportedOperationException when this engine does not score frames on their own
+     */
+    default FrameScorer newFrameScorer(LivenessPolicy policy) {
+        throw new UnsupportedOperationException("this engine does not score frames on their own");
+    }
+
     /** Version of the model set, from models.json, for results and audit. */
     String modelSetVersion();
 

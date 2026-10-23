@@ -16,6 +16,7 @@ import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
 import io.mosip.registration.liveness.ModelResources;
 import io.mosip.registration.liveness.api.FrameDecoder;
+import io.mosip.registration.liveness.api.FrameScorer;
 import io.mosip.registration.liveness.api.LivenessEngine;
 import io.mosip.registration.liveness.api.LivenessEventListener;
 import io.mosip.registration.liveness.api.LivenessMetrics;
@@ -115,6 +116,16 @@ public final class DefaultLivenessEngine implements LivenessEngine {
             modelSetVersion, executor::shutdown);
         metrics.sessionStarted();
         return active;
+    }
+
+    @Override
+    public synchronized FrameScorer newFrameScorer(LivenessPolicy policy) {
+        if (closed) {
+            throw new IllegalStateException("the liveness engine is closed");
+        }
+        Objects.requireNonNull(policy, "policy");
+        return new DefaultFrameScorer(new FrameAnalyzer(detector, classifier, mesh,
+            new QualityChecker(policy.minFacePx(), policy.maxYawDeg())), decoder, clock);
     }
 
     @Override

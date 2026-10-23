@@ -6,6 +6,7 @@
 package io.mosip.registration.liveness.session;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -25,6 +26,7 @@ import javax.imageio.ImageIO;
 import org.junit.jupiter.api.Test;
 
 import io.mosip.registration.liveness.api.FeedbackCode;
+import io.mosip.registration.liveness.api.FrameScorer;
 import io.mosip.registration.liveness.api.LivenessEngine;
 import io.mosip.registration.liveness.api.LivenessEventListener;
 import io.mosip.registration.liveness.api.LivenessPolicy;
@@ -71,6 +73,18 @@ class DefaultLivenessEngineTest {
             assertEquals(1, engine.metrics().framesAnalysed());
             assertEquals(1, engine.metrics().sessions());
         }
+    }
+
+    @Test
+    void aFrameScorerScoresNothingWithoutAFaceAndStopsWithItsEngine() throws Exception {
+        LivenessEngine engine = LivenessEngine.create(new ImageIoFrameDecoder());
+        try (FrameScorer scorer = engine.newFrameScorer(LivenessPolicy.defaults())) {
+            assertFalse(scorer.score(greyJpeg()).isPresent());
+            assertFalse(scorer.score(new byte[] { 1, 2, 3 }).isPresent());
+            assertFalse(scorer.score(null).isPresent());
+        }
+        engine.close();
+        assertThrows(IllegalStateException.class, () -> engine.newFrameScorer(LivenessPolicy.defaults()));
     }
 
     @Test

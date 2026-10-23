@@ -83,6 +83,23 @@ final class SessionFixture {
         return core.current();
     }
 
+    /** As {@link #frame}, with the passive score the device sent with the frame. */
+    LivenessUpdate frame(SessionCore core, ScriptedAnalyzer.Step step, double deviceScore) {
+        t += 100;
+        clock.advance(100);
+        analyzer.then(step);
+        core.onFrame(IMAGE, t, deviceScore);
+        return core.current();
+    }
+
+    LivenessUpdate frames(SessionCore core, int count, ScriptedAnalyzer.Step step, double deviceScore) {
+        LivenessUpdate last = core.current();
+        for (int i = 0; i < count; i++) {
+            last = frame(core, step, deviceScore);
+        }
+        return last;
+    }
+
     LivenessUpdate frames(SessionCore core, int count, ScriptedAnalyzer.Step step) {
         LivenessUpdate last = core.current();
         for (int i = 0; i < count; i++) {
