@@ -85,7 +85,7 @@ session.retry();
 | `activeEnabled` | `active.enabled` | true |
 | `minChallenges` | `active.min_challenges` | 2 |
 | `challengeTypes` | `active.challenge_types` | BLINK, TURN_LEFT, TURN_RIGHT |
-| `challengeTimeoutMs` | `active.challenge_timeout_ms` | 12000 |
+| `challengeTimeoutMs` | `active.challenge_timeout_ms` | 15000 |
 | `baselineMs` | `active.baseline_ms` | 600 |
 | `maxAttempts` | `max_attempts` | 3 |
 | `diagnostic` | `diagnostic.enabled` | false |

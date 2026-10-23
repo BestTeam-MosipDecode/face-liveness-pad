@@ -114,7 +114,7 @@ The sequence cannot be known in advance, so a replayed video cannot perform the 
 ### 5.2 Phases of one challenge
 
 1. **Hold still.** The screen shows "Hold still". The session collects at least 3 good frames over `active.baseline_ms` (added key, default 600 ms) and takes the median of each measure as the baseline.
-2. **Instruction.** The screen shows the instruction, for example "Please blink". The deadline is set to the display time plus `active.challenge_timeout_ms` (default 12 000 ms, 8 000 ms before 23 October 2026).
+2. **Instruction.** The screen shows the instruction, for example "Please blink". The deadline is set to the display time plus `active.challenge_timeout_ms` (default 15 000 ms, 8 000 ms before 23 October 2026).
 3. **Detection.** The action must be observed after the instruction is shown and before the deadline. While it is not, the screen shows "Please continue". When it is, the screen shows "Action detected" and the next challenge starts at step 1.
 
 The hold-still phase counts towards the timeout of the challenge. An action already in progress before the instruction, such as a smile held from the start, raises the baseline and is therefore not counted.
@@ -262,7 +262,7 @@ Every event of the engine carries the workflow, the attempt number, the duration
 | `active.enabled` | `true` | Section 4 |
 | `active.min_challenges` | `2` | Section 5.1 |
 | `active.challenge_types` | `BLINK,TURN_LEFT,TURN_RIGHT` | Section 5.1 |
-| `active.challenge_timeout_ms` | `12000` | Section 5.2 |
+| `active.challenge_timeout_ms` | `15000` | Section 5.2 |
 | `max_attempts` | `3` | Section 7 |
 | `on_max_attempts` | `BLOCK`, and `EXCEPTION` for residents | Section 7.1 |
 | `diagnostic.enabled` | `false` | Sections 8, 9 |
