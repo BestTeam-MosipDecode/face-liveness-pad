@@ -25,6 +25,7 @@ The mode is set by `mosip.mock.sbi.face.source` in `application.properties`, nex
 | `mosip.mock.sbi.face.replay.folder` | none | Folder of `frame_NNNNN.jpg` files, as written by `training/scripts/capture_session.py`, for example `captures/S01/bona_fide/normal_20261019-101500` |
 | `mosip.mock.sbi.face.replay.fps` | `0` | Frames per second of the replay; `0` keeps the timestamps of `metadata.json`, or 10 per second without it |
 | `mosip.mock.sbi.face.replay.end` | `loop` | After the last frame: `loop` starts again, `hold` repeats the last frame (a frozen stream), `stop` returns no frame and no capture (RCAPTURE ends with the timeout error of the device), as an unplugged device |
+| `mosip.mock.sbi.face.liveness.score` | `Y` | `N` to stream the face frames without their passive liveness score (`X-Liveness-Score`); with `Y`, the device scores each frame with `liveness-engine`, which must be installed before the device is built |
 | `mosip.mock.sbi.face.replay.corrupt.every` | `0` | Every Nth streamed frame is truncated to a few bytes, to test a corrupted frame; `0` for none |
 
 In `replay` mode the sequence is paced on the clock from the start of each stream: the device returns the frame due at the time of each request, so the Registration Client sees the sequence at its recorded speed whatever its own request rate. The frames are read once at startup. On Windows, the webcam is opened with the DirectShow backend, which opens in about one second where the default backend took about 20 s.
