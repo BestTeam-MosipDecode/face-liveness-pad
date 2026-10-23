@@ -154,7 +154,7 @@ public final class LivenessPolicy {
         // SMILE is left out of the default: not reliable enough on the team captures (#5). Still configurable.
         private Set<ChallengeType> challengeTypes = EnumSet.of(ChallengeType.BLINK, ChallengeType.TURN_LEFT,
             ChallengeType.TURN_RIGHT);
-        private long challengeTimeoutMs = 8000;
+        private long challengeTimeoutMs = 12000;
         private long baselineMs = 600;
         private int maxAttempts = 3;
         private long passiveTimeoutMs = 20000;
