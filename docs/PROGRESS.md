@@ -17,8 +17,9 @@ Phase 0
 - [x] 0.3 Branche de base choisie : `master` (1.2.0.2). Branche `feature/face-liveness` créée en local dans `registration-client/`, non poussée (7 octobre)
 - [ ] 0.4 Faire tourner le Registration Client non modifié
   - [x] Build de la 1.2.0.2 avec JDK 11.0.32 et Maven 3.9.9 (7 octobre)
-  - [x] `docs/dev-setup-windows.md`, première version (7 octobre). Sections 1 à 3 vérifiées, sections 4 à 7 à vérifier avec Collab.
-  - [ ] Démarrage du client, connexion d'un opérateur, capture du visage avec un dispositif simulé (bloqué, voir Blocages)
+  - [x] `docs/dev-setup-windows.md`, première version (7 octobre). Sections 1 à 4 et 8 vérifiées sur le poste de référence ; sections 5 à 8 et 11 vérifiées sur Collab du 21 au 23 octobre, jusqu'à l'embarquement (issue n° 33).
+  - [x] Démarrage du client et connexion d'un opérateur sur Collab (21 octobre), capture du visage avec vivacité à l'embarquement, avec le dispositif simulé (23 octobre)
+  - [ ] Enregistrement de l'embarquement, refusé par le serveur (`RPR-RCT-001`, voir Blocages)
 - [x] 0.5 Structurer `face-liveness-pad/` (7 octobre). Pull Request n° 1 fusionnée dans `main` par Elisée le 7 octobre.
 - [x] 0.6 Analyse de Silent-Face-Anti-Spoofing (7 octobre, faite avant 0.5). Spécification de prétraitement dans `training/README.md`, vérifiée par exécution sur les trois images d'exemple.
 - [x] 0.7 Issues GitHub et répartition (7 octobre). 12 étiquettes et 37 issues créées sur GitHub, n° 2 à 38, avec responsables et échéances.
