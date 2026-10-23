@@ -47,6 +47,24 @@ class SbiClientTest {
 	}
 
 	@Test
+	void readsThePassiveScoreThatTheDeviceSendsWithAFrame() throws IOException {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		out.write(("--BoundaryString\r\nContent-Type:image/jpeg\r\nX-Liveness-Score:0.9731\r\nContent-Length:"
+				+ FRAME_A.length + "\r\n\r\n").getBytes(StandardCharsets.US_ASCII));
+		out.write(FRAME_A);
+		out.write("\r\n\r\n".getBytes(StandardCharsets.US_ASCII));
+		out.write(stream(FRAME_B).readAllBytes());
+		InputStream in = new ByteArrayInputStream(out.toByteArray());
+		SbiClient.Frame scored = SbiClient.readScoredFrame(in);
+		assertArrayEquals(FRAME_A, scored.image);
+		assertEquals(0.9731, scored.livenessScore, 0.0);
+		SbiClient.Frame unscored = SbiClient.readScoredFrame(in);
+		assertArrayEquals(FRAME_B, unscored.image);
+		assertNull(unscored.livenessScore);
+		assertNull(SbiClient.livenessScore("X-Liveness-Score:NaN\r\n"));
+	}
+
+	@Test
 	void aTruncatedFrameEndsTheStream() throws IOException {
 		byte[] whole = stream(FRAME_A).readAllBytes();
 		byte[] truncated = java.util.Arrays.copyOf(whole, whole.length - 6);

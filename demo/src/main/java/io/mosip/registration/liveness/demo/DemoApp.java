@@ -313,10 +313,15 @@ public final class DemoApp extends Application {
 				device = client;
 				Platform.runLater(() -> status.setText(statusLine()));
 			}
-			client.stream(frame -> {
+			client.stream((frame, livenessScore) -> {
 				latestFrame.set(frame);
 				lastStreamed = frame;
-				target.submit(frame, nowMs());
+				// The passive score of the device, when it sends one, replaces the score of the engine.
+				if (livenessScore != null) {
+					target.submit(frame, nowMs(), livenessScore);
+				} else {
+					target.submit(frame, nowMs());
+				}
 			});
 			deviceStopped(target, DeviceEvent.STREAM_INTERRUPTED, "The stream of the face device ended.");
 		} catch (IOException exception) {
