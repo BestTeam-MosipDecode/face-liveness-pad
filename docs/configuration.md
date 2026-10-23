@@ -92,6 +92,7 @@ These keys keep their current meaning. Liveness does not change them.
 | `mosip.registration.face_threshold` | `90` | Quality threshold of the captured face image |
 | `mosip.face_authentication.quality_score` | `30` | Quality threshold of a face captured for authentication |
 | `mosip.registration.face_recapture_time` | `5` | Existing recapture setting of the client |
+| `mosip.registration.capture_time_out` | not set: the client uses `60000` | Duration of the device stream and of the capture request, in ms. The device ends the stream at this timeout, so the whole liveness check and the capture must fit in it: at least `passive.timeout_ms` + `active.min_challenges` × `active.challenge_timeout_ms` + the capture time, about 55 000 ms with the defaults. On Collab it is about 10 000 ms, kept as it is (decision of 23 October 2026): a check there has to finish within about 10 s |
 
 ## 6. Snippet for `registration-default.properties`
 
