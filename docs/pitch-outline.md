@@ -168,15 +168,16 @@ These figures come from two team members recorded under normal light, low light 
 
 On the slide:
 
-- Demo application: the real engine, the simulated device in webcam mode over SBI, the real status pane of the client
-- Scene 1, live face: passive check, then random challenges, then the captured image is checked
+- Demo application: the real engine, the simulated device in webcam mode over SBI, which scores each frame, the real status pane of the client
+- Scene 1, live face: passive score of the device, then random challenges, then the captured image is checked
 - Scene 2, printed photo then phone screen: refused with the generic message
 - Scene 3, comparison: with a passive pass allowed at 0.85, the same live face passes in a second or two
 - Scene 4: operator and supervisor workflows, attempts exhausted, offline run, configuration
+- On Collab, if it answers: the modified Registration Client, onboarding of the operator with liveness
 
 Speaker notes:
 
-The demo runs the same engine and the same status pane as our fork, fed by the simulated device over SBI, as the Registration Client would feed them. We first show a live face: the passive check scores it, the random challenges complete the session, and the captured image is checked. Next, a printed photo and a phone screen are refused with the generic message. For comparison, we allow a passive pass at 0.85: the same face then passes without any action, which is what a glossy print achieved on our second subject. We end with the operator and supervisor workflows, the end of the attempts, a run with the network turned off and the configuration keys. If a MOSIP environment is available on the day, we also show the modified Registration Client; otherwise the demo application stands for it, with the same components.
+The demo runs the same engine and the same status pane as our fork, fed by the simulated device over SBI, as the Registration Client would feed them. We first show a live face: the passive check scores it, the random challenges complete the session, and the captured image is checked. Next, a printed photo and a phone screen are refused with the generic message. For comparison, we allow a passive pass at 0.85: the same face then passes without any action, which is what a glossy print achieved on our second subject. We end with the operator and supervisor workflows, the end of the attempts, a run with the network turned off and the configuration keys. If the Collab environment answers on the day, we also show the modified Registration Client during the onboarding of an operator, as in the video; otherwise the demo application stands for it, with the same components.
 
 ## Slide 13: Limits and next steps
 
