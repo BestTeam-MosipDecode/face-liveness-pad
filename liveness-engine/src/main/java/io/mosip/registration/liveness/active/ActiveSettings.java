@@ -14,7 +14,7 @@ public final class ActiveSettings {
     /** {@code active.baseline_ms}. */
     private long baselineMs = 600;
     /** {@code active.challenge_timeout_ms}. */
-    private long challengeTimeoutMs = 8000;
+    private long challengeTimeoutMs = 15000;
     /** {@code passive.threshold.attack}. */
     private double attackThreshold = 0.30;
     /** {@code passive.min_frames}. */

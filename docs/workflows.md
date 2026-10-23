@@ -79,7 +79,7 @@ Liveness runs inside the client process, the face comparison for authentication 
 In a registration centre, the screen usually faces the operator, not the resident. The active challenges ask the resident to act within a few seconds. Both of the following are provided (decision of 7 October 2026, to implement in #24):
 
 - the client shows the instruction in a large font, readable from the resident's seat, or on a second screen turned towards the resident when the centre has one. This is the default;
-- the operator also sees the instruction and reads it aloud when the resident cannot see the screen. The challenge timeout (`active.challenge_timeout_ms`, 8 seconds) leaves time for it.
+- the operator also sees the instruction and reads it aloud when the resident cannot see the screen. The challenge timeout (`active.challenge_timeout_ms`, 15 seconds) leaves time for it.
 
 For operator and supervisor authentication, the person in front of the camera also reads the screen, so the question does not arise.
 

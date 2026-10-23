@@ -92,17 +92,18 @@ class ChallengeRunnerTest {
     @Test
     void timeoutWhenTheActionIsNotPerformed() {
         ChallengeRunner runner = runner(ChallengeType.BLINK);
+        long timeoutMs = new ActiveSettings().challengeTimeoutMs();
         holdStill(runner);
         ChallengeStatus status = runner.status();
         while (!status.isFinished()) {
             status = next(runner, BASE);
             if (!status.isFinished()) {
-                assertTrue(t <= 8000);
+                assertTrue(t <= timeoutMs);
             }
         }
         assertEquals(Outcome.CHALLENGE_TIMEOUT, status.outcome());
         assertEquals(Feedback.FAILED, status.feedback());
-        assertEquals(8100, t);
+        assertEquals(timeoutMs + 100, t);
     }
 
     @Test
