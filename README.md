@@ -20,11 +20,11 @@ Target: Registration Client 1.2.0.2 (desktop, Java 11). Submission for MOSIP Dec
 | Component | Where | Status |
 | --- | --- | --- |
 | Liveness engine in Java | `liveness-engine/` | Passive and active checks, session state machine, captured image check, model check at startup, public API. 189 tests |
-| Registration Client integration | [fork of `mosip/registration-client`](https://github.com/BestTeam-MosipDecode/registration-client), branch `feature/face-liveness` | Configuration keys, stream to engine, audit events, resident face capture gated on liveness with the exception process after the last attempt, operator and supervisor face authentication gated on liveness, status pane on the capture and authentication screens, signature check of the engine jar. Left: the check on screen with the simulated device and a MOSIP environment |
+| Registration Client integration | [fork of `mosip/registration-client`](https://github.com/BestTeam-MosipDecode/registration-client), branch `feature/face-liveness` | Configuration keys, stream to engine, audit events, resident face capture gated on liveness with the exception process after the last attempt, operator and supervisor face authentication gated on liveness, the face enrolled at onboarding gated on liveness, status pane on the capture, authentication and onboarding screens, signature check of the engine jar. Checked on the MOSIP Collab environment up to the operator onboarding (liveness verified), which the server refused; reported to MOSIP |
 | Simulated L0/L1 device | `mock-sbi/` | `static`, `webcam` and `replay` modes, failure simulation, scenario runner |
 | Demo application | `demo/` | Standalone JavaFX demo of the whole check: the engine, the status pane and the messages of the modified client, the simulated device over SBI. Runs without a MOSIP environment |
 | Reference pipeline in Python | `training/` | Models exported to ONNX and checked, reference detection, crop and landmarks, evaluation script, capture tools. Team captures in progress |
-| Documentation | `docs/` | Design documents as built, setup guide, screen mock-ups, messages in three languages, test plan. Test results to come |
+| Documentation | `docs/` | Design documents as built, setup guide verified on Collab, screen mock-ups, messages in three languages, test plan and results |
 
 ## Repository structure
 
@@ -68,7 +68,7 @@ On Windows, with JDK 11 and Maven 3. The steps, the errors to expect and how to 
    ```
 
 4. Start the simulated face device: [mock-sbi/README.md](mock-sbi/README.md).
-5. Run the client against a MOSIP environment: sections 5 to 7 of [docs/dev-setup-windows.md](docs/dev-setup-windows.md).
+5. Run the client against a MOSIP environment: sections 5 to 8 and 11 of [docs/dev-setup-windows.md](docs/dev-setup-windows.md), as verified on Collab.
 6. Without a MOSIP environment, run the demo application, which uses the same engine, status pane and device calls: [demo/README.md](demo/README.md).
 
 The Python tools (model export, evaluation, captures) are described in [training/README.md](training/README.md). The design documents are listed in [docs/README.md](docs/README.md).
