@@ -123,14 +123,22 @@ final class SessionCore {
 
     /** One frame of the stream, or null when it could not be decoded. */
     void onFrame(BgrImage image, long t) {
+        onFrame(image, t, null);
+    }
+
+    /**
+     * One frame of the stream with the passive score the face device computed for it, or null when the device sent
+     * none (section 4 of docs/decision-flow.md).
+     */
+    void onFrame(BgrImage image, long t, Double deviceScore) {
         try {
-            onFrameNow(image, t);
+            onFrameNow(image, t, deviceScore);
         } finally {
             deliver();
         }
     }
 
-    private void onFrameNow(BgrImage image, long t) {
+    private void onFrameNow(BgrImage image, long t, Double deviceScore) {
         if (closed) {
             return;
         }
@@ -160,6 +168,11 @@ final class SessionCore {
             return;
         }
         metrics.frameAnalysed(clock.millis() - started);
+        // The score of the device replaces the one of the client, on the frames the client can use: one face, quality
+        // and head angle checked here. A score outside 0 to 1 is not a score.
+        if (deviceScore != null && analysis.score() != null && deviceScore >= 0 && deviceScore <= 1) {
+            analysis = analysis.withScore(deviceScore);
+        }
         imageWidth = image.width();
         imageHeight = image.height();
         switch (state) {

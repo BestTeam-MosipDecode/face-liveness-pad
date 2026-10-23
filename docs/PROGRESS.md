@@ -179,6 +179,11 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 - 23 octobre. L'embarquement capturait le visage sans vivacité (`BiometricsController`, écart n° 1). Vivacité ajoutée (registration-client#15), puis panneau compact et consignes de rotation avec flèche et retour face à la caméra (#16). Sur Collab, vivacité vérifiée et visage capturé à l'embarquement.
 - 23 octobre. Le flux du dispositif dure `mosip.registration.capture_time_out`, environ 10 s sur Collab : une vérification plus longue échoue (flux coupé, puis `error 700` du dispositif à la capture). Laissé tel quel, voir Décisions.
 - 23 octobre. L'enregistrement de l'embarquement est refusé par le serveur : `RPR-RCT-001`, « Unable to access API », à 8 h 11 min 41 s UTC. Le client 1.2.0.2 n'affichait que « ERROR », à cause d'une exception sur une réponse d'IDA sans objet `response` ; corrigé dans registration-client#17. Signalé à Varaniya par e-mail le 23 octobre, avec les questions de l'AMA du 22 octobre, qui a été manquée (Q15, Q16, Android).
+- 23 octobre. Réponses de Varaniya par e-mail :
+  - embarquement : MOSIP demande comment le compte opérateur a obtenu son UIN, la comparaison se faisant avec l'identité de ce UIN. Réponse d'Elisée : compte fourni par MOSIP le 16 octobre, sans UIN ; demande de rattacher un UIN au compte ou d'indiquer comment l'obtenir ;
+  - paquet (Q15) : quand la vivacité échoue, le résident fait les défis, qui doivent figurer dans les détails du paquet ;
+  - emplacement de la vivacité (Q16) : détectée par le dispositif (Mock-MDS) ; si le score n'atteint pas le seuil, le client lance les défis ;
+  - Android : la note de conception suffit.
 - Réponses de Varaniya sur le forum, le 21 octobre, aux questions d'Elisée du 20 octobre :
   - Collab : l'accès est fourni, signaler tout problème ;
   - démonstration : MOSIP compte sur une démonstration sur Collab, l'application de démo reste la solution de repli ;
@@ -401,6 +406,8 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - 23 octobre. Délai par action (`active.challenge_timeout_ms`) porté de 8 à 15 s par défaut pour les trois parcours, dans le moteur et dans le prototype Python. Aux essais de l'embarquement sur Collab, 8 s puis 12 s se sont révélées trop courtes pour lire la consigne et faire l'action. Les résultats déjà publiés restent ceux mesurés à 8 s. Les échecs venaient aussi de la consigne de rotation, qui ne disait pas de revenir face à la caméra (corrigée dans registration-client#16), et de la durée du flux sur Collab (entrée suivante). Décidé par Elisée.
 - 23 octobre. Vivacité ajoutée à l'embarquement des opérateurs et des superviseurs (option A), réalisée par Magloire04 : le visage enregistré à l'embarquement sert de référence à toutes les connexions par le visage. Réglages du parcours `OPERATOR`, blocage après la dernière tentative (registration-client#15 et #16, `docs/workflows.md`, section 2.4). Décidé par Elisée.
 - 23 octobre. Durée du flux vidéo laissée à `mosip.registration.capture_time_out` de l'environnement, sans changement du client. Sur Collab, environ 10 s : une vérification doit y tenir dans ce temps. La valeur recommandée pour un déploiement est dans `docs/configuration.md`, section 5. Décidé par Elisée.
+- 23 octobre. Score passif calculé dans le dispositif, comme MOSIP l'a demandé (option B) : le dispositif simulé note chaque image avec les modèles du moteur et envoie le score avec elle (`X-Liveness-Score`) ; le client l'utilise à la place du sien et lance les défis s'il n'atteint pas le seuil. Sans score du dispositif, le client calcule le sien. Face-liveness-pad#115 et registration-client#18. Décidé par Elisée.
+- 23 octobre. La vérification de chaque visage part dans le paquet (entrée `faceLiveness` des métadonnées : décision, tentative, source du score passif, défis et résultat de chacun, version des modèles ; sans image ni score), en plus de `faceLivenessException`. Registration-client#18. Décidé par Elisée.
 
 ## Blocages
 

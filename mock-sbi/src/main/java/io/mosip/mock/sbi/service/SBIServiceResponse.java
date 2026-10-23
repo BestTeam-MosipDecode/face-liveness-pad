@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
 
@@ -791,7 +792,9 @@ public class SBIServiceResponse {
                 {
                     try
                     {
-                        renderJPGImageData (socket, deviceHelper.getCaptureInfo().getImage());
+                        renderJPGImageData (socket, deviceHelper.getCaptureInfo().getImage(),
+                        	deviceHelper.getCaptureInfo() instanceof SBIFaceCaptureInfo
+                        		? ((SBIFaceCaptureInfo) deviceHelper.getCaptureInfo()).getLivenessScore() : null);
                     }
                     catch (Exception ex)
                     {
@@ -2391,19 +2394,19 @@ public class SBIServiceResponse {
          return header.getBytes(StandardCharsets.US_ASCII);
      }
 	 
-	private void renderJPGImageData (Socket socket, byte[] image) throws IOException
+	private void renderJPGImageData (Socket socket, byte[] image, Double livenessScore) throws IOException
     {
         if (image != null && socket != null && !socket.isClosed())
-            writeFrame (socket, image);
+            writeFrame (socket, image, livenessScore);
     }
 	
-	private void writeFrame (Socket socket, byte[] image) throws IOException
+	private void writeFrame (Socket socket, byte[] image, Double livenessScore) throws IOException
     {
         // prepare image data
         byte[] imageInByte = image;
         
         // prepare header
-        byte [] header = createHeader (imageInByte.length);
+        byte [] header = createHeader (imageInByte.length, livenessScore);
         // prepare footer
         byte [] footer = createFooter ();
 
@@ -2416,12 +2419,17 @@ public class SBIServiceResponse {
         outputStream.flush();
    	}
 
-	private byte [] createHeader (int length)
+	/**
+	 * Header of one frame of the stream. A face frame scored by the device carries its passive liveness score, from 0
+	 * to 1, in {@code X-Liveness-Score} (FacePassiveScorer); the client reads it, other clients ignore it.
+	 */
+	static byte [] createHeader (int length, Double livenessScore)
 	{
          String header =
              "--BoundaryString\r\n" +
     		 "Access-Control-Allow-Origin:*\r\n" +
              "Content-Type:image/jpeg\r\n" +
+             (livenessScore != null ? String.format(Locale.ROOT, "X-Liveness-Score:%.4f\r\n", livenessScore) : "") +
              "Content-Length:" + length + "\r\n\r\n"; // there are always 2 new line character before the actual data
 
          // using ascii encoder is fine since there is no international character used in this string.

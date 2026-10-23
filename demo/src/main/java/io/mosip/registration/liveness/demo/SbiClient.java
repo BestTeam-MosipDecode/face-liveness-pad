@@ -18,7 +18,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.UUID;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -80,18 +80,18 @@ final class SbiClient {
 
 	/**
 	 * Reads the stream until it ends or {@link #stopStream()} is called, and hands each JPEG frame to
-	 * {@code onFrame} on the calling thread.
+	 * {@code onFrame} on the calling thread, with the passive liveness score the device sent with it, or null.
 	 */
-	void stream(Consumer<byte[]> onFrame) throws IOException {
+	void stream(BiConsumer<byte[], Double> onFrame) throws IOException {
 		ObjectNode request = JSON.createObjectNode().put("deviceId", deviceId).put("deviceSubId", "0")
 				.put("timeout", STREAM_TIMEOUT_MS);
 		try (Socket socket = open()) {
 			streamSocket = socket;
 			send(socket, "STREAM", "/stream", request);
 			InputStream in = new BufferedInputStream(socket.getInputStream());
-			byte[] frame;
-			while ((frame = readFrame(in)) != null) {
-				onFrame.accept(frame);
+			Frame frame;
+			while ((frame = readScoredFrame(in)) != null) {
+				onFrame.accept(frame.image, frame.livenessScore);
 			}
 		} finally {
 			streamSocket = null;
@@ -159,17 +159,39 @@ final class SbiClient {
 		}
 	}
 
-	/**
-	 * Next frame of the stream, with the steps of {@code Streamer.retrieveNextImage} of the client: the part header up
-	 * to {@code Content-Length:}, its value, the first 0xFF byte, then the frame. Null at the end of the stream.
-	 */
+	/** One frame of the stream, with the passive liveness score the device sent in its header, or null. */
+	static final class Frame {
+		final byte[] image;
+		final Double livenessScore;
+
+		Frame(byte[] image, Double livenessScore) {
+			this.image = image;
+			this.livenessScore = livenessScore;
+		}
+	}
+
+	/** Next frame of the stream without its score, or null at the end of the stream. */
 	static byte[] readFrame(InputStream in) throws IOException {
+		Frame frame = readScoredFrame(in);
+		return frame == null ? null : frame.image;
+	}
+
+	/**
+	 * Next frame of the stream, with the steps of {@code Streamer.readFrame} of the client: the part header up to
+	 * {@code Content-Length:}, with the {@code X-Liveness-Score} of a device that scores its frames, the length, the
+	 * first 0xFF byte, then the frame. Null at the end of the stream.
+	 */
+	static Frame readScoredFrame(InputStream in) throws IOException {
 		byte[] marker = "Content-Length:".getBytes(StandardCharsets.US_ASCII);
+		StringBuilder header = new StringBuilder();
 		int matched = 0;
 		while (matched < marker.length) {
 			int b = in.read();
 			if (b < 0) {
 				return null;
+			}
+			if (header.length() < 1024) {
+				header.append((char) b);
 			}
 			matched = b == marker[matched] ? matched + 1 : (b == marker[0] ? 1 : 0);
 		}
@@ -198,7 +220,27 @@ final class SbiClient {
 			}
 			read += n;
 		}
-		return frame;
+		return new Frame(frame, livenessScore(header.toString()));
+	}
+
+	/** The value of {@code X-Liveness-Score} in a frame header, or null, as {@code Streamer.livenessScore} reads it. */
+	static Double livenessScore(String frameHeader) {
+		String name = "X-Liveness-Score:";
+		int start = frameHeader.indexOf(name);
+		if (start < 0) {
+			return null;
+		}
+		start += name.length();
+		int end = start;
+		while (end < frameHeader.length() && frameHeader.charAt(end) != '\r' && frameHeader.charAt(end) != '\n') {
+			end++;
+		}
+		try {
+			double score = Double.parseDouble(frameHeader.substring(start, end).trim());
+			return Double.isFinite(score) ? score : null;
+		} catch (NumberFormatException exception) {
+			return null;
+		}
 	}
 
 	/** Payload of a compact JWS, without checking the signature: the client checks it against the device trust. */

@@ -44,6 +44,8 @@ public class SBIFaceHelper extends SBIDeviceHelper {
 		SBIFaceCaptureInfo captureInfo = new SBIFaceCaptureInfo ();
 		captureInfo.initCaptureInfo();
 		setCaptureInfo (captureInfo);
+		// Loads the liveness models before the first stream rather than during it.
+		FacePassiveScorer.get();
 		if (frameSource != null)
 		{
 			try {
@@ -72,6 +74,9 @@ public class SBIFaceHelper extends SBIDeviceHelper {
 		if (image == null || image.length == 0)
 			return -1;
 		getCaptureInfo ().setImage(image);
+		// Passive liveness score of the frame, sent with it in the stream.
+		FacePassiveScorer scorer = FacePassiveScorer.get();
+		((SBIFaceCaptureInfo) getCaptureInfo ()).setLivenessScore(scorer != null ? scorer.score(image) : null);
 		
 		return 0;
 	}

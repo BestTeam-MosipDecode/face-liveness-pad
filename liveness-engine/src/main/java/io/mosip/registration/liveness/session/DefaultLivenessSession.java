@@ -47,6 +47,11 @@ final class DefaultLivenessSession implements LivenessSession {
     }
 
     @Override
+    public void submit(byte[] encodedFrame, long timestampMs, double deviceScore) {
+        worker.offerFrame(timestampMs, () -> core.onFrame(decode(encodedFrame), timestampMs, deviceScore));
+    }
+
+    @Override
     public void deviceEvent(DeviceEvent event, long timestampMs) {
         Objects.requireNonNull(event, "event");
         worker.run(() -> core.onDeviceEvent(event, timestampMs));

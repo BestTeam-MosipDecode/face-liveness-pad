@@ -105,6 +105,11 @@ public final class FrameAnalyzer implements AutoCloseable {
             return score;
         }
 
+        /** The same analysis with another frame score, for a score computed by the face device. */
+        public FrameAnalysis withScore(double frameScore) {
+            return new FrameAnalysis(timestampMs, faces, quality, frameScore, measures);
+        }
+
         /** Face Mesh measures, computed in the active check only. */
         public FaceMeasures measures() {
             return measures;

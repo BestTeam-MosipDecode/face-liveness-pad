@@ -27,6 +27,16 @@ public interface LivenessSession extends AutoCloseable {
      */
     void submit(byte[] encodedFrame, long timestampMs);
 
+    /**
+     * As {@link #submit(byte[], long)}, with the passive score that the face device computed for the frame and sent
+     * with it (section 4 of docs/decision-flow.md). On a frame that the session can use, this score replaces the one
+     * the session would compute; a score outside 0 to 1 is ignored. Without a device score, use
+     * {@link #submit(byte[], long)}.
+     */
+    default void submit(byte[] encodedFrame, long timestampMs, double deviceScore) {
+        submit(encodedFrame, timestampMs);
+    }
+
     /** Reports a device problem. Never skipped. Counts as a failed attempt once a frame has been analysed. */
     void deviceEvent(DeviceEvent event, long timestampMs);
 

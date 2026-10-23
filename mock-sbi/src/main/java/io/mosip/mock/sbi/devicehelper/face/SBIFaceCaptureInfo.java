@@ -13,6 +13,8 @@ public class SBIFaceCaptureInfo extends SBICaptureInfo {
 	private int requestScoreFace;
 	private int captureScoreFace;
 	private boolean isCaptureFace;
+	// Passive liveness score of the last streamed frame (FacePassiveScorer), or null.
+	private Double livenessScore;
 	
 	private String bioValueExceptionPhoto;
 	private String bioSubTypeExceptionPhoto;
@@ -75,6 +77,14 @@ public class SBIFaceCaptureInfo extends SBICaptureInfo {
 
 	public void setCaptureScoreFace(int captureScoreFace) {
 		this.captureScoreFace = captureScoreFace;
+	}
+
+	public Double getLivenessScore() {
+		return livenessScore;
+	}
+
+	public void setLivenessScore(Double livenessScore) {
+		this.livenessScore = livenessScore;
 	}
 
 	public boolean isCaptureFace() {

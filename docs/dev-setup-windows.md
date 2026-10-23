@@ -167,7 +167,7 @@ cd target
 .\run_reg.bat
 ```
 
-The device listens on the first free port from 4501, where the client discovers it. `python mock-sbi\scripts\check_device.py`, from the root of the repository, calls it the way the client does and checks each answer.
+The device depends on `liveness-engine`, which scores each face frame in the device (section 3 first). The device listens on the first free port from 4501, where the client discovers it. `python mock-sbi\scripts\check_device.py`, from the root of the repository, calls it the way the client does and checks each answer.
 
 An antivirus can take the device for a threat: it opens a local server, loads a private test key and signs its answers. On the reference machine, the behaviour shield of Avast stopped the device during a replay run and moved `mock-mds-1.2.0.2.jar` to quarantine without showing any dialog. The next start then fails with `Could not find or load main class io.mosip.mock.sbi.test.TestMockSBI`. Add an exception for the build folder, `face-liveness-pad\mock-sbi\target\*`, in the antivirus settings, then build the device again.
 
@@ -178,7 +178,7 @@ An antivirus can take the device for a threat: it opens a local server, loads a 
 3. Set `mosip.mock.sbi.quality.score=94`. The device reports a fixed quality, and Collab requires 90 % for the onboarding face: with the default of 44, the **Save** button stays disabled.
 4. For a live face, keep `mosip.mock.sbi.face.source=webcam`, then restart the device.
 
-`mock-sbi\target` is ignored by Git. Never copy these keys or their password into a tracked file.
+`mock-sbi\target` is ignored by Git. Never copy these keys or their password into a tracked file. A rebuild of the device copies `application.properties` and `Biometric Devices` into `target` again and replaces these settings: keep a copy of `target\application.properties` outside the repository and put it back after each build.
 
 ## 9. Face liveness settings
 

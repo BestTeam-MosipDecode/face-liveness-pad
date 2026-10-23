@@ -28,6 +28,7 @@ The capture request leaves at the same time as the stream. When the device retur
 | Stream | Start the stream with a frame listener that submits each frame to the session. The preview keeps working as before |
 | Capture request | Call `rCaptureTaskService()` only when the session reaches `PASSED`, instead of at the start of the stream |
 | Captured image | Submit the image returned by `RCAPTURE` to the session for the check of section 6 of the decision flow, before the existing quality and duplicate checks |
+| Packet | Carry the liveness check of each face in the `faceLiveness` entry of the meta data: decision, attempt, source of the passive score, challenges and their result (section 7.1 of the decision flow) |
 | Failure | Show the message of the feedback code. Offer a new attempt while attempts are left |
 | Last attempt failed | Offer the exception process: one capture without liveness decision, liveness exception mark, supervisor authentication at submission (decision flow, section 7.1) |
 

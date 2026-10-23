@@ -59,6 +59,7 @@ Content-Length:<n>\r\n
 
 - **Frame source.** One fixed JPEG, `Biometric Devices/Face/Stream Image/0.jpeg` (490 x 360), read again from disk for every frame.
 - **Rate.** About 30 frames per second (`Thread.sleep(30)` between frames).
+- **Passive liveness score.** Since 23 October 2026, the project device scores each face frame with the models of `liveness-engine` and writes `X-Liveness-Score:<0 to 1>\r\n` before `Content-Length`, as MOSIP asked that the passive score come from the device ([decision-flow.md](decision-flow.md), section 4). A frame without a usable face goes without it, and `mosip.mock.sbi.face.liveness.score=N` turns it off. Scoring takes 50 to 70 ms per frame on the reference machine, so the stream of the webcam falls to about 6 frames per second, above the sampling of the client (one frame every 100 ms). The mock MDS of MOSIP sends no score: the client then scores the frames itself.
 - **End of stream.** At the request timeout, after a successful `RCAPTURE`, or when the client closes the socket. The service then writes a second HTTP response on the same socket, which the client ignores.
 - **Stream during `RCAPTURE`.** Measured in webcam mode on 21 October 2026 (Windows 11, JDK 11): frames keep coming while `RCAPTURE` runs, and the stream ends with the capture. Without `RCAPTURE`, a 20 s stream runs to its timeout. The client keeps passing the frames received during `RCAPTURE` to the liveness session; after the capture request, the end of the stream is not counted as an interruption (`LivenessFrameSource.captureRequested`).
 

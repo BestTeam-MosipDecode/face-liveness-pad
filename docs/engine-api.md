@@ -39,6 +39,8 @@ LivenessSession session = engine.newSession(Workflow.RESIDENT, policy, new Liven
 
 // For each frame of the device stream (Streamer thread), with a monotonic clock:
 session.submit(jpegBytes, System.nanoTime() / 1_000_000);
+// Or, when the device sent the passive score of the frame (X-Liveness-Score), with that score:
+session.submit(jpegBytes, System.nanoTime() / 1_000_000, deviceScore);
 
 // When the capture request returns: RCAPTURE gives an ISO/IEC 19794-5 record holding a JPEG 2000 image.
 ConvertRequestDto request = new ConvertRequestDto();
@@ -53,6 +55,13 @@ if (check.accepted()) {
 // After a failure, if update.retryAvailable():
 captureRequested.set(false);
 session.retry();
+```
+
+On a frame that the session can use, the score given by the device replaces the score of the session ([decision-flow.md](decision-flow.md), section 4). The device side scores its frames with the same models:
+
+```java
+FrameScorer scorer = engine.newFrameScorer(LivenessPolicy.defaults());   // once, in the device
+OptionalDouble score = scorer.score(jpegBytes);   // empty without one face that passes the quality checks
 ```
 
 ## 3. Life cycle

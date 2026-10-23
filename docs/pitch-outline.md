@@ -49,7 +49,7 @@ The feature serves the people in a registration centre and the organisations tha
 
 On the slide:
 
-- Passive check first: two MiniFASNet models score the frames of the stream and reject clear attacks at once
+- Passive check first, in the face device as MOSIP asked: two MiniFASNet models score each frame, and clear attacks are rejected at once
 - Then random facial actions in every session: blink, head turn left or right (smile available by configuration)
 - Capture or authentication only after `PASSED`, then the image returned by `RCAPTURE` is checked again
 - Retry policy, then the MOSIP exception process for a resident, another sign-in method for an operator or supervisor
@@ -64,7 +64,7 @@ The decision follows the hybrid approach of the problem statement. The passive c
 On the slide:
 
 - Image: `docs/diagrams/components.svg`
-- Device, real or simulated, over SBI (`STREAM`, `RCAPTURE`) through the existing SBI providers of the client
+- Device, real or simulated, over SBI (`STREAM`, `RCAPTURE`) through the existing SBI providers of the client; the simulated device scores each frame and sends the score with it
 - `liveness-engine`: a separate Java 11 module with its own API, no dependency on the client or JavaFX
 - Client side: frame source adapter, liveness service, configuration provider, status pane, audit listener
 

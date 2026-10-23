@@ -101,6 +101,8 @@ The median makes the decision robust to a single badly scored frame. With the de
 
 On 21 October 2026, after the second subject (#7), the coordinator set the pass threshold to 1.00 by default for the three workflows: a glossy print of that subject scored 0.999, above part of the live faces, so every session now goes through the challenges. The attack threshold stays 0.30 and still rejects clear attacks at once. Both remain configurable per workflow, and the published figures are preliminary (two subjects).
 
+**Passive score of the device.** MOSIP answered on 23 October 2026 that the passive score should come from the device (MDS), the Registration Client performing the active challenges when it does not reach the threshold. The simulated device of the project (`mock-sbi`) therefore scores each face frame with the same models and sends the score with the frame (header `X-Liveness-Score`, [mock-sbi.md](mock-sbi.md), section 4). The session uses this score instead of its own on the frames that it can use: one face that passes the quality checks of section 3.5 and the yaw limit. A score outside 0 to 1 is ignored. The window, the thresholds and the rest of the decision are unchanged. A device that sends no score, such as the mock MDS of MOSIP, keeps the score of the client of section 3.6. With the pass threshold at 1.00, the score of the device cannot make a session pass without the challenges: it rejects clear attacks and sends the other sessions to the active check.
+
 If no decision is reached within `passive.timeout_ms` after the first frame (added key, default 20 000 ms), the attempt fails with the guidance code given most often during that time: `NO_FACE`, `MULTIPLE_FACES` or `LOW_QUALITY`.
 
 ## 5. Active check
@@ -196,6 +198,14 @@ The exception process for liveness reuses that path:
 Once the face is stored, the screen shows `LIVENESS_EXCEPTION_CAPTURED` with `LIVENESS_EXCEPTION_SUPERVISOR` in the place of the attempts exhausted. A new scan of a marked field, with no attempt left, goes through the exception again, so the operator can take a better image. The mark goes with the face of its field: when the client clears that face (field hidden, face no longer required) or the whole registration, the mark is removed; the audit event stays. These two points are in registration-client#13.
 
 The `faceLivenessException` entry is provisional: how the mark travels in the packet is to be confirmed with the mentors (Q15), since it is read on the server side. The client changes are in registration-client#9.
+
+**Liveness check in the packet.** MOSIP answered on 23 October 2026 that the active challenges performed have to be carried in the packet details. Next to `faceLivenessException`, the meta data of the packet holds a `faceLiveness` entry: a JSON object with one member per face field. For a face stored after liveness, it gives `decision` (`PASSED`), `attempt`, `maxAttempts`, `passiveScore` (`DEVICE` or `CLIENT`, the source of the passive score), `challenges` (each with its `type` and its `result`) and `modelSetVersion`. For a face captured under the exception process, it gives `decision` (`EXCEPTION`) and `attempts`. It holds no image and no score, for example:
+
+```json
+{"individualBiometrics": {"decision": "PASSED", "attempt": 1, "maxAttempts": 3, "passiveScore": "DEVICE",
+  "challenges": [{"type": "BLINK", "result": "PASSED"}, {"type": "TURN_LEFT", "result": "PASSED"}],
+  "modelSetVersion": "1.1.0"}}
+```
 
 The message `LIVENESS_MAX_ATTEMPTS` refers to the exception process, which does not apply to authentication. The authentication screens need a second key, for example `LIVENESS_MAX_ATTEMPTS_AUTH`: "Face verification could not be completed. Use another sign-in method or contact your supervisor." / « La vérification du visage n'a pas pu aboutir. Utilisez un autre mode de connexion ou contactez votre superviseur. » (#24).
 
