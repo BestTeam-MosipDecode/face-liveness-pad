@@ -34,7 +34,7 @@ class LivenessPolicyTest {
         assertEquals(2, p.minChallenges());
         assertEquals(EnumSet.of(ChallengeType.BLINK, ChallengeType.TURN_LEFT, ChallengeType.TURN_RIGHT), p.challengeTypes(),
             "SMILE is left out of the default, still available in the configuration (#5)");
-        assertEquals(12000, p.challengeTimeoutMs());
+        assertEquals(15000, p.challengeTimeoutMs());
         assertEquals(600, p.baselineMs());
         assertEquals(3, p.maxAttempts());
         assertEquals(20000, p.passiveTimeoutMs());
