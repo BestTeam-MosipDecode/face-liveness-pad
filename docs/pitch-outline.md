@@ -95,11 +95,12 @@ On the slide:
 - Resident face capture: `RCAPTURE` only after `PASSED`; after the last attempt, capture under exception, audited (`REG-EVT-112`), marked in the packet, supervisor required at submission
 - Operator sign-in and packet authentication: liveness before the face is matched; failed liveness attempts count as failed logins
 - Supervisor authentication and end of day approval: same check, supervisor role required, face not offered when liveness is disabled for the supervisor
+- Operator and supervisor onboarding: the reference face goes through the same check before it is enrolled
 - 17 configuration keys, any of them can be set per workflow
 
 Speaker notes:
 
-The three workflows of the problem statement are wired in our fork of release 1.2.0.2. For the resident, the existing capture request now waits for the liveness result. If the resident fails every attempt, the operator can continue under the exception process: the capture is audited, marked in the packet, and a different user with the supervisor role must authenticate at submission. Operator and supervisor authentication have no exception path: the face is refused and another sign-in method is offered. All of it is driven by 17 configuration keys, which can differ per workflow.
+The three workflows of the problem statement are wired in our fork of release 1.2.0.2. For the resident, the existing capture request now waits for the liveness result. If the resident fails every attempt, the operator can continue under the exception process: the capture is audited, marked in the packet, and a different user with the supervisor role must authenticate at submission. Operator and supervisor authentication have no exception path: the face is refused and another sign-in method is offered. The face an operator or a supervisor enrols at onboarding, which every later face sign-in is compared with, goes through the same check. All of it is driven by 17 configuration keys, which can differ per workflow.
 
 ## Slide 8: What the user sees
 
@@ -184,12 +185,12 @@ On the slide:
 - Paper mask worn by another person: known limitation; next step, a dedicated check of mask edges and paper texture
 - Glossy prints can score like live faces: challenges in every session, about 10 s; next step, a complementary passive signal (moiré, #8)
 - Two subjects so far: record more, then confirm the thresholds on held-out subjects
-- On Collab, sign-in and sync work; onboarding waits for renewed device certificates. Android covered by a design note only
+- On Collab, the device is trusted and the onboarding face passes liveness; the server refuses the onboarding itself (`RPR-RCT-001`, reported to MOSIP). Android covered by a design note only
 - Stream injection before the client depends on device integrity (L1 devices), outside PAD
 
 Speaker notes:
 
-We list our limits because the jury will meet them anyway. The cut-out paper mask is the main one: real eyes and a real mouth show through the holes, so the passive classifier scores it like a live face, and its wearer can perform the challenges. Glossy prints of our second subject also scored like live faces, which the random challenges now stop, at the cost of about ten seconds per session. Our results rest on two subjects, so the next step is more subjects and a held-out evaluation before any threshold is called final. On the MOSIP Collab environment, the modified client signs in and synchronises; the operator onboarding waits for device certificates renewed by MOSIP. The Android client is covered by a design note only.
+We list our limits because the jury will meet them anyway. The cut-out paper mask is the main one: real eyes and a real mouth show through the holes, so the passive classifier scores it like a live face, and its wearer can perform the challenges. Glossy prints of our second subject also scored like live faces, which the random challenges now stop, at the cost of about ten seconds per session. Our results rest on two subjects, so the next step is more subjects and a held-out evaluation before any threshold is called final. On the MOSIP Collab environment, the modified client signs in and synchronises, and the face an operator enrols at onboarding passes the liveness check; the server then refuses the onboarding itself, which we reported to MOSIP. The Android client is covered by a design note only.
 
 ## Slide 14: Impact
 

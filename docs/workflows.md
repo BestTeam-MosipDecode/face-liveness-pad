@@ -70,6 +70,16 @@ At login, each failed liveness attempt also counts as a failed login in the exis
 
 Liveness comes before the comparison: an attacker learns nothing about whether a photo would have matched.
 
+### 2.4 Onboarding
+
+Before the first registration, an operator or a supervisor enrols their own biometrics (`BiometricsController`, onboarding mode). The face enrolled there is the reference of every later face sign-in, so it goes through the liveness check of the sign-in (registration-client#15, #16):
+
+- Scan streams the face to a new session with the settings of the `OPERATOR` workflow. The capture is requested once liveness is established, and the captured record is stored only if `LivenessAuthGate` accepts it (check of section 6 of [decision-flow.md](decision-flow.md)). With liveness enabled, a face captured without an established check is refused, so the path fails closed.
+- The face image of this screen is about 290 px wide: the pane uses a compact style. After the last attempt it sends the user to the supervisor (`LIVENESS_MAX_ATTEMPTS_BLOCKED`), without another sign-in method, since the user is already signed in.
+- The attempts are those of the sign-in of the same user. Fingerprints, iris and the exception photo are unchanged.
+
+Checked on Collab on 23 October 2026: liveness verified and face captured. The server then refused the onboarding itself (`RPR-RCT-001`, "Unable to access API"), which was reported to MOSIP. Before registration-client#17, the client of release 1.2.0.2 showed only "ERROR" for any error returned by IDA at onboarding.
+
 ## 3. Online and offline
 
 Liveness runs inside the client process, the face comparison for authentication uses the templates stored on the machine, and the audit events go through the existing audit service of the client, which writes them locally. None of these sequences needs the network. Only configuration updates do, through the existing synchronisation.

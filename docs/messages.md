@@ -22,8 +22,8 @@ Files `messages_en.properties`, `messages_fr.properties`, `messages_ar.propertie
 | `LIVENESS_INSTRUCTION_SOON` | An instruction will appear in a moment. | Une consigne va s'afficher dans un instant. | Under the band, hold-still phase |
 | `LIVENESS_CHALLENGE_BLINK` | Please blink | Veuillez cligner des yeux | Challenge |
 | `LIVENESS_CHALLENGE_SMILE` | Please smile | Veuillez sourire | Challenge |
-| `LIVENESS_CHALLENGE_TURN_LEFT` | Please turn your head to your left | Veuillez tourner la tête vers votre gauche | Challenge |
-| `LIVENESS_CHALLENGE_TURN_RIGHT` | Please turn your head to your right | Veuillez tourner la tête vers votre droite | Challenge |
+| `LIVENESS_CHALLENGE_TURN_LEFT` | ← Please turn your head to your left, then look back at the camera | ← Veuillez tourner la tête vers votre gauche, puis revenir face à la caméra | Challenge |
+| `LIVENESS_CHALLENGE_TURN_RIGHT` | Please turn your head to your right, then look back at the camera → | Veuillez tourner la tête vers votre droite, puis revenir face à la caméra → | Challenge |
 | `LIVENESS_KEEP_GOING` | Please continue | Veuillez continuer | Action not detected yet |
 | `LIVENESS_ACTION_DETECTED` | Action detected | Action détectée | Action detected |
 | `LIVENESS_SUCCESS` | Face captured successfully | Visage capturé avec succès | Captured image accepted |
@@ -83,8 +83,8 @@ Text of `messages_ar.properties` and `labels_ar.properties`, for reading. Head t
 | `LIVENESS_INSTRUCTION_SOON` | ستظهر تعليمات بعد لحظة. |
 | `LIVENESS_CHALLENGE_BLINK` | يُرجى رمش العينين |
 | `LIVENESS_CHALLENGE_SMILE` | يُرجى الابتسام |
-| `LIVENESS_CHALLENGE_TURN_LEFT` | يُرجى إدارة رأسك نحو يسارك |
-| `LIVENESS_CHALLENGE_TURN_RIGHT` | يُرجى إدارة رأسك نحو يمينك |
+| `LIVENESS_CHALLENGE_TURN_LEFT` | يُرجى إدارة رأسك نحو يسارك، ثم انظر إلى الكاميرا مجددًا ← |
+| `LIVENESS_CHALLENGE_TURN_RIGHT` | → يُرجى إدارة رأسك نحو يمينك، ثم انظر إلى الكاميرا مجددًا |
 | `LIVENESS_KEEP_GOING` | يُرجى المتابعة |
 | `LIVENESS_ACTION_DETECTED` | تم رصد الحركة |
 | `LIVENESS_SUCCESS` | تم التقاط الوجه بنجاح |
@@ -136,8 +136,8 @@ LIVENESS_HOLD_STILL=Hold still
 LIVENESS_INSTRUCTION_SOON=An instruction will appear in a moment.
 LIVENESS_CHALLENGE_BLINK=Please blink
 LIVENESS_CHALLENGE_SMILE=Please smile
-LIVENESS_CHALLENGE_TURN_LEFT=Please turn your head to your left
-LIVENESS_CHALLENGE_TURN_RIGHT=Please turn your head to your right
+LIVENESS_CHALLENGE_TURN_LEFT=\u2190 Please turn your head to your left, then look back at the camera
+LIVENESS_CHALLENGE_TURN_RIGHT=Please turn your head to your right, then look back at the camera \u2192
 LIVENESS_KEEP_GOING=Please continue
 LIVENESS_ACTION_DETECTED=Action detected
 LIVENESS_SUCCESS=Face captured successfully
@@ -174,8 +174,8 @@ LIVENESS_HOLD_STILL=Ne bougez plus
 LIVENESS_INSTRUCTION_SOON=Une consigne va s'afficher dans un instant.
 LIVENESS_CHALLENGE_BLINK=Veuillez cligner des yeux
 LIVENESS_CHALLENGE_SMILE=Veuillez sourire
-LIVENESS_CHALLENGE_TURN_LEFT=Veuillez tourner la t\u00eate vers votre gauche
-LIVENESS_CHALLENGE_TURN_RIGHT=Veuillez tourner la t\u00eate vers votre droite
+LIVENESS_CHALLENGE_TURN_LEFT=\u2190 Veuillez tourner la t\u00eate vers votre gauche, puis revenir face \u00e0 la cam\u00e9ra
+LIVENESS_CHALLENGE_TURN_RIGHT=Veuillez tourner la t\u00eate vers votre droite, puis revenir face \u00e0 la cam\u00e9ra \u2192
 LIVENESS_KEEP_GOING=Veuillez continuer
 LIVENESS_ACTION_DETECTED=Action d\u00e9tect\u00e9e
 LIVENESS_SUCCESS=Visage captur\u00e9 avec succ\u00e8s
@@ -212,8 +212,8 @@ LIVENESS_HOLD_STILL=\u0644\u0627 \u062A\u062A\u062D\u0631\u0643
 LIVENESS_INSTRUCTION_SOON=\u0633\u062A\u0638\u0647\u0631 \u062A\u0639\u0644\u064A\u0645\u0627\u062A \u0628\u0639\u062F \u0644\u062D\u0638\u0629.
 LIVENESS_CHALLENGE_BLINK=\u064A\u064F\u0631\u062C\u0649 \u0631\u0645\u0634 \u0627\u0644\u0639\u064A\u0646\u064A\u0646
 LIVENESS_CHALLENGE_SMILE=\u064A\u064F\u0631\u062C\u0649 \u0627\u0644\u0627\u0628\u062A\u0633\u0627\u0645
-LIVENESS_CHALLENGE_TURN_LEFT=\u064A\u064F\u0631\u062C\u0649 \u0625\u062F\u0627\u0631\u0629 \u0631\u0623\u0633\u0643 \u0646\u062D\u0648 \u064A\u0633\u0627\u0631\u0643
-LIVENESS_CHALLENGE_TURN_RIGHT=\u064A\u064F\u0631\u062C\u0649 \u0625\u062F\u0627\u0631\u0629 \u0631\u0623\u0633\u0643 \u0646\u062D\u0648 \u064A\u0645\u064A\u0646\u0643
+LIVENESS_CHALLENGE_TURN_LEFT=\u064A\u064F\u0631\u062C\u0649 \u0625\u062F\u0627\u0631\u0629 \u0631\u0623\u0633\u0643 \u0646\u062D\u0648 \u064A\u0633\u0627\u0631\u0643\u060C \u062B\u0645 \u0627\u0646\u0638\u0631 \u0625\u0644\u0649 \u0627\u0644\u0643\u0627\u0645\u064A\u0631\u0627 \u0645\u062C\u062F\u062F\u064B\u0627 \u2190
+LIVENESS_CHALLENGE_TURN_RIGHT=\u2192 \u064A\u064F\u0631\u062C\u0649 \u0625\u062F\u0627\u0631\u0629 \u0631\u0623\u0633\u0643 \u0646\u062D\u0648 \u064A\u0645\u064A\u0646\u0643\u060C \u062B\u0645 \u0627\u0646\u0638\u0631 \u0625\u0644\u0649 \u0627\u0644\u0643\u0627\u0645\u064A\u0631\u0627 \u0645\u062C\u062F\u062F\u064B\u0627
 LIVENESS_KEEP_GOING=\u064A\u064F\u0631\u062C\u0649 \u0627\u0644\u0645\u062A\u0627\u0628\u0639\u0629
 LIVENESS_ACTION_DETECTED=\u062A\u0645 \u0631\u0635\u062F \u0627\u0644\u062D\u0631\u0643\u0629
 LIVENESS_SUCCESS=\u062A\u0645 \u0627\u0644\u062A\u0642\u0627\u0637 \u0627\u0644\u0648\u062C\u0647 \u0628\u0646\u062C\u0627\u062D
