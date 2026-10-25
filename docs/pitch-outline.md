@@ -12,12 +12,12 @@ On the slide:
 
 - Title: Face liveness and presentation attack detection for registration and biometric authentication
 - MOSIP Decode 2026, problem statement 04
-- Best_Team: Elisée Atonde (coordination and documentation), Temitayo Gbolahan (tests and evaluation), Tobi Obassandjo (engine and Registration Client integration), Silverio Mensah (simulated device)
+- Best_Team: Temitayo Gbolahan (tests and evaluation), Tobi Obassandjo (engine and Registration Client integration)
 - Code: `BestTeam-MosipDecode/face-liveness-pad` and the `feature/face-liveness` branch of the team's fork of `registration-client`, MPL-2.0
 
 Speaker notes:
 
-We are Best_Team, a team of four who worked on problem statement 04. We added a face liveness and presentation attack detection gate to the desktop Registration Client, release 1.2.0.2. It covers the three workflows of the problem statement: resident face capture, operator authentication and supervisor authentication. Everything we show is open source under MPL-2.0, in our repository and in our fork of the client.
+We are Best_Team, and we worked on problem statement 04. We added a face liveness and presentation attack detection gate to the desktop Registration Client, release 1.2.0.2. It covers the three workflows of the problem statement: resident face capture, operator authentication and supervisor authentication. Everything we show is open source under MPL-2.0, in our repository and in our fork of the client.
 
 ## Slide 2: The problem
 
@@ -165,7 +165,7 @@ On the slide:
 
 Speaker notes:
 
-These figures come from two team members recorded under normal light, low light and backlight, so they are preliminary and we present them with their sample size. No live sequence was rejected. On the first subject every print, screen and replayed video was rejected in about one second, but on the second subject two glossy prints and one phone screen scored like live faces. That is why we changed the default: the passive check still rejects clear attacks, and every session now has to pass random challenges, which a print or a still screen cannot do. The paper mask worn by another person remains the weak point, since its wearer can perform the challenges. On a laptop processor without a graphics card, the analysis takes about 56 ms per frame. The full tables are in docs/test-results.md.
+These figures come from two subjects recorded under normal light, low light and backlight, so they are preliminary and we present them with their sample size. No live sequence was rejected. On the first subject every print, screen and replayed video was rejected in about one second, but on the second subject two glossy prints and one phone screen scored like live faces. That is why we changed the default: the passive check still rejects clear attacks, and every session now has to pass random challenges, which a print or a still screen cannot do. The paper mask worn by another person remains the weak point, since its wearer can perform the challenges. On a laptop processor without a graphics card, the analysis takes about 56 ms per frame. The full tables are in docs/test-results.md.
 
 ## Slide 12: Live demo
 
@@ -225,7 +225,7 @@ Our work gives MOSIP deployments a liveness and PAD gate that runs on the regist
 | ONNX Runtime 1.19.2 | `docs/architecture.md`, section 9 |
 | 193 engine tests | `README.md`, status table; surefire reports of `liveness-engine`, 23 October 2026 |
 | Two subjects at 0.85: live faces 9 of 12 in the pass zone (BPCER 0 %), glossy print 33 %, phone screen 17 %, paper mask 33 % | `docs/test-results.md`, section 1.2.1 (#103) |
-| 15 of 15 attacks in 0.8 to 1.5 s, about 56 ms per frame, machine | Comment of Magloire04 on #29 (19 October 2026) |
+| 15 of 15 attacks in 0.8 to 1.5 s, about 56 ms per frame, machine | Comment on #29 (19 October 2026) |
 | Challenges: turn right 3 of 3, turn left 2 of 3, blink 1 of 3 | Comment on #29 |
 | 24 of 24 device stream runs, SBI 0.9.5 and 1.0 | Comment on #29 |
 | Paper mask as a known limitation | `docs/security-privacy.md`, section 3, item 6 |

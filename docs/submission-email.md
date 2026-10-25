@@ -27,10 +27,10 @@ Shared folder (video, pitch deck, design, tests, documents):
 Installation and use: README.md of face-liveness-pad and docs/dev-setup-windows.md.
 Demo without a MOSIP environment: demo/README.md.
 
-Team members: Elisée Atonde, Temitayo Gbolahan, Tobi Obassandjo, Silverio Mensah.
+Team members: Temitayo Gbolahan, Tobi Obassandjo.
 
 Best regards,
-Elisée Atonde, for Best_Team
+Best_Team
 ```
 
 ## Shared folder
