@@ -1,6 +1,6 @@
 # Alignment with ISO/IEC 30107
 
-Status on 19 October 2026: the protocol of section 4 was run on a single subject, so the results are preliminary (sections 4.1 and 5). This document maps the project to the two parts of ISO/IEC 30107 cited by the problem statement:
+Status on 25 October 2026: the protocol of section 4 was run on two subjects, so the results are preliminary (sections 4.1 and 5). This document maps the project to the two parts of ISO/IEC 30107 cited by the problem statement:
 
 - ISO/IEC 30107-1:2023, *Biometric presentation attack detection, Part 1: Framework* (second edition, 2023-08);
 - ISO/IEC 30107-3:2023, *Biometric presentation attack detection, Part 3: Testing and reporting* (second edition, 2023-01).
@@ -20,11 +20,11 @@ Out of the scope of both the standards and the PAD part of the project: attacks 
 | 3 | Terms and definitions | The documents of the project use the vocabulary of the series and of ISO/IEC 2382-37: presentation attack, presentation attack detection (PAD), bona fide presentation, attack presentation, presentation attack instrument (PAI), artefact (3.1), liveness (3.2) |
 | 4.2 | Presentation attack instruments | The instruments tested are listed in section 4.1 below, grouped by species |
 | 5.1 | Types of presentation attack detection | PAD is done by software on the colour images of the capture device. No additional sensor is used |
-| 5.2.2 | Challenge-response related to liveness detection | The active check asks for voluntary reactions drawn at random: blink, smile, head turn ([decision-flow.md](decision-flow.md), section 5) |
+| 5.2.2 | Challenge-response related to liveness detection | The active check asks for voluntary reactions drawn at random: blink and head turns by default, smile by configuration ([decision-flow.md](decision-flow.md), section 5) |
 | 5.2.3 | Liveness detection not related to challenge-response | The passive check scores the appearance of the face on several frames without asking anything of the person (decision flow, section 4) |
 | 5.3 | Presentation attack detection process | The liveness session processes each frame (detection, quality, score), aggregates the scores and decides, with the active check as a second stage (decision flow, sections 3 to 5) |
 | 5.4.2 | PAD processing considerations relative to the other biometric subsystems | PAD runs before storage and before comparison. A face is stored in a registration, or compared for authentication, only after the liveness decision and the check of the captured image ([workflows.md](workflows.md)) |
-| 5.4.3 | PAD location implications regarding data interchange | PAD runs in the Registration Client, not in the device. The stream it analyses is not signed, while the captured image is. The captured image check links the two (decision flow, section 6). The PAD result is not exchanged in a standard format: see section 5 of this document |
+| 5.4.3 | PAD location implications regarding data interchange | The passive score comes from the face device when the device sends one, as MOSIP asked, and from the client otherwise. The challenges, the decision and the captured image check run in the Registration Client. The stream is not signed, while the captured image is: the captured image check links the two (decision flow, sections 4 and 6). The PAD result travels in the meta data of the packet, not in a standard format: see section 5 of this document |
 | 6 | Obstacles to biometric impostor presentation attacks in a biometric system | Beyond PAD, the registration context adds obstacles: an operator is present during the capture, attempts are limited, every outcome is audited, and the exception process requires a second user with the supervisor role |
 
 ## 3. ISO/IEC 30107-3, Testing and reporting
@@ -95,7 +95,7 @@ The introduction of Part 3 stresses that PAD error rates depend on the set of at
 | Replayed video | Video of the person, including blinks and head movements, on a phone or tablet | Random challenges |
 | Paper mask | Printed face with cut-out eyes or mouth, worn | Classifier and challenges |
 
-Each species is presented under three lighting conditions (normal, low light, backlight). The test plan aims at several attack presenters and several subjects of different skin tones; the exact counts are fixed in `test-plan.md` (#6). For the submission, one subject was recorded, with one sequence per species and lighting condition, and the paper mask was worn by another person than the subject (#7).
+Each species is presented under three lighting conditions (normal, low light, backlight). The test plan aims at several attack presenters and several subjects of different skin tones; the exact counts are fixed in `test-plan.md` (#6). For the submission, two subjects were recorded: S10 with one sequence per species and lighting condition, the paper mask being worn by another person than the subject, and S30 with every species but the paper mask (#7, [test-results.md](test-results.md), section 1).
 
 ### 4.2 Reporting
 
@@ -108,9 +108,9 @@ For each level of evaluation (PAD subsystem, full system), `test-results.md` giv
 
 ## 5. Gaps
 
-1. **No PAD result in a standard data format.** ISO/IEC 30107-2 defines how to convey PAD approach and results, integrated in the ISO/IEC 39794 series. The project records the result in the audit trail of the client, not in the biometric record. This could be added if MOSIP packets adopt those formats.
+1. **No PAD result in a standard data format.** ISO/IEC 30107-2 defines how to convey PAD approach and results, integrated in the ISO/IEC 39794 series. The project records the result in the audit trail of the client and in the meta data of the packet (entry `faceLiveness`), not in the biometric record. This could be added if MOSIP packets adopt those formats.
 2. **Concealer attacks and non-conformant presentations not tested** (clauses 8.2 and 9).
-3. **Small evaluation set.** One subject and three presentations per species do not reach the statistical significance discussed in the introduction of Part 3, and leave no subject out of the calibration. The results show behaviour on a defined set, not a general error rate, and are published as preliminary.
+3. **Small evaluation set.** Two subjects and three to six presentations per species do not reach the statistical significance discussed in the introduction of Part 3, and leave a single subject out of the calibration ([test-results.md](test-results.md), section 1.2.1). The results show behaviour on a defined set, not a general error rate, and are published as preliminary.
 4. **No independent tester.** The team that built the feature also tests it. The test roles of Annex C are filled by the same people.
 
 ## 6. Sources

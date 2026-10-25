@@ -19,11 +19,11 @@ Target: Registration Client 1.2.0.2 (desktop, Java 11). Submission for MOSIP Dec
 
 | Component | Where | Status |
 | --- | --- | --- |
-| Liveness engine in Java | `liveness-engine/` | Passive and active checks, session state machine, captured image check, model check at startup, public API. 189 tests |
-| Registration Client integration | [fork of `mosip/registration-client`](https://github.com/BestTeam-MosipDecode/registration-client), branch `feature/face-liveness` | Configuration keys, stream to engine, audit events, resident face capture gated on liveness with the exception process after the last attempt, operator and supervisor face authentication gated on liveness, the face enrolled at onboarding gated on liveness, status pane on the capture, authentication and onboarding screens, signature check of the engine jar. Checked on the MOSIP Collab environment up to the operator onboarding (liveness verified), which the server refused; reported to MOSIP |
-| Simulated L0/L1 device | `mock-sbi/` | `static`, `webcam` and `replay` modes, failure simulation, scenario runner |
+| Liveness engine in Java | `liveness-engine/` | Passive and active checks, session state machine, captured image check, model check at startup, public API. 193 tests |
+| Registration Client integration | [fork of `mosip/registration-client`](https://github.com/BestTeam-MosipDecode/registration-client), branch `feature/face-liveness` | Configuration keys, stream to engine, audit events, resident face capture gated on liveness with the exception process after the last attempt, operator and supervisor face authentication gated on liveness, the face enrolled at onboarding gated on liveness, status pane on the capture, authentication and onboarding screens, signature check of the engine jar, passive score sent by the face device, liveness check of each face carried in the packet. Checked on the MOSIP Collab environment: sign-in, synchronisation and the operator onboarding, whose face passes liveness; saving the onboarding waits for MOSIP to link a UIN to the operator account |
+| Simulated L0/L1 device | `mock-sbi/` | `static`, `webcam` and `replay` modes, a passive liveness score sent with each face frame, failure simulation, scenario runner |
 | Demo application | `demo/` | Standalone JavaFX demo of the whole check: the engine, the status pane and the messages of the modified client, the simulated device over SBI. Runs without a MOSIP environment |
-| Reference pipeline in Python | `training/` | Models exported to ONNX and checked, reference detection, crop and landmarks, evaluation script, capture tools. Team captures in progress |
+| Reference pipeline in Python | `training/` | Models exported to ONNX and checked, reference detection, crop and landmarks, evaluation script, capture tools. Team captures of two subjects measured (#7) |
 | Documentation | `docs/` | Design documents as built, setup guide verified on Collab, screen mock-ups, messages in three languages, test plan and results |
 
 ## Repository structure

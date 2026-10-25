@@ -1,6 +1,6 @@
 # Simulated face device (mock-sbi)
 
-Status on 9 October 2026: study of the MOSIP mock device (#16). Installation, modes and configuration will be added with #17, #18 and #19.
+Status on 25 October 2026: study of the MOSIP mock device (#16), kept as the reference for the SBI calls. The project device built from it (#17 to #19), with its modes, configuration keys and quick start, is described in [../mock-sbi/README.md](../mock-sbi/README.md). Section 4 records the passive score it sends with each face frame since 23 October 2026.
 
 This document describes how the MOSIP mock device works, what the Registration Client 1.2.0.2 expects from a face device, and how we build `mock-sbi` on top of it.
 
@@ -86,7 +86,7 @@ Any device we write must therefore keep the exact `Content-Length:` header, send
 - The face key is `Biometric Devices/Face/Keys/mosipface.p12` (alias and password `mosipface`). Its certificate `CN=MosipFace` is issued by `CN=RootCA,O=Mosip` (`Biometric Devices/rootca.cer`), and both are valid until 8 February 2031.
 - The authentication key `mosipfaceftm.p12` is issued by `CN=RootCAFTM`, which expired on 10 June 2022. Registration does not use it.
 - These keys are public test material. They must never be used outside development and tests.
-- The client always validates the signature and the trust chain (`MosipDeviceSpecificationHelper.validateJWTResponse`, `setValidateTrust(true)`). No setting turns this off. The chain is checked against CA certificates synchronised from the server for the `DEVICE` domain (`CertificateSyncServiceImpl.java`). The MOSIP Collab setup guide offers MockMDS to capture biometrics without devices, which suggests the Collab server already trusts `rootca.cer`. This is to be confirmed on a registered machine.
+- The client always validates the signature and the trust chain (`MosipDeviceSpecificationHelper.validateJWTResponse`, `setValidateTrust(true)`). No setting turns this off. The chain is checked against CA certificates synchronised from the server for the `DEVICE` domain (`CertificateSyncServiceImpl.java`). The MOSIP Collab setup guide offers MockMDS to capture biometrics without devices, which suggested that the Collab server trusts `rootca.cer`. Checked on Collab on 22 October 2026: it does not, since the certificates of the mock devices published for Collab have expired, and the onboarding stops with `REG-MDM-108` until the device uses the keys that MOSIP provides for the environment ([dev-setup-windows.md](dev-setup-windows.md), section 8).
 
 ## 7. Profiles and failure simulation
 
