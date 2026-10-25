@@ -1,6 +1,6 @@
 # Test results
 
-Status on 21 October 2026: sections 1, 3, 4 and 5 hold the measures made on the captures of the first team subject (S10, 15 October), with the scores and replays run on the machine that recorded them; only aggregated figures leave that machine. Section 2 and the client-level rows of sections 3 to 5 need the Registration Client signed in to a MOSIP environment: on 21 October the Collab tunnel works and the client starts, but the first sign-in is refused (`KER-SYN-AUTH-001`, machine registration under review by MOSIP). Values marked "not run" are filled in when the test is done, following [test-plan.md](test-plan.md). No face image appears in this document.
+Status on 25 October 2026: section 1 holds the measures made on the captures of two team subjects (S10 on 15 October, S30 on 20 October), sections 3 to 5 those of S10, with the scores and replays run on the machines that recorded them; only aggregated figures leave those machines. Section 2.1 records the cases run on screen in the demo application and on the MOSIP Collab environment. The full matrix of section 2 needs resident registrations in the Registration Client signed in to Collab, which wait for MOSIP to link a UIN to the operator account (onboarding, section 2). Values marked "not run" are filled in when the test is done, following [test-plan.md](test-plan.md). No face image appears in this document.
 
 **Section 1 covers two subjects (S10 on 15 October, S30 on 20 October), the other sections one (S10).** They show that the chain works and where it fails; they are not a statistically meaningful error rate. ISO/IEC 30107-3 asks for many subjects and presentation attack instruments before an APCER or a BPCER can be compared with other systems.
 
@@ -23,8 +23,6 @@ PAD subsystem evaluation (ISO/IEC 30107-3, clause 7.3), computed by `training/sc
 
 ### 1.2 Error rates on the test split
 
-| Type | Sequences | APCER or BPCER | Pass zone | Challenge zone | Attack zone | No decision |
-| --- | --- | --- | --- | --- | --- | --- |
 Each sequence is replayed through the passive window of section 4 of the decision flow with the thresholds above; the first decision reached is counted. APCER counts the attacks that end in the pass zone, BPCER the bona fide presentations that end in the attack zone.
 
 | Type | Sequences | APCER or BPCER | Pass zone | Challenge zone | Attack zone | No decision |
@@ -82,13 +80,11 @@ Calibrated on one subject and tested on the other (`evaluate.py --test-subjects`
 | Light `low` | 2 | 0 % (0.997) |
 | Light `backlight` | 2 | 0 % (0.993) |
 | Skin tone MST 1-3 | not run | no subject in this band yet |
-| Skin tone MST 4-7 | not run | the band of the only subject is not published |
-| Skin tone MST 8-10 | not run | the band of the only subject is not published |
+| Skin tone MST 4-7 | not run | not published: with at most one subject per band, the band would describe that person |
+| Skin tone MST 8-10 | not run | not published, as above |
 
 ### 1.4 Actions
 
-| Action | Sequences | Detected | Other action detected |
-| --- | --- | --- | --- |
 Measured by the coordinator with the Python detectors of `training/liveness/actions.py` on the S10 action sequences (#5, 15 October), and with the engine in section 3.3:
 
 | Action | Sequences | Detected | Other action detected |
@@ -113,11 +109,11 @@ Consequence: `SMILE` was left out of the default challenge types on 16 October (
 
 Cases of [test-plan.md](test-plan.md), section 9 (#27). Workflows: R resident capture, O operator authentication, S supervisor authentication. Online and offline as defined in the plan.
 
-Not run on 21 October: the matrix needs an operator signed in to the Registration Client, and the first sign-in on Collab is refused until MOSIP completes the registration of the machine. The engine behaviour behind F04 to F06 and F09 to F11 is measured on replayed sequences in sections 3 and 5.
+The matrix needs resident registrations in the Registration Client signed in to a MOSIP environment. On Collab, sign-in and synchronisation work and the operator onboarding was checked on screen (section 2.1); a resident registration needs the onboarding saved first, which waits for MOSIP to link a UIN to the operator account ([workflows.md](workflows.md), section 2.4). The engine behaviour behind F04 to F06 and F09 to F11 is measured on replayed sequences in sections 3 and 5.
 
 | ID | Case | Expected | R online | R offline | O online | O offline | S online | S offline |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| F01 | Live face, good light | `PASSED` without challenge, capture accepted, `LIVENESS_SUCCESS` | not run | not run | not run | not run | not run | not run |
+| F01 | Live face, good light | `PASSED` after the challenges (pass threshold 1.00), capture accepted, `LIVENESS_SUCCESS` | not run | not run | not run | not run | not run | not run |
 | F02 | Ambiguous score leads to a challenge | `ACTIVE_CHALLENGE`, challenges detected, then `PASSED` | not run | not run | not run | not run | not run | not run |
 | F03 | Action not performed | `FAILED` with `CHALLENGE_TIMEOUT` or `CHALLENGE_FAILED`, retry offered, attempt counted | not run | not run | not run | not run | not run | not run |
 | F04 | Printed photo | Never `PASSED`. `PAD_ATTACK_DETECTED` with the generic message, or failed challenge | not run | not run | not run | not run | not run | not run |
@@ -132,11 +128,28 @@ Not run on 21 October: the matrix needs an operator signed in to the Registratio
 | F13 | Liveness disabled | No session, original client behaviour | not run | not run | not run | not run | not run | not run |
 | F14 | Supervisor override | R: capture under exception, supervisor authentication with liveness at submission. O, S: no override offered | not run | not run | not run | not run | not run | not run |
 
+### 2.1 Cases run on screen
+
+Run on 25 October 2026 for the video of the submission, with the default settings unless stated: the demo application ([../demo/README.md](../demo/README.md)) runs the engine, the status pane and the messages of the modified client, fed over SBI by the simulated device in webcam mode, which scores each frame. It does not run the screens of the Registration Client, so these rows do not fill the matrix above. The last row is the Registration Client itself on Collab.
+
+| Case | Workflow, settings | Where | Result |
+| --- | --- | --- | --- |
+| F01, live face | Resident | Demo application | Device score, then 2 challenges (turn right, blink), `PASSED`, captured image accepted |
+| F01, live face | Operator, French | Demo application | `PASSED` after 2 challenges (blink, turn left) |
+| F01, live face | Supervisor, diagnostic mode | Demo application, Wi-Fi turned off | `PASSED` after 2 challenges (blink, turn right), device score shown on the diagnostic line |
+| F01, live face, language changed during the session | Supervisor, English then Arabic | Demo application | Instructions switched to Arabic, right to left, then `PASSED` |
+| Passive pass allowed at 0.85 (setting) | Resident | Demo application | `PASSED` in 2.5 s without a challenge |
+| F04, printed photo | Resident | Demo application | Refused with the generic message, attempt 1 of 3, retry offered |
+| F05, photo on a phone screen | Resident | Demo application | Refused the same way, attempt 2 of 3 |
+| F12 and F14, attempts exhausted | Resident, 1 attempt, printed photo | Demo application | Exception process offered; face captured under exception, a supervisor required before submission |
+| F05 and F12, phone screen | Supervisor, 1 attempt, French | Demo application | Refused, the user is sent to another sign-in method |
+| Onboarding, live face | Operator | Registration Client on MOSIP Collab, 23 and 25 October | Device score, 2 challenges (blink, turn right), liveness verified, face captured. Saving the onboarding refused by the server (`RPR-RCT-001`) until a UIN is linked to the operator account |
+
 ## 3. System PAD campaign
 
 Full system evaluation (ISO/IEC 30107-3, clause 7.5), on the complete Registration Client with passive and active checks (#28).
 
-Run on 19 October 2026 at the level of the engine public API: each recorded sequence goes through `LivenessEngine` and a `LivenessSession`, the code the client calls, in real time (frames submitted at their recorded timestamps, so frames are skipped as on a device stream), with `ReplayBenchmarkTest` of `liveness-engine`. The same run through the Registration Client screens waits for the Collab sign-in.
+Run on 19 October 2026 at the level of the engine public API: each recorded sequence goes through `LivenessEngine` and a `LivenessSession`, the code the client calls, in real time (frames submitted at their recorded timestamps, so frames are skipped as on a device stream), with `ReplayBenchmarkTest` of `liveness-engine`. The same run through the Registration Client screens waits for resident registrations on Collab (section 2).
 
 ### 3.1 Context
 
@@ -164,8 +177,6 @@ Run on 19 October 2026 at the level of the engine public API: each recorded sequ
 
 | Type | Attempts | APCER or BPCER | Challenge rate |
 | --- | --- | --- | --- |
-| Type | Attempts | APCER or BPCER | Challenge rate |
-| --- | --- | --- | --- |
 | `print_matte` | 3 | 0 %, `PAD_ATTACK_DETECTED` in 0.76 to 0.92 s | not applicable, active check disabled for this run |
 | `print_glossy` | 3 | 0 %, detected in 0.83 to 0.92 s | as above |
 | `screen_phone` | 3 | 0 %, detected in 0.77 to 0.92 s | as above |
@@ -190,8 +201,6 @@ DET curve: not drawn for this run, which has one attempt per type and condition;
 
 ## 4. Performance
 
-| Measure | Value |
-| --- | --- |
 Measured on 19 October 2026 with the run of section 3 (`ReplayBenchmarkTest`, 30 sequences, 551 analysed frames), on the machine that recorded the captures.
 
 | Measure | Value |
@@ -214,9 +223,9 @@ The device stream of the simulated device in webcam mode reached 6 to 8 frames p
 | Test | Result |
 | --- | --- |
 | Recorded sequences replayed through the simulated device, decisions identical to the live run | Device side: section 5.1. Engine decisions on the same sequences: section 3. Comparison through the client: not run |
-| Stream of the simulated device received by the client without mirroring | not run |
-| Stream kept running during `RCAPTURE` | not run |
-| Capture response signature validated by the client | not run |
+| Stream of the simulated device received by the client without mirroring | Pass on Collab, 23 October: the turn challenge of the onboarding passed in the direction asked, which a mirrored stream would invert |
+| Stream kept running during `RCAPTURE` | Pass, 21 October: the simulated device in webcam mode keeps sending frames during `RCAPTURE` and ends the stream when the capture completes ([decision-flow.md](decision-flow.md), section 6) |
+| Capture response signature validated by the client | Pass on Collab, 23 October: the onboarding capture, signed with the device keys MOSIP provided for the environment, was accepted. With the public test keys, the client refuses it (`REG-MDM-108`, [dev-setup-windows.md](dev-setup-windows.md), section 8) |
 | Device unavailable and reconnection handled | not run |
 
 ### 5.1 Device-level scenarios, automated
