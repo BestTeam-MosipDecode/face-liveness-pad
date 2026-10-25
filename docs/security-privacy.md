@@ -1,6 +1,6 @@
 # Security and privacy
 
-Status on 19 October 2026: the controls below are implemented in the engine and in the three workflows of the client, unless marked otherwise. This document lists what the liveness feature protects, the attacks it addresses, the controls in place or planned, the limits that remain, and how personal data is handled. It relies on [decision-flow.md](decision-flow.md) and [workflows.md](workflows.md).
+Status on 25 October 2026: the controls below are implemented in the engine and in the three workflows of the client, unless marked otherwise. This document lists what the liveness feature protects, the attacks it addresses, the controls in place or planned, the limits that remain, and how personal data is handled. It relies on [decision-flow.md](decision-flow.md) and [workflows.md](workflows.md).
 
 ## 1. What is protected
 
@@ -41,7 +41,7 @@ Status on 19 October 2026: the controls below are implemented in the engine and 
 ### 2.3 Integrity of models and configuration
 
 - **Models.** Each model file has its size and SHA-256 in `models.json`. At startup the engine requires the four models in the manifest, checks them, and builds its ONNX sessions from the verified bytes; any difference stops the engine and the capture is refused (#31, #74). The model set version is written in every audit event.
-- **Client files.** At startup, the client verifies the signature of its JAR files (`ClientIntegrityValidator`), but only for files named `registration-client*` and `registration-services*`, and not when `environment=LOCAL`. A separate `liveness-engine` JAR would not be covered. Either the check is extended to it, or the engine is packaged inside one of the two verified JARs. To decide with the integration (#26).
+- **Client files.** At startup, the client verifies the signature of its JAR files (`ClientIntegrityValidator`): the files named `registration-client*` and `registration-services*` and, since registration-client#11, `liveness-engine*`, which holds the models and `models.json`. `configure.sh` signs the engine JAR with the same key as the client JARs. As for them, the check is skipped when `environment=LOCAL`. The other libraries, ONNX Runtime included, keep the checksum check of the client manifest.
 - **Configuration.** Liveness settings come from the server configuration, synchronised like the other client settings and read through `ApplicationContext`. When a key is missing, the engine applies its packaged defaults, never a weaker value. Changing the local database of a client is outside the scope of this feature.
 - **Randomness.** Challenges are drawn with `java.security.SecureRandom`. A fixed seed is only possible in tests, through injection.
 
@@ -67,7 +67,7 @@ These attacks are not, or only partly, covered. They are stated in the submissio
 - Frames are decoded in memory, analysed and dropped. The engine keeps only numbers between frames: scores of the current window, measures of the current challenge, the box of the tracked face.
 - The engine writes no image to disk. The only face image kept is the one the client already stores in the registration or uses for matching, as it does today.
 - Logs, audit events and error messages never contain an image, a template, a landmark or a score. Audit events contain the workflow, the attempt number, the reason code, the duration and the model set version. Scores go only to the diagnostic log, when `diagnostic.enabled` is true, which is not the default.
-- The packet receives no additional biometric data. The only addition is the liveness exception mark, when the exception process is used.
+- The packet receives no additional biometric data. Its meta data carries the result of the check of each face (entry `faceLiveness`: decision, attempt, source of the passive score, challenges and their result, model set version), never an image or a score, and the liveness exception mark when the exception process is used ([decision-flow.md](decision-flow.md), section 7.1).
 
 ### 4.2 Data used to build and test the feature
 

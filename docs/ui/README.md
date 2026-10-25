@@ -39,7 +39,7 @@ Source: [../diagrams/ui-flow.puml](../diagrams/ui-flow.puml)
 | --- | --- | --- |
 | [a01](a01-operator-login.png) | Operator sign-in, offline, passive check | `LIVENESS_CHECKING` |
 | [a02](a02-operator-challenge-fr.png) | Operator authentication of a packet, challenge, in French | `LIVENESS_CHALLENGE_TURN_RIGHT` |
-| [a03](a03-supervisor-approval.png) | Supervisor authentication for the end of day approval, challenge | `LIVENESS_CHALLENGE_SMILE` |
+| [a03](a03-supervisor-approval.png) | Supervisor authentication for the end of day approval, challenge | `LIVENESS_CHALLENGE_BLINK` |
 | [a04](a04-max-attempts-auth.png) | Sign-in attempts exhausted: no exception, another sign-in method | `LIVENESS_MAX_ATTEMPTS_AUTH` |
 
 ![Operator authentication in French](a02-operator-challenge-fr.png)

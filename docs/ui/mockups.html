@@ -299,14 +299,14 @@ const SCREENS = [
     faceStatus: 'Action requested', headingNote: 'Challenge 1 of 2',
     preview: { ring: 'action', progress: 35 },
     band: { tone: 'action', icon: 'eye', text: 'Please blink' },
-    sub: timer({ label: 'Time left', share: 70, left: '6 s' }),
+    sub: timer({ label: 'Time left', share: 70, left: '11 s' }),
     details: [D_LIVE('Waiting for an action', 'warn'), ['Attempt', '1 of 3'], ['Quality score', 'After capture'], ['Face device', 'Connected', 'ok']] },
 
   { id: 'r05-challenge-turn', caption: 'Resident capture: second challenge, after the first action was detected', kind: 'resident',
     faceStatus: 'Action requested', headingNote: 'Challenge 2 of 2',
     preview: { ring: 'action', progress: 75 },
-    band: { tone: 'action', icon: 'left', text: 'Please turn your head to the left' },
-    sub: timer({ label: 'Time left', share: 45, left: '4 s' }),
+    band: { tone: 'action', icon: 'left', text: 'Please turn your head to your left, then look back at the camera' },
+    sub: timer({ label: 'Time left', share: 45, left: '7 s' }),
     details: [D_LIVE('Waiting for an action', 'warn'), ['Challenge 1', 'Action detected', 'ok'], ['Attempt', '1 of 3'], ['Face device', 'Connected', 'ok']] },
 
   { id: 'r06-success', caption: 'Resident capture: liveness verified, face captured', kind: 'resident',
@@ -359,7 +359,7 @@ const SCREENS = [
 
   { id: 'r12-resident-screen-fr', caption: 'Second screen turned towards the resident, in French', kind: 'residentView', lang: 'fr',
     step: 'Action 1 sur 2', icon: 'eye', text: 'Veuillez cligner des yeux',
-    timer: { label: 'Temps restant', share: 70, left: '6 s' } },
+    timer: { label: 'Temps restant', share: 70, left: '11 s' } },
 
   { id: 'a01-operator-login', caption: 'Operator sign-in by face, offline', kind: 'auth', offline: true,
     title: 'Sign in', context: 'Sign in to start registrations at this centre.', user: 'operator1',
@@ -371,15 +371,15 @@ const SCREENS = [
   { id: 'a02-operator-challenge-fr', caption: 'Operator authentication of a packet, active challenge, in French', kind: 'auth', lang: 'fr',
     title: 'Authentification de l\'opérateur', context: 'Confirmez votre identité pour créer le paquet d\'enregistrement.', userLabel: 'Identifiant', user: 'operator1',
     preview: { ring: 'action', progress: 40 },
-    band: { tone: 'action', icon: 'right', text: 'Veuillez tourner la tête vers la droite' },
-    sub: timer({ label: 'Temps restant', share: 55, left: '5 s' }),
+    band: { tone: 'action', icon: 'right', text: 'Veuillez tourner la tête vers votre droite, puis revenir face à la caméra' },
+    sub: timer({ label: 'Temps restant', share: 55, left: '8 s' }),
     buttons: [['Annuler', 'btn-outline']] },
 
   { id: 'a03-supervisor-approval', caption: 'Supervisor authentication for the end of day approval', kind: 'auth',
     title: 'Supervisor authentication', context: 'Approve the 12 registrations of the day.', user: 'supervisor1',
     preview: { ring: 'action', progress: 30 },
-    band: { tone: 'action', icon: 'smile', text: 'Please smile' },
-    sub: timer({ label: 'Time left', share: 80, left: '7 s' }),
+    band: { tone: 'action', icon: 'eye', text: 'Please blink' },
+    sub: timer({ label: 'Time left', share: 80, left: '12 s' }),
     buttons: [['Cancel', 'btn-outline']] },
 
   { id: 'a04-max-attempts-auth', caption: 'Operator sign-in: attempts exhausted, no exception path', kind: 'auth',

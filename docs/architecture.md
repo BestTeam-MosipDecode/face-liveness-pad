@@ -1,6 +1,6 @@
 # Architecture
 
-Status on 19 October 2026: the engine and the three workflows are implemented: resident face capture with the exception process after the last attempt, operator and supervisor face authentication. The check on screen with the simulated device and a MOSIP environment is still to do. The client changes are on the `feature/face-liveness` branch of the team's fork of `registration-client`, based on release 1.2.0.2.
+Status on 25 October 2026: the engine and the three workflows are implemented: resident face capture with the exception process after the last attempt, operator and supervisor face authentication, and the face enrolled at onboarding. The passive score comes from the face device when it sends one, and the packet carries the liveness check of each face ([decision-flow.md](decision-flow.md), sections 4 and 7.1). On the MOSIP Collab environment, sign-in, synchronisation and the operator onboarding, whose face passes liveness, were checked on screen on 23 October 2026 with the simulated device ([workflows.md](workflows.md), section 2.4). The client changes are on the `feature/face-liveness` branch of the team's fork of `registration-client`, based on release 1.2.0.2.
 
 ## 1. Context
 

@@ -45,7 +45,7 @@ Notes:
 
 - Booleans accept `Y` and `N` as well as `true` and `false`, like the existing `mosip.registration.face_enable_flag`.
 - Thresholds are decimals between 0 and 1, the scale of the engine score. The existing quality thresholds of the client (`mosip.registration.face_threshold=90`) use 0 to 100 and are unrelated.
-- The two thresholds are provisional. They were kept on 19 October 2026 after the captures of a single subject (#7), see section 4 of [decision-flow.md](decision-flow.md).
+- The two thresholds are provisional. The pass threshold was raised to 1.00 on 21 October 2026 after the captures of a second subject, the attack threshold staying 0.30 (#7), see section 4 of [decision-flow.md](decision-flow.md).
 - The challenge types `LOOK_LEFT` and `LOOK_RIGHT` of the project plan are not available in this version. A list that contains them is invalid as a whole.
 
 ## 3. Validation rules

@@ -50,8 +50,8 @@ The feature serves the people in a registration centre and the organisations tha
 On the slide:
 
 - Passive check first, in the face device as MOSIP asked: two MiniFASNet models score each frame, and clear attacks are rejected at once
-- Then random facial actions in every session: blink, head turn left or right (smile available by configuration)
-- Capture or authentication only after `PASSED`, then the image returned by `RCAPTURE` is checked again
+- Then random facial actions in every session, 15 s each: blink, head turn left or right (smile available by configuration)
+- Capture or authentication only after `PASSED`, then the image returned by `RCAPTURE` is checked again; the packet records the challenges performed
 - Retry policy, then the MOSIP exception process for a resident, another sign-in method for an operator or supervisor
 - Runs inside the client, offline included
 
@@ -79,6 +79,7 @@ On the slide:
 - Image: `docs/diagrams/session-states.svg`
 - Score of each frame aggregated by the median over the window; attack threshold 0.30
 - Pass threshold 1.00 by default since 21 October: every session ends with the challenges
+- 15 s for each challenge, hold-still phase included
 - Quality checks before scoring: one face, size, head angle, lighting, sharpness
 - During the active check the passive score is still computed and the face is followed from frame to frame
 - Every failure after the first analysed frame counts as an attempt, device errors included
@@ -96,6 +97,7 @@ On the slide:
 - Operator sign-in and packet authentication: liveness before the face is matched; failed liveness attempts count as failed logins
 - Supervisor authentication and end of day approval: same check, supervisor role required, face not offered when liveness is disabled for the supervisor
 - Operator and supervisor onboarding: the reference face goes through the same check before it is enrolled
+- Packet: the check of each face (decision, challenges and their result), entry `faceLiveness` of the meta data, no image and no score
 - 17 configuration keys, any of them can be set per workflow
 
 Speaker notes:
@@ -108,6 +110,7 @@ On the slide:
 
 - Images: three renders of the status pane, for example `docs/ui/pane/en/p04-challenge-blink.png`, `docs/ui/pane/fr/p05-challenge-turn.png`, `docs/ui/pane/ar/p07-failed-retry.png`
 - Large instruction band for the resident, progress, "Challenge 1 of 2", liveness status in words as well as colours
+- An arrow shows the side of each head turn; a compact pane fits the face box of the onboarding screen
 - 32 messages and 14 labels in English, French and Arabic, right to left in Arabic
 - A detected attack shows the same generic message as an engine error
 - Scores appear only in the diagnostic mode, off by default
@@ -121,7 +124,7 @@ The status pane is the component we added to the capture and authentication scre
 On the slide:
 
 - All processing on the workstation: no frame, landmark or score leaves the machine
-- No image written by the engine; logs and audit events carry codes, durations and the model set version only
+- No image written by the engine; logs, audit events and the packet carry codes, results and the model set version only, never a score
 - Challenges drawn with `SecureRandom`; the signature validation of SBI responses is untouched
 - Capture response accepted only with exactly one face record, which must pass the capture check
 - Four models checked against their SHA-256 in `models.json` before loading; the engine JAR signature is verified at client startup
@@ -158,7 +161,7 @@ On the slide:
 
 - Hence the default pass threshold of 1.00: a print or a still screen must also perform the random challenges
 - Footnote: two subjects, three lighting conditions, 67 sequences; preliminary, not a certification result
-- Engine tests: 189; liveness tests of the client services: 89
+- Engine tests: 193
 
 Speaker notes:
 
@@ -184,14 +187,14 @@ The demo runs the same engine and the same status pane as our fork, fed by the s
 On the slide:
 
 - Paper mask worn by another person: known limitation; next step, a dedicated check of mask edges and paper texture
-- Glossy prints can score like live faces: challenges in every session, about 10 s; next step, a complementary passive signal (moiré, #8)
+- Glossy prints can score like live faces: challenges in every session for now; next step, a complementary passive signal, such as moiré
 - Two subjects so far: record more, then confirm the thresholds on held-out subjects
-- On Collab, the device is trusted and the onboarding face passes liveness; the server refuses the onboarding itself (`RPR-RCT-001`, reported to MOSIP). Android covered by a design note only
+- On Collab, the device is trusted and the onboarding face passes liveness; saving the onboarding waits for MOSIP to link a UIN to our operator account. Android covered by a design note only
 - Stream injection before the client depends on device integrity (L1 devices), outside PAD
 
 Speaker notes:
 
-We list our limits because the jury will meet them anyway. The cut-out paper mask is the main one: real eyes and a real mouth show through the holes, so the passive classifier scores it like a live face, and its wearer can perform the challenges. Glossy prints of our second subject also scored like live faces, which the random challenges now stop, at the cost of about ten seconds per session. Our results rest on two subjects, so the next step is more subjects and a held-out evaluation before any threshold is called final. On the MOSIP Collab environment, the modified client signs in and synchronises, and the face an operator enrols at onboarding passes the liveness check; the server then refuses the onboarding itself, which we reported to MOSIP. The Android client is covered by a design note only.
+We list our limits because the jury will meet them anyway. The cut-out paper mask is the main one: real eyes and a real mouth show through the holes, so the passive classifier scores it like a live face, and its wearer can perform the challenges. Glossy prints of our second subject also scored like live faces, which the random challenges now stop, at the cost of about ten seconds per session. Our results rest on two subjects, so the next step is more subjects and a held-out evaluation before any threshold is called final. On the MOSIP Collab environment, the modified client signs in and synchronises, and the face an operator enrols at onboarding passes the liveness check. Saving the onboarding needs a UIN linked to the operator account, which we asked MOSIP to do. The Android client is covered by a design note only.
 
 ## Slide 14: Impact
 
@@ -220,13 +223,12 @@ Our work gives MOSIP deployments a liveness and PAD gate that runs on the regist
 | 18 pane states in three languages | `docs/ui/README.md`, "Status pane of the client"; `docs/ui/pane/` |
 | Model licences and sizes, 10.4 MB in total | `docs/architecture.md`, section 9; `THIRD_PARTY_NOTICES.md`; `docs/PROGRESS.md` (issue n° 4) |
 | ONNX Runtime 1.19.2 | `docs/architecture.md`, section 9 |
-| 189 engine tests | `README.md`, status table (after #108) |
-| 89 liveness tests of the client services | registration-client#14 description, run of 19 October 2026 |
+| 193 engine tests | `README.md`, status table; surefire reports of `liveness-engine`, 23 October 2026 |
 | Two subjects at 0.85: live faces 9 of 12 in the pass zone (BPCER 0 %), glossy print 33 %, phone screen 17 %, paper mask 33 % | `docs/test-results.md`, section 1.2.1 (#103) |
 | 15 of 15 attacks in 0.8 to 1.5 s, about 56 ms per frame, machine | Comment of Magloire04 on #29 (19 October 2026) |
 | Challenges: turn right 3 of 3, turn left 2 of 3, blink 1 of 3 | Comment on #29 |
 | 24 of 24 device stream runs, SBI 0.9.5 and 1.0 | Comment on #29 |
 | Paper mask as a known limitation | `docs/security-privacy.md`, section 3, item 6 |
 | Two subjects, 67 sequences, three lighting conditions | `docs/test-results.md`, sections 1.1 and 1.2.1 |
-| Sign-in and sync on Collab, onboarding blocked by expired device certificates | `docs/PROGRESS.md`, section on Collab; comment on #27 |
+| Sign-in and sync on Collab, onboarding face verified, saving waits for a UIN linked to the operator account | `docs/workflows.md`, section 2.4; `docs/PROGRESS.md`, section on Collab; comment on #27 |
 | Team and roles | `docs/PROGRESS.md`, "Équipe" |

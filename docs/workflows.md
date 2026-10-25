@@ -1,6 +1,6 @@
 # Workflows
 
-Status on 19 October 2026: the three workflows are implemented as described below: resident face capture with the exception process (registration-client#6, #8, #9, #13), operator and supervisor authentication (registration-client#10). They are not yet checked on screen with a MOSIP environment. This document shows how liveness fits into the three face workflows of Registration Client 1.2.0.2: resident face capture, operator authentication and supervisor authentication. It completes [architecture.md](architecture.md), which lists the integration points, and [decision-flow.md](decision-flow.md), which specifies the rules of a liveness session. It is the reference for the integration issues #20 to #26.
+Status on 25 October 2026: the three workflows are implemented as described below: resident face capture with the exception process (registration-client#6, #8, #9, #13), operator and supervisor authentication (registration-client#10), the face enrolled at onboarding (registration-client#15, #16) and the liveness check of each face in the packet (registration-client#18). The onboarding was checked on screen on the MOSIP Collab environment on 23 October 2026 (section 2.4). This document shows how liveness fits into the three face workflows of Registration Client 1.2.0.2: resident face capture, operator authentication and supervisor authentication. It completes [architecture.md](architecture.md), which lists the integration points, and [decision-flow.md](decision-flow.md), which specifies the rules of a liveness session. It is the reference for the integration issues #20 to #26.
 
 Class names and line numbers refer to the `feature/face-liveness` branch of the team's `registration-client` fork, identical to release 1.2.0.2 on 7 October 2026.
 
@@ -79,7 +79,7 @@ Before the first registration, an operator or a supervisor enrols their own biom
 - The face image of this screen is about 290 px wide: the pane uses a compact style. After the last attempt it sends the user to the supervisor (`LIVENESS_MAX_ATTEMPTS_BLOCKED`), without another sign-in method, since the user is already signed in.
 - The attempts are those of the sign-in of the same user. Fingerprints, iris and the exception photo are unchanged.
 
-Checked on Collab on 23 October 2026: liveness verified and face captured. The server then refused the onboarding itself (`RPR-RCT-001`, "Unable to access API"), which was reported to MOSIP. Before registration-client#17, the client of release 1.2.0.2 showed only "ERROR" for any error returned by IDA at onboarding.
+Checked on Collab on 23 October 2026: liveness verified and face captured. The server then refused to save the onboarding (`RPR-RCT-001`, "Unable to access API"). MOSIP explained that the face is compared with the identity of the UIN linked to the operator account, and the account provided for the hackathon has none. A UIN was then obtained through the self-registration portal, and MOSIP was asked to link it to the account. Before registration-client#17, the client of release 1.2.0.2 showed only "ERROR" for any error returned by IDA at onboarding.
 
 ## 3. Online and offline
 
