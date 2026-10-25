@@ -349,7 +349,7 @@ The factors stay provisional until more team members are measured (issue #5).
 
 Captures never leave the machine that recorded them. Each member:
 
-1. records with `capture_session.py`, using the pseudonyms of their range: S01 to S09 (Temitayo), S10 to S19 (Elisée), S20 to S29 (Tobi), S30 to S39 (Silverio), volunteers included. For `paper_mask`, another person than the subject wears the mask, and their pseudonym is given with `--presenter` (section 3.2 of `docs/test-plan.md`);
+1. records with `capture_session.py`, using the pseudonyms of their range: S01 to S09, S10 to S19, S20 to S29 or S30 to S39, one range per team member, volunteers included. For `paper_mask`, another person than the subject wears the mask, and their pseudonym is given with `--presenter` (section 3.2 of `docs/test-plan.md`);
 2. scores their own captures and writes the score file, which holds no image:
 
    ```powershell
