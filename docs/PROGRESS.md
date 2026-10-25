@@ -2,11 +2,11 @@
 
 Suivi de travail interne du projet Face Liveness / PAD (MOSIP Decode 2026, sujet 04).
 Plan de référence : `PLAN_FACE_LIVENESS.md`, à la racine du workspace `mosip_decode/` (hors dépôt).
-Dernière mise à jour : 23 octobre 2026.
+Dernière mise à jour : 25 octobre 2026.
 
 ## Étape en cours
 
-Mesures et tests (issues n° 7 et n° 27 à 30), puis documentation finale, démonstration et soumission (issues n° 33 à 38). Le moteur et les trois parcours du client sont fusionnés sur `feature/face-liveness` dans le fork. Premières mesures faites le 19 octobre sur les séquences S10 (voir la section dédiée). Depuis le 21 octobre, le tunnel Collab fonctionne, et le client modifié se connecte et se synchronise ; depuis le 22 octobre, le dispositif est reconnu avec les clés renouvelées par MOSIP, et la vivacité fonctionne à l'embarquement ; l'enregistrement de l'embarquement est refusé par le serveur (`RPR-RCT-001`), signalé à MOSIP le 23 octobre (voir la section Collab).
+Soumission (issue n° 38) : e-mail à envoyer le lundi 26 octobre au matin, avant 19 h 29 à Cotonou. La vidéo, le deck et le dossier Drive sont prêts depuis le 25 octobre (issues n° 36 et 37 fermées, voir la section Soumission). Sur Collab, le client modifié se connecte, se synchronise et vérifie la vivacité du visage à l'embarquement ; l'enregistrement de l'embarquement attend que MOSIP rattache un UIN au compte opérateur, et les parcours de bout en bout des issues n° 26 et 27 attendent cet embarquement (voir la section Collab).
 
 ## Terminé
 
@@ -19,7 +19,7 @@ Phase 0
   - [x] Build de la 1.2.0.2 avec JDK 11.0.32 et Maven 3.9.9 (7 octobre)
   - [x] `docs/dev-setup-windows.md`, première version (7 octobre). Sections 1 à 4 et 8 vérifiées sur le poste de référence ; sections 5 à 8 et 11 vérifiées sur Collab du 21 au 23 octobre, jusqu'à l'embarquement (issue n° 33).
   - [x] Démarrage du client et connexion d'un opérateur sur Collab (21 octobre), capture du visage avec vivacité à l'embarquement, avec le dispositif simulé (23 octobre)
-  - [ ] Enregistrement de l'embarquement, refusé par le serveur (`RPR-RCT-001`, voir Blocages)
+  - [ ] Enregistrement de l'embarquement, refusé par le serveur (`RPR-RCT-001`) faute d'UIN rattaché au compte opérateur ; rattachement demandé à MOSIP (voir Blocages)
 - [x] 0.5 Structurer `face-liveness-pad/` (7 octobre). Pull Request n° 1 fusionnée dans `main` par Elisée le 7 octobre.
 - [x] 0.6 Analyse de Silent-Face-Anti-Spoofing (7 octobre, faite avant 0.5). Spécification de prétraitement dans `training/README.md`, vérifiée par exécution sur les trois images d'exemple.
 - [x] 0.7 Issues GitHub et répartition (7 octobre). 12 étiquettes et 37 issues créées sur GitHub, n° 2 à 38, avec responsables et échéances.
@@ -184,6 +184,8 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
   - paquet (Q15) : quand la vivacité échoue, le résident fait les défis, qui doivent figurer dans les détails du paquet ;
   - emplacement de la vivacité (Q16) : détectée par le dispositif (Mock-MDS) ; si le score n'atteint pas le seuil, le client lance les défis ;
   - Android : la note de conception suffit.
+- 23 octobre, au soir. Réponse de Varaniya sur l'embarquement : l'opérateur doit déjà avoir un UIN, à obtenir par le portail d'auto-inscription de Collab. UIN obtenu par Elisée sur ce portail le soir même (gardé hors dépôt), puis rattachement au compte opérateur demandé à MOSIP par e-mail. Sans réponse au 25 octobre au soir : l'enregistrement de l'embarquement, puis les inscriptions de résidents des issues n° 26 et 27, attendent ce rattachement.
+- 25 octobre. Scène 9 de la vidéo tournée sur Collab : embarquement de l'opérateur, score du dispositif, deux défis, vivacité vérifiée et visage capturé.
 - Réponses de Varaniya sur le forum, le 21 octobre, aux questions d'Elisée du 20 octobre :
   - Collab : l'accès est fourni, signaler tout problème ;
   - démonstration : MOSIP compte sur une démonstration sur Collab, l'application de démo reste la solution de repli ;
@@ -192,7 +194,7 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 - Les réponses aux autres questions envoyées par e-mail (Q15, Q16) sont promises pour la semaine suivante, donc après la date limite.
 - L'AMA du mercredi 21 octobre est reportée au jeudi 22 octobre, de 12 h 30 à 13 h 30 à Cotonou (annonce du forum du 21 octobre).
 
-## Démonstration (issue n° 36, 22 octobre)
+## Démonstration et vidéo (issue n° 36, 22 au 25 octobre)
 
 - Démo reconstruite le 21 octobre avec le moteur de `main` : seuil de passage à 1,00 par défaut.
 - Testée par Elisée le 22 octobre avec la webcam et le dispositif simulé en mode webcam, parcours résident en français, puis opérateur. Les quatre cas prévus donnent le résultat et le message attendus :
@@ -200,7 +202,15 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
   - photo ou écran de téléphone refusés avec le message générique, puis nouvelle tentative ;
   - avec la case « Allow a passive pass (0.85) », le visage passe sans défi, pour la scène de comparaison ;
   - tentatives épuisées : « Continuer sous exception » pour le résident, autre méthode de connexion pour l'opérateur.
-- Étape suivante : l'enregistrement de la vidéo, d'après `docs/demo-script.md`.
+- 25 octobre. Dix clips tournés par Elisée d'après `docs/demo-script.md`, dont la scène 9 dans le client modifié sur Collab. Montage en deux versions, sous-titres avec voix de synthèse et sous-titres seuls ; la version sans voix est retenue (voir Décisions) : 4 min 35, 1080p, sous-titres dans un bandeau sous l'image, calés sur les événements de chaque clip et vérifiés image par image. Clips et montage restent dans `captures/` (ignoré par Git). Vidéo déposée dans `01_Video` du dossier Drive ; issue n° 36 fermée par Elisée.
+- Les cas vus à l'écran pendant le tournage sont reportés dans `docs/test-results.md`, section 2.1 (#117).
+
+## Soumission (issues n° 37 et 38, 25 octobre)
+
+- Deck « Face Liveness Pitch » mis à jour le 25 octobre d'après `docs/pitch-outline.md` : score du dispositif, défis à chaque session (15 s chacun), paquet, embarquement sur Collab, deux sujets, 193 tests du moteur. Exporté en .pptx et .pdf par Elisée dans `02_Pitch` ; issue n° 37 fermée par Elisée.
+- Documentation remise à jour avant les exports (#117) : lignes de statut, vérification de la signature du JAR du moteur, entrée `faceLiveness` du paquet, cas vus à l'écran, maquettes r04, r05, r12, a02 et a03.
+- Dossier Drive `MOSIP-Decode-2026_Best_Team_PS04`, partagé en lecture par lien : vidéo, deck, PDF de `03_Source` à `06_Documentation` construits depuis `main` après #117, et `07_Student_IDs` pour la carte étudiante de chaque membre. Les PDF se reconstruisent avec les scripts `drive_*.py` (hors dépôt).
+- Reste pour le 26 octobre : `03_Source/README.pdf` reconstruit après la fusion de cette mise à jour, lien du Drive vérifié en navigation privée, e-mail de `docs/submission-email.md` envoyé par Elisée, puis issue n° 38 fermée.
 
 ## Nettoyage de l'historique et vérification des commits (13 octobre)
 
@@ -408,10 +418,12 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - 23 octobre. Durée du flux vidéo laissée à `mosip.registration.capture_time_out` de l'environnement, sans changement du client. Sur Collab, environ 10 s : une vérification doit y tenir dans ce temps. La valeur recommandée pour un déploiement est dans `docs/configuration.md`, section 5. Décidé par Elisée.
 - 23 octobre. Score passif calculé dans le dispositif, comme MOSIP l'a demandé (option B) : le dispositif simulé note chaque image avec les modèles du moteur et envoie le score avec elle (`X-Liveness-Score`) ; le client l'utilise à la place du sien et lance les défis s'il n'atteint pas le seuil. Sans score du dispositif, le client calcule le sien. Face-liveness-pad#115 et registration-client#18. Décidé par Elisée.
 - 23 octobre. La vérification de chaque visage part dans le paquet (entrée `faceLiveness` des métadonnées : décision, tentative, source du score passif, défis et résultat de chacun, version des modèles ; sans image ni score), en plus de `faceLivenessException`. Registration-client#18. Décidé par Elisée.
+- 25 octobre. Vidéo de la soumission : version sous-titrée sans voix, sous-titres dans un bandeau sous l'image pour ne jamais cacher l'interface. Décidé par Elisée.
 
 ## Blocages
 
 - Accès Collab. Elisée a envoyé le formulaire de demande, puis un e-mail à `decode@mosip.io` le 7 octobre à 14 h 25. Réponse de MOSIP Decode (Pragya, Community Manager) le 7 octobre à 21 h 58 : la demande est transmise aux mentors du sujet 04, Varaniya et Jana, pour vérifier l'accès Collab et aider à la mise en route du client. En attente de leur retour au 8 octobre. À l'AMA du 14 octobre, Varaniya annonce l'envoi des accès par e-mail le jour même. Toujours aucun accès le 15 octobre après-midi : relance à faire par e-mail, et démonstration autonome (moteur, dispositif simulé, écran de capture) envisagée en solution de repli. Sans enregistrement de la machine, sans identifiants et sans accès WireGuard, le client ne peut pas se synchroniser avec le serveur. La fin de l'étape 0.4 attend cet accès. Les étapes 0.5, 0.6 et 0.8 n'en dépendent pas. Identifiants d'opérateur reçus par e-mail le 16 octobre (gardés hors dépôt) ; Elisée a répondu en demandant la configuration WireGuard et le nom d'hôte de l'environnement. Configuration WireGuard reçue le 21 octobre : connexion et synchronisation fonctionnent depuis l'activation de la machine par MOSIP ; depuis les clés renouvelées le 22 octobre, l'embarquement va jusqu'à l'enregistrement, refusé par le serveur (`RPR-RCT-001`) et signalé à MOSIP le 23 octobre (voir la section Collab).
+- Embarquement sur Collab (issues n° 26 et 27). Cause connue depuis le 23 octobre au soir : l'embarquement compare le visage à l'identité de l'UIN rattaché au compte opérateur, et le compte fourni par MOSIP n'en a pas. UIN obtenu par le portail d'auto-inscription ; rattachement demandé à MOSIP, sans réponse au 25 octobre. Sans lui, pas d'inscription de résident sur Collab : la matrice fonctionnelle reste à faire dans le client.
 
 ## Écarts relevés par rapport au plan
 
@@ -429,7 +441,7 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - Q1 (close, 7 octobre) : base = 1.2.0.2.
 - Q2 (close, 7 octobre) : date limite = 26 octobre 2026, 19 h 29 à Cotonou.
 - Q9 (close, 7 octobre) : calendrier resserré et périmètre réduit validés.
-- Q3 (ouverte, étape 0.4) : accès Collab. Identifiants reçus le 16 octobre, configuration WireGuard le 21 octobre, tous hors dépôt ; nom d'hôte confirmé, `api-internal.collab.mosip.net`. Reste l'enregistrement de la machine, refusé à la connexion (`KER-SYN-AUTH-001`), demandé à MOSIP le 21 octobre.
+- Q3 (close, 21 octobre) : accès Collab. Identifiants reçus le 16 octobre, configuration WireGuard le 21 octobre, tous hors dépôt ; nom d'hôte confirmé, `api-internal.collab.mosip.net`. Machine activée par MOSIP le 21 octobre : connexion et synchronisation fonctionnent. L'embarquement attend un UIN rattaché au compte (voir Blocages).
 - Q0 (close, 7 octobre) : JDK 21.0.3 et Maven 3.9.6 non installés, ils ne servent pas à la 1.2.0.2.
 - Q4 (close, 7 octobre) : membres, comptes GitHub et répartition reçus (voir Équipe).
 - Q10 (close, 7 octobre) : issues et étiquettes créées, phase 1 répartie.
@@ -438,6 +450,6 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - Q13 (close, 7 octobre) : Pull Request n° 40 ouverte avec l'accord d'Elisée, puis fusionnée par Elisée.
 - Q14 (close, 7 octobre) : clés `passive.timeout_ms` et `active.baseline_ms`, opération de contrôle de l'image capturée et règle de comptage des tentatives validées.
 - Q7 (close, 7 octobre) : résident orienté vers la procédure d'exception de MOSIP après la dernière tentative.
-- Q15 (ouverte, non posée le 14 octobre faute de temps) : comment une exception de vivacité du visage doit-elle être portée dans le paquet pour le traitement côté serveur ?
-- Q16 (ouverte, 14 octobre) : à l'AMA, Anusha place la vérification de vivacité dans RCAPTURE, côté dispositif. Les mentors du sujet 04 attendent-ils aussi une vérification côté dispositif, en plus de celle du client sur le flux ?
+- Q15 (close, 23 octobre) : comment la vivacité doit-elle être portée dans le paquet ? Réponse de Varaniya : les défis effectués figurent dans les détails du paquet. Entrée `faceLiveness` des métadonnées, en plus de `faceLivenessException` (registration-client#18).
+- Q16 (close, 23 octobre) : où placer la vérification passive ? Réponse de Varaniya : dans le dispositif ; si le score n'atteint pas le seuil, le client lance les défis. Score envoyé par le dispositif simulé (#115) et utilisé par le client (registration-client#18).
 - Q6 étendue (étape 2.1) : moteur compilé pour Java 11, nom de paquet `io.mosip.registration.liveness`.
