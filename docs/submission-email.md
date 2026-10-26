@@ -1,6 +1,6 @@
 # Submission
 
-Draft of the submission email and plan of the shared folder (#38). The email is sent by the coordinator on Monday 26 October 2026 in the morning, before the deadline of 23:59 IST (19:29 in Cotonou). Nothing here is sent automatically.
+Draft of the submission email and plan of the shared folder (#38). MOSIP extended the deadline to 2 November 2026 (email of 26 October). The email is sent by the coordinator on Saturday 31 October 2026, ahead of that deadline. Nothing here is sent automatically.
 
 ## Email
 
@@ -20,12 +20,15 @@ Source code (public GitHub repositories, with their history):
   https://github.com/BestTeam-MosipDecode/face-liveness-pad
 - Changes to the Registration Client 1.2.0.2, branch feature/face-liveness:
   https://github.com/BestTeam-MosipDecode/registration-client/tree/feature/face-liveness
+Submitted commits: face-liveness-pad main [commit], registration-client feature/face-liveness [commit].
 
-Shared folder (video, pitch deck, design, tests, documents):
+Shared folder (video, pitch deck, design, tests, documents, student IDs):
 [Drive link]
 
 Installation and use: README.md of face-liveness-pad and docs/dev-setup-windows.md.
 Demo without a MOSIP environment: demo/README.md.
+API documentation: docs/engine-api.md (Java API of the liveness engine), docs/mock-sbi.md and mock-sbi/README.md (SBI calls of the face device, formats, signatures and the passive score header), docs/decision-flow.md section 7.1 (liveness entry of the packet). PDF copies are in 06_Documentation of the shared folder.
+The modified client was also run on the MOSIP Collab environment: sign-in, synchronisation and operator onboarding with the liveness check (scene 9 of the video).
 
 Team members: Temitayo Gbolahan, Tobi Obassandjo.
 
