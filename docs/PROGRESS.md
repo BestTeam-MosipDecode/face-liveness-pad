@@ -2,11 +2,11 @@
 
 Suivi de travail interne du projet Face Liveness / PAD (MOSIP Decode 2026, sujet 04).
 Plan de référence : `PLAN_FACE_LIVENESS.md`, à la racine du workspace `mosip_decode/` (hors dépôt).
-Dernière mise à jour : 25 octobre 2026.
+Dernière mise à jour : 26 octobre 2026.
 
 ## Étape en cours
 
-Soumission (issue n° 38) : e-mail à envoyer le lundi 26 octobre au matin, avant 19 h 29 à Cotonou. La vidéo, le deck et le dossier Drive sont prêts depuis le 25 octobre (issues n° 36 et 37 fermées, voir la section Soumission). Sur Collab, le client modifié se connecte, se synchronise et vérifie la vivacité du visage à l'embarquement ; l'enregistrement de l'embarquement attend que MOSIP rattache un UIN au compte opérateur, et les parcours de bout en bout des issues n° 26 et 27 attendent cet embarquement (voir la section Collab).
+Soumission (issue n° 38) : date limite reportée au 2 novembre par MOSIP (e-mail du 26 octobre) ; envoi prévu le samedi 31 octobre, que l'embarquement sur Collab aboutisse ou non (voir Décisions). La vidéo, le deck et le dossier Drive sont prêts depuis le 25 octobre (issues n° 36 et 37 fermées, voir la section Soumission). Sur Collab, le client modifié se connecte, se synchronise et vérifie la vivacité du visage à l'embarquement ; l'enregistrement de l'embarquement attend que MOSIP rattache un UIN au compte opérateur, et les parcours de bout en bout des issues n° 26 et 27 attendent cet embarquement (voir la section Collab).
 
 ## Terminé
 
@@ -210,7 +210,7 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 - Deck « Face Liveness Pitch » mis à jour le 25 octobre d'après `docs/pitch-outline.md` : score du dispositif, défis à chaque session (15 s chacun), paquet, embarquement sur Collab, deux sujets, 193 tests du moteur. Exporté en .pptx et .pdf par Elisée dans `02_Pitch` ; issue n° 37 fermée par Elisée.
 - Documentation remise à jour avant les exports (#117) : lignes de statut, vérification de la signature du JAR du moteur, entrée `faceLiveness` du paquet, cas vus à l'écran, maquettes r04, r05, r12, a02 et a03.
 - Dossier Drive `MOSIP-Decode-2026_Best_Team_PS04`, partagé en lecture par lien : vidéo, deck, PDF de `03_Source` à `06_Documentation` construits depuis `main` après #117, et `07_Student_IDs` pour la carte étudiante de chaque membre. Les PDF se reconstruisent avec les scripts `drive_*.py` (hors dépôt).
-- Reste pour le 26 octobre : `03_Source/README.pdf` reconstruit après la fusion de cette mise à jour, lien du Drive vérifié en navigation privée, e-mail de `docs/submission-email.md` envoyé par Elisée, puis issue n° 38 fermée.
+- Reste avant l'envoi du 31 octobre : `03_Source/README.pdf` reconstruit sur le dernier commit, lien du Drive vérifié en navigation privée, e-mail de `docs/submission-email.md` envoyé par Elisée, puis issue n° 38 fermée.
 
 ## Nettoyage de l'historique et vérification des commits (13 octobre)
 
@@ -419,6 +419,7 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 - 23 octobre. Score passif calculé dans le dispositif, comme MOSIP l'a demandé (option B) : le dispositif simulé note chaque image avec les modèles du moteur et envoie le score avec elle (`X-Liveness-Score`) ; le client l'utilise à la place du sien et lance les défis s'il n'atteint pas le seuil. Sans score du dispositif, le client calcule le sien. Face-liveness-pad#115 et registration-client#18. Décidé par Elisée.
 - 23 octobre. La vérification de chaque visage part dans le paquet (entrée `faceLiveness` des métadonnées : décision, tentative, source du score passif, défis et résultat de chacun, version des modèles ; sans image ni score), en plus de `faceLivenessException`. Registration-client#18. Décidé par Elisée.
 - 25 octobre. Vidéo de la soumission : version sous-titrée sans voix, sous-titres dans un bandeau sous l'image pour ne jamais cacher l'interface. Décidé par Elisée.
+- 26 octobre. Date limite reportée au 2 novembre 2026 par MOSIP (e-mail du 26 octobre ; heure à confirmer dans les consignes de soumission). Envoi interne fixé au samedi 31 octobre. La semaine sert à relancer MOSIP pour le rattachement de l'UIN et, s'il arrive, à terminer les issues n° 26 et 27 sur Collab ; le dossier du 25 octobre reste prêt en solution de repli. Décidé par Elisée.
 
 ## Blocages
 
@@ -439,7 +440,7 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 ## Questions pour Elisée
 
 - Q1 (close, 7 octobre) : base = 1.2.0.2.
-- Q2 (close, 7 octobre) : date limite = 26 octobre 2026, 19 h 29 à Cotonou.
+- Q2 (close, 7 octobre) : date limite = 26 octobre 2026, 19 h 29 à Cotonou ; reportée au 2 novembre 2026 par MOSIP le 26 octobre.
 - Q9 (close, 7 octobre) : calendrier resserré et périmètre réduit validés.
 - Q3 (close, 21 octobre) : accès Collab. Identifiants reçus le 16 octobre, configuration WireGuard le 21 octobre, tous hors dépôt ; nom d'hôte confirmé, `api-internal.collab.mosip.net`. Machine activée par MOSIP le 21 octobre : connexion et synchronisation fonctionnent. L'embarquement attend un UIN rattaché au compte (voir Blocages).
 - Q0 (close, 7 octobre) : JDK 21.0.3 et Maven 3.9.6 non installés, ils ne servent pas à la 1.2.0.2.
