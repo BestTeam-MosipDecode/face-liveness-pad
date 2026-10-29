@@ -2,11 +2,11 @@
 
 Suivi de travail interne du projet Face Liveness / PAD (MOSIP Decode 2026, sujet 04).
 Plan de référence : `PLAN_FACE_LIVENESS.md`, à la racine du workspace `mosip_decode/` (hors dépôt).
-Dernière mise à jour : 26 octobre 2026.
+Dernière mise à jour : 29 octobre 2026.
 
 ## Étape en cours
 
-Soumission (issue n° 38) : date limite reportée au 2 novembre par MOSIP (e-mail du 26 octobre) ; envoi prévu le samedi 31 octobre, que l'embarquement sur Collab aboutisse ou non (voir Décisions). La vidéo, le deck et le dossier Drive sont prêts depuis le 25 octobre (issues n° 36 et 37 fermées, voir la section Soumission). Sur Collab, le client modifié se connecte, se synchronise et vérifie la vivacité du visage à l'embarquement ; l'enregistrement de l'embarquement attend que MOSIP rattache un UIN au compte opérateur, et les parcours de bout en bout des issues n° 26 et 27 attendent cet embarquement (voir la section Collab).
+Soumission (issue n° 38) : date limite reportée au 2 novembre par MOSIP (e-mail du 26 octobre) ; envoi prévu le samedi 31 octobre, que l'embarquement sur Collab aboutisse ou non (voir Décisions). La vidéo, le deck et le dossier Drive sont prêts depuis le 25 octobre (issues n° 36 et 37 fermées, voir la section Soumission). Sur Collab, le client modifié se connecte, se synchronise et vérifie la vivacité du visage à l'embarquement ; l'enregistrement de l'embarquement est refusé par le serveur, un problème de l'environnement Collab confié par MOSIP à son équipe le 27 octobre, et les parcours de bout en bout des issues n° 26 et 27 attendent cet embarquement (voir la section Collab).
 
 ## Terminé
 
@@ -186,6 +186,7 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
   - Android : la note de conception suffit.
 - 23 octobre, au soir. Réponse de Varaniya sur l'embarquement : l'opérateur doit déjà avoir un UIN, à obtenir par le portail d'auto-inscription de Collab. UIN obtenu par Elisée sur ce portail le soir même (gardé hors dépôt), puis rattachement au compte opérateur demandé à MOSIP par e-mail. Sans réponse au 25 octobre au soir : l'enregistrement de l'embarquement, puis les inscriptions de résidents des issues n° 26 et 27, attendent ce rattachement.
 - 25 octobre. Scène 9 de la vidéo tournée sur Collab : embarquement de l'opérateur, score du dispositif, deux défis, vivacité vérifiée et visage capturé.
+- 27 octobre. Varaniya répond que les données envoyées à IDA sont chiffrées et ne peuvent pas être déplacées, et demande le problème exact. Réponse d'Elisée avec l'appel en cause, relevé dans les journaux du client : `POST /registrationprocessor/v1/registrationstatus/auth`, identifiant de l'opérateur de type `USERID`, réponse `RPR-RCT-001` environ 7 s plus tard (23 octobre à 8 h 11 min 41 s UTC, 25 octobre à 14 h 46 min 50 s UTC). Varaniya transmet le problème à Nandu (MOSIP) comme bug de l'environnement Collab. Sans nouvelle au 29 octobre.
 - Réponses de Varaniya sur le forum, le 21 octobre, aux questions d'Elisée du 20 octobre :
   - Collab : l'accès est fourni, signaler tout problème ;
   - démonstration : MOSIP compte sur une démonstration sur Collab, l'application de démo reste la solution de repli ;
@@ -424,7 +425,7 @@ Ce qui sortirait du périmètre : jeux de données publics (1.3) et évaluation 
 ## Blocages
 
 - Accès Collab. Elisée a envoyé le formulaire de demande, puis un e-mail à `decode@mosip.io` le 7 octobre à 14 h 25. Réponse de MOSIP Decode (Pragya, Community Manager) le 7 octobre à 21 h 58 : la demande est transmise aux mentors du sujet 04, Varaniya et Jana, pour vérifier l'accès Collab et aider à la mise en route du client. En attente de leur retour au 8 octobre. À l'AMA du 14 octobre, Varaniya annonce l'envoi des accès par e-mail le jour même. Toujours aucun accès le 15 octobre après-midi : relance à faire par e-mail, et démonstration autonome (moteur, dispositif simulé, écran de capture) envisagée en solution de repli. Sans enregistrement de la machine, sans identifiants et sans accès WireGuard, le client ne peut pas se synchroniser avec le serveur. La fin de l'étape 0.4 attend cet accès. Les étapes 0.5, 0.6 et 0.8 n'en dépendent pas. Identifiants d'opérateur reçus par e-mail le 16 octobre (gardés hors dépôt) ; Elisée a répondu en demandant la configuration WireGuard et le nom d'hôte de l'environnement. Configuration WireGuard reçue le 21 octobre : connexion et synchronisation fonctionnent depuis l'activation de la machine par MOSIP ; depuis les clés renouvelées le 22 octobre, l'embarquement va jusqu'à l'enregistrement, refusé par le serveur (`RPR-RCT-001`) et signalé à MOSIP le 23 octobre (voir la section Collab).
-- Embarquement sur Collab (issues n° 26 et 27). Cause connue depuis le 23 octobre au soir : l'embarquement compare le visage à l'identité de l'UIN rattaché au compte opérateur, et le compte fourni par MOSIP n'en a pas. UIN obtenu par le portail d'auto-inscription ; rattachement demandé à MOSIP, sans réponse au 25 octobre. Sans lui, pas d'inscription de résident sur Collab : la matrice fonctionnelle reste à faire dans le client.
+- Embarquement sur Collab (issues n° 26 et 27). Cause connue depuis le 23 octobre au soir : l'embarquement compare le visage à l'identité de l'UIN rattaché au compte opérateur, et le compte fourni par MOSIP n'en a pas. UIN obtenu par le portail d'auto-inscription ; rattachement demandé à MOSIP. Le 27 octobre, MOSIP confie l'échec à son équipe comme bug de l'environnement Collab ; sans nouvelle au 29 octobre. Sans lui, pas d'inscription de résident sur Collab : la matrice fonctionnelle reste à faire dans le client.
 
 ## Écarts relevés par rapport au plan
 

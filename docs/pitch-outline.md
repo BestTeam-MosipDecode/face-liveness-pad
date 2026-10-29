@@ -189,12 +189,12 @@ On the slide:
 - Paper mask worn by another person: known limitation; next step, a dedicated check of mask edges and paper texture
 - Glossy prints can score like live faces: challenges in every session for now; next step, a complementary passive signal, such as moiré
 - Two subjects so far: record more, then confirm the thresholds on held-out subjects
-- On Collab, the device is trusted and the onboarding face passes liveness; saving the onboarding waits for MOSIP to link a UIN to our operator account. Android covered by a design note only
+- On Collab, the device is trusted and the onboarding face passes liveness; saving the onboarding fails on the server (`RPR-RCT-001`), an issue of the Collab environment under review by MOSIP. Android covered by a design note only
 - Stream injection before the client depends on device integrity (L1 devices), outside PAD
 
 Speaker notes:
 
-We list our limits because the jury will meet them anyway. The cut-out paper mask is the main one: real eyes and a real mouth show through the holes, so the passive classifier scores it like a live face, and its wearer can perform the challenges. Glossy prints of our second subject also scored like live faces, which the random challenges now stop, at the cost of about ten seconds per session. Our results rest on two subjects, so the next step is more subjects and a held-out evaluation before any threshold is called final. On the MOSIP Collab environment, the modified client signs in and synchronises, and the face an operator enrols at onboarding passes the liveness check. Saving the onboarding needs a UIN linked to the operator account, which we asked MOSIP to do. The Android client is covered by a design note only.
+We list our limits because the jury will meet them anyway. The cut-out paper mask is the main one: real eyes and a real mouth show through the holes, so the passive classifier scores it like a live face, and its wearer can perform the challenges. Glossy prints of our second subject also scored like live faces, which the random challenges now stop, at the cost of about ten seconds per session. Our results rest on two subjects, so the next step is more subjects and a held-out evaluation before any threshold is called final. On the MOSIP Collab environment, the modified client signs in and synchronises, and the face an operator enrols at onboarding passes the liveness check. Saving the onboarding then fails on the server side, an issue of the Collab environment that MOSIP is reviewing. The Android client is covered by a design note only.
 
 ## Slide 14: Impact
 
@@ -230,5 +230,5 @@ Our work gives MOSIP deployments a liveness and PAD gate that runs on the regist
 | 24 of 24 device stream runs, SBI 0.9.5 and 1.0 | Comment on #29 |
 | Paper mask as a known limitation | `docs/security-privacy.md`, section 3, item 6 |
 | Two subjects, 67 sequences, three lighting conditions | `docs/test-results.md`, sections 1.1 and 1.2.1 |
-| Sign-in and sync on Collab, onboarding face verified, saving waits for a UIN linked to the operator account | `docs/workflows.md`, section 2.4; `docs/PROGRESS.md`, section on Collab; comment on #27 |
+| Sign-in and sync on Collab, onboarding face verified, saving refused by the server (`RPR-RCT-001`), under review by MOSIP | `docs/workflows.md`, section 2.4; `docs/PROGRESS.md`, section on Collab; comment on #27 |
 | Team and roles | `docs/PROGRESS.md`, "Équipe" |
