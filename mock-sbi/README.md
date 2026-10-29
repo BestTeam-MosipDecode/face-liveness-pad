@@ -68,7 +68,7 @@ cd target
 .\run_reg.bat
 ```
 
-- `java -version` must show 11 in the same terminal before `mvn` and `run_reg.bat`.
+- `java -version` must show 11 in the same terminal before `mvn` and `run_reg.bat`. With Java 12 or later, the stream works but every capture fails with `UnsatisfiedLinkError: no opencv_java490`.
 - PowerShell splits `-Dgpg.skip` at the dot, and Maven then stops with `Unknown lifecycle phase ".skip"`: keep the quotes.
 - PowerShell runs a script of the current folder only with `.\` in front of its name.
 - `webcam` mode: the camera opens with DirectShow, in about one second (#17).
