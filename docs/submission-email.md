@@ -28,7 +28,7 @@ Shared folder (video, pitch deck, design, tests, documents, student IDs):
 Installation and use: README.md of face-liveness-pad and docs/dev-setup-windows.md.
 Demo without a MOSIP environment: demo/README.md.
 API documentation: docs/engine-api.md (Java API of the liveness engine), docs/mock-sbi.md and mock-sbi/README.md (SBI calls of the face device, formats, signatures and the passive score header), docs/decision-flow.md section 7.1 (liveness entry of the packet). PDF copies are in 06_Documentation of the shared folder.
-The modified client was also run on the MOSIP Collab environment: sign-in, synchronisation and operator onboarding with the liveness check (scene 9 of the video).
+The modified client was also run on the MOSIP Collab environment: sign-in, synchronisation and operator onboarding with the liveness check (scene 9 of the video). Saving the onboarding still fails on the server with an internal error of IDA (RPR-RTS-002), reported to MOSIP on 29 October, so a resident registration could not be run on Collab.
 
 Team members: Temitayo Gbolahan, Tobi Obassandjo.
 

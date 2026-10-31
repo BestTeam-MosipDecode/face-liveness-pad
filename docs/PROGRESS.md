@@ -2,7 +2,7 @@
 
 Suivi de travail interne du projet Face Liveness / PAD (MOSIP Decode 2026, sujet 04).
 Plan de référence : `PLAN_FACE_LIVENESS.md`, à la racine du workspace `mosip_decode/` (hors dépôt).
-Dernière mise à jour : 29 octobre 2026.
+Dernière mise à jour : 31 octobre 2026.
 
 ## Étape en cours
 
@@ -188,7 +188,7 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 - 25 octobre. Scène 9 de la vidéo tournée sur Collab : embarquement de l'opérateur, score du dispositif, deux défis, vivacité vérifiée et visage capturé.
 - 27 octobre. Varaniya répond que les données envoyées à IDA sont chiffrées et ne peuvent pas être déplacées, et demande le problème exact. Réponse d'Elisée avec l'appel en cause, relevé dans les journaux du client : `POST /registrationprocessor/v1/registrationstatus/auth`, identifiant de l'opérateur de type `USERID`, réponse `RPR-RCT-001` environ 7 s plus tard (23 octobre à 8 h 11 min 41 s UTC, 25 octobre à 14 h 46 min 50 s UTC). Varaniya transmet le problème à Nandu (MOSIP) comme bug de l'environnement Collab. Sans nouvelle au 29 octobre.
 - 29 octobre. Dispositif simulé démarré par `run_reg.bat` dans une session où le JDK 21 est celui par défaut : le flux marche, mais chaque capture échoue (`UnsatisfiedLinkError: no opencv_java490`, le convertisseur ISO de MOSIP charge OpenCV d'une façon refusée à partir de Java 12). Relancé avec le JDK 11, comme le demande son README ; `dev-setup-windows.md`, section 8, le précise désormais. Sur Collab, la plupart des essais échouent sur la durée du flux de 10 s : vivacité établie trop tard, ou capture du dispositif pas terminée avant la coupure. Après trois échecs, le Scan de l'embarquement est bloqué jusqu'au redémarrage du client.
-- 29 octobre. Nandu (MOSIP) demande un nouvel essai avec l'heure UTC de l'enregistrement. Essai à 13 h 30 min 51 s UTC : `RPR-RCT-001`, 1,3 s plus tard. Nandu trouve la cause : aucun UIN n'était rattaché au compte opérateur ; MOSIP rattache l'UIN obtenu le 23 octobre. Nouvel essai à 16 h 26 min 52 s UTC, avec le visage de la personne inscrite : la requête atteint IDA, qui répond `500 Internal Server Error`, et le service d'état d'enregistrement renvoie `RPR-RTS-002` 7,8 s plus tard. Heure et erreur transmises à Nandu.
+- 29 octobre. Nandu (MOSIP) demande un nouvel essai avec l'heure UTC de l'enregistrement. Essai à 13 h 30 min 51 s UTC : `RPR-RCT-001`, 1,3 s plus tard. Nandu trouve la cause : aucun UIN n'était rattaché au compte opérateur ; MOSIP rattache l'UIN obtenu le 23 octobre. Nouvel essai à 16 h 26 min 52 s UTC, avec le visage de la personne inscrite : la requête atteint IDA, qui répond `500 Internal Server Error`, et le service d'état d'enregistrement renvoie `RPR-RTS-002` 7,8 s plus tard. Heure et erreur transmises à Nandu. Sans réponse au 31 octobre au matin.
 - Réponses de Varaniya sur le forum, le 21 octobre, aux questions d'Elisée du 20 octobre :
   - Collab : l'accès est fourni, signaler tout problème ;
   - démonstration : MOSIP compte sur une démonstration sur Collab, l'application de démo reste la solution de repli ;
