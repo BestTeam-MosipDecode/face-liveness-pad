@@ -167,6 +167,8 @@ cd target
 .\run_reg.bat
 ```
 
+Start the device in a terminal where JDK 11 is selected (section 1), like the client. With a newer JDK, the stream works but every capture fails: the face ISO converter of MOSIP loads OpenCV in a way that Java 12 and later refuse (`UnsatisfiedLinkError: no opencv_java490`), the device closes the connection, and the log of the client shows `127.0.0.1:4501 failed to respond`.
+
 The device depends on `liveness-engine`, which scores each face frame in the device (section 3 first). The device listens on the first free port from 4501, where the client discovers it. `python mock-sbi\scripts\check_device.py`, from the root of the repository, calls it the way the client does and checks each answer.
 
 An antivirus can take the device for a threat: it opens a local server, loads a private test key and signs its answers. On the reference machine, the behaviour shield of Avast stopped the device during a replay run and moved `mock-mds-1.2.0.2.jar` to quarantine without showing any dialog. The next start then fails with `Could not find or load main class io.mosip.mock.sbi.test.TestMockSBI`. Add an exception for the build folder, `face-liveness-pad\mock-sbi\target\*`, in the antivirus settings, then build the device again.
@@ -195,8 +197,8 @@ Verified on 23 October 2026, with the tunnel active, the device of section 8 and
 1. Sign in in English with the operator account. The first sign-in runs the initial synchronisation.
 2. From the home page, open the onboarding of the operator. With only a face device, mark every fingerprint and both irises as exceptions, by clicking each image.
 3. On the face, press **Scan**. The liveness pane appears over the face image: a short passive analysis, then two random challenges, with 15 s for each. For a turn, turn the head to the side of the arrow, then look back at the camera. The capture starts on its own once liveness is established, and the face is stored only if it matches the face followed on the stream ([workflows.md](workflows.md), section 2.4).
-4. On Collab, the device stream lasts `mosip.registration.capture_time_out`, about 10 s: the whole check and the capture must finish within it ([configuration.md](configuration.md), section 5). An attempt that lasts longer fails, either while the stream is cut or at the capture, with `error 700` from the device.
-5. Press **Save**. On 23 October the server refused the onboarding with `RPR-RCT-001` ("Unable to access API"), a failure on the server side that was reported to MOSIP. The client shows the message returned by the server (before registration-client#17 it showed only "ERROR").
+4. On Collab, the device stream lasts `mosip.registration.capture_time_out`, about 10 s: the whole check and the capture must finish within it ([configuration.md](configuration.md), section 5). An attempt that lasts longer fails, either while the stream is cut or at the capture, with `error 700` from the device. The device takes about 2.5 s to open the webcam, then from under 1 s to more than 3 s for the capture, which leaves about 6 s for the passive analysis and the two challenges. After three failed attempts, the scan of the onboarding is blocked (`on_max_attempts` is `BLOCK` for the operator); restarting the client resets the count.
+5. Press **Save**. On 23 October the server refused the onboarding with `RPR-RCT-001` ("Unable to access API"), a failure on the server side that was reported to MOSIP. On 29 October, after MOSIP linked a UIN to the operator account, the error became `RPR-RTS-002`: IDA answered `500 Internal Server Error` to the registration status service. The client shows the message returned by the server (before registration-client#17 it showed only "ERROR").
 
 ## Not covered yet
 

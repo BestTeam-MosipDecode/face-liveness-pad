@@ -1,6 +1,6 @@
 # Test results
 
-Status on 25 October 2026: section 1 holds the measures made on the captures of two team subjects (S10 on 15 October, S30 on 20 October), sections 3 to 5 those of S10, with the scores and replays run on the machines that recorded them; only aggregated figures leave those machines. Section 2.1 records the cases run on screen in the demo application and on the MOSIP Collab environment. The full matrix of section 2 needs resident registrations in the Registration Client signed in to Collab, which wait for MOSIP to link a UIN to the operator account (onboarding, section 2). Values marked "not run" are filled in when the test is done, following [test-plan.md](test-plan.md). No face image appears in this document.
+Status on 31 October 2026: section 1 holds the measures made on the captures of two team subjects (S10 on 15 October, S30 on 20 October), sections 3 to 5 those of S10, with the scores and replays run on the machines that recorded them; only aggregated figures leave those machines. Section 2.1 records the cases run on screen in the demo application and on the MOSIP Collab environment. The full matrix of section 2 needs resident registrations in the Registration Client signed in to Collab, which wait for the onboarding to be saved: since the UIN was linked on 29 October, IDA fails on it with an internal error (`RPR-RTS-002`), under review by MOSIP (section 2). Values marked "not run" are filled in when the test is done, following [test-plan.md](test-plan.md). No face image appears in this document.
 
 **Section 1 covers two subjects (S10 on 15 October, S30 on 20 October), the other sections one (S10).** They show that the chain works and where it fails; they are not a statistically meaningful error rate. ISO/IEC 30107-3 asks for many subjects and presentation attack instruments before an APCER or a BPCER can be compared with other systems.
 
@@ -109,7 +109,7 @@ Consequence: `SMILE` was left out of the default challenge types on 16 October (
 
 Cases of [test-plan.md](test-plan.md), section 9 (#27). Workflows: R resident capture, O operator authentication, S supervisor authentication. Online and offline as defined in the plan.
 
-The matrix needs resident registrations in the Registration Client signed in to a MOSIP environment. On Collab, sign-in and synchronisation work and the operator onboarding was checked on screen (section 2.1); a resident registration needs the onboarding saved first, which waits for MOSIP to link a UIN to the operator account ([workflows.md](workflows.md), section 2.4). The engine behaviour behind F04 to F06 and F09 to F11 is measured on replayed sequences in sections 3 and 5.
+The matrix needs resident registrations in the Registration Client signed in to a MOSIP environment. On Collab, sign-in and synchronisation work and the operator onboarding was checked on screen (section 2.1); a resident registration needs the onboarding saved first, which fails in IDA on the server (`RPR-RTS-002`) since the UIN was linked on 29 October, under review by MOSIP ([workflows.md](workflows.md), section 2.4). The engine behaviour behind F04 to F06 and F09 to F11 is measured on replayed sequences in sections 3 and 5.
 
 | ID | Case | Expected | R online | R offline | O online | O offline | S online | S offline |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -143,7 +143,7 @@ Run on 25 October 2026 for the video of the submission, with the default setting
 | F05, photo on a phone screen | Resident | Demo application | Refused the same way, attempt 2 of 3 |
 | F12 and F14, attempts exhausted | Resident, 1 attempt, printed photo | Demo application | Exception process offered; face captured under exception, a supervisor required before submission |
 | F05 and F12, phone screen | Supervisor, 1 attempt, French | Demo application | Refused, the user is sent to another sign-in method |
-| Onboarding, live face | Operator | Registration Client on MOSIP Collab, 23 and 25 October | Device score, 2 challenges (blink, turn right), liveness verified, face captured. Saving the onboarding refused by the server (`RPR-RCT-001`) until a UIN is linked to the operator account |
+| Onboarding, live face | Operator | Registration Client on MOSIP Collab, 23, 25 and 29 October | Device score, 2 challenges (blink, turn right), liveness verified, face captured. Saving the onboarding refused by the server: `RPR-RCT-001` until the UIN was linked, then `RPR-RTS-002` (IDA internal error) on 29 October, under review by MOSIP |
 
 ## 3. System PAD campaign
 
