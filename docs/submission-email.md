@@ -1,6 +1,6 @@
 # Submission
 
-Draft of the submission email and plan of the shared folder (#38). MOSIP extended the deadline to 2 November 2026 (email of 26 October). The email is sent by the coordinator on Saturday 31 October 2026, ahead of that deadline. Nothing here is sent automatically.
+Draft of the submission email and plan of the shared folder (#38). MOSIP extended the deadline to 2 November 2026 (email of 26 October). The coordinator sent the email ahead of that deadline, with the commits face-liveness-pad `main` b2c892a and registration-client `feature/face-liveness` 4e9c2d6. Nothing here is sent automatically.
 
 ## Email
 
