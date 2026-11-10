@@ -2,11 +2,11 @@
 
 Suivi de travail interne du projet Face Liveness / PAD (MOSIP Decode 2026, sujet 04).
 Plan de référence : `PLAN_FACE_LIVENESS.md`, à la racine du workspace `mosip_decode/` (hors dépôt).
-Dernière mise à jour : 1er novembre 2026.
+Dernière mise à jour : 10 novembre 2026.
 
 ## Étape en cours
 
-Soumission envoyée à MOSIP par Elisée avant la date limite du 2 novembre (issue n° 38 fermée, voir la section Soumission). Reste l'évaluation, du 1er au 6 novembre, et le pitch final si l'équipe est présélectionnée. Sur Collab, le client modifié se connecte, se synchronise et vérifie la vivacité du visage à l'embarquement ; l'enregistrement de l'embarquement est refusé par le serveur : depuis le rattachement de l'UIN par MOSIP le 29 octobre, la requête atteint IDA, qui répond par une erreur interne (`RPR-RTS-002`), signalée à MOSIP le même jour et de nouveau le 31 octobre, et les parcours de bout en bout des issues n° 26 et 27 attendent cet embarquement (voir la section Collab).
+Pitch final (niveau 2) : l'équipe a franchi le niveau 1 (e-mail de MOSIP du 10 novembre). Présentation en direct le jeudi 12 novembre, de 18 h 45 à 19 h 00, fuseau demandé à MOSIP (14 h 15 à Cotonou en heure indienne) : 10 minutes, puis 5 minutes de questions. Déroulé, mise en place et réponses préparées dans `docs/final-pitch.md`. Sur Collab, le client modifié se connecte, se synchronise et vérifie la vivacité du visage à l'embarquement ; l'enregistrement de l'embarquement est refusé par le serveur : depuis le rattachement de l'UIN par MOSIP le 29 octobre, la requête atteint IDA, qui répond par une erreur interne (`RPR-RTS-002`), signalée à MOSIP le même jour et de nouveau le 31 octobre, et les parcours de bout en bout des issues n° 26 et 27 attendent cet embarquement (voir la section Collab).
 
 ## Terminé
 
@@ -216,6 +216,8 @@ Pour la mise à jour de `Solution_envisagee.md` par Elisée (étape 0.8). La ver
 - Dossier Drive `MOSIP-Decode-2026_Best_Team_PS04`, partagé en lecture par lien : vidéo, deck, PDF de `03_Source` à `06_Documentation` construits depuis `main` après #117, et `07_Student_IDs` pour la carte étudiante de chaque membre. Les PDF se reconstruisent avec les scripts `drive_*.py` (hors dépôt).
 - 31 octobre. Tous les PDF de `03_Source` à `06_Documentation` reconstruits sur le commit `b2c892a` de `main`. L'ancien deck n'étant plus accessible depuis le compte actuel, deck recréé à l'identique sur ce compte à partir de sa version du 25 octobre, slide 13 corrigée (`RPR-RTS-002`), puis exporté en .pptx et .pdf pour `02_Pitch`.
 - Soumission envoyée à `decode@mosip.io` par Elisée avant la date limite du 2 novembre, avec l'e-mail de `docs/submission-email.md`. Commits soumis : face-liveness-pad `main` `b2c892a`, registration-client `feature/face-liveness` `4e9c2d6`. L'e-mail indique que l'enregistrement de l'embarquement échoue sur le serveur. Issue n° 38 fermée.
+- 10 novembre. MOSIP annonce que l'équipe a franchi le niveau 1. Niveau 2, la finale : présentation en direct devant un jury d'experts MOSIP et de professionnels du secteur, 10 minutes (prototype ou vidéo de démonstration de préférence), puis 5 minutes de questions. Créneau proposé : jeudi 12 novembre, 18 h 45 à 19 h 00. Réponse d'Elisée le jour même : créneau confirmé, fuseau horaire demandé, liste des membres avec leurs coordonnées (gardées hors dépôt) pour les invitations.
+- 10 novembre. Préparation dans `docs/final-pitch.md` : déroulé de 10 minutes sur les slides 1, 2, 4, 6, 7, 11, 12, 13 et 14, démonstration en direct des scènes 3, 5, 6 et 8, extrait de la scène 9 pour Collab, mise en place horaire et réponses aux questions probables du jury. PDF du deck réduit à ces 9 slides et extrait de la scène 9 (28 s) dans `captures/final_pitch/`, ignoré par Git.
 
 ## Nettoyage de l'historique et vérification des commits (13 octobre)
 

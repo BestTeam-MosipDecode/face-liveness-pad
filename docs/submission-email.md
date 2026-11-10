@@ -70,7 +70,7 @@ Optional items: design mock-ups (`docs/ui/`), architecture diagram (`docs/diagra
 
 ## Final pitch
 
-MOSIP answered on 21 October, on the community forum, that the date and the format of the final pitch are sent to the shortlisted teams after the submission deadline, during the evaluation (1 to 6 November). The pitch is the deck, then a live demonstration of the working solution, preferred, or a recorded demo. The live demonstration uses the modified client on Collab if the environment accepts our machine by then, otherwise the demo application (`demo/`), with the video as fallback.
+MOSIP answered on 21 October, on the community forum, that the date and the format of the final pitch are sent to the shortlisted teams after the submission deadline, during the evaluation (1 to 6 November). The pitch is the deck, then a live demonstration of the working solution, preferred, or a recorded demo. The live demonstration uses the modified client on Collab if the environment accepts our machine by then, otherwise the demo application (`demo/`), with the video as fallback. The team cleared Level 1 on 10 November: the plan of the final round, on 12 November, is in [final-pitch.md](final-pitch.md).
 
 ## Test data
 
