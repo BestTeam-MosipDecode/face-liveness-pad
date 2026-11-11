@@ -4,7 +4,7 @@ Plan of the live presentation of Level 2, the final round of MOSIP Decode 2026, 
 
 - Slot: Thursday 12 November 2026, 6:45 PM to 7:00 PM, time zone asked to MOSIP on 10 November. In IST, the zone of the earlier deadlines, it is 13:15 to 13:30 UTC, 14:15 to 14:30 in Cotonou.
 - Session link: sent by MOSIP to the members listed in the reply of 10 November.
-- Roles: a speaker, who talks and moves the slides, and a demo operator at the workstation that runs the demo. One person can hold both.
+- Presenter: Temitayo Gbolahan, at the reference workstation, who also runs the demo with their own face. Elisée Atonde, coordinator, prepares the workstation and stays in support.
 - The deck, the demo and the scenes are those of [pitch-outline.md](pitch-outline.md) and [demo-script.md](demo-script.md).
 
 ## Running order
@@ -29,6 +29,18 @@ Plan of the live presentation of Level 2, the final round of MOSIP Decode 2026, 
 
 If the camera, the device or the laptop fails during the demo, play the demo video from 0:35 and comment over it.
 
+## Demo controls
+
+| Scene | In the demo window |
+| --- | --- |
+| Before the session | "Challenges per attempt" at 1, "Attempts" at 3, "Allow a passive pass (0.85)" and "Diagnostic mode" unticked, language English |
+| 3, live face | Workflow "Resident face capture", `Start`, look at the camera, then follow the instructions: hold still, blink or turn the head to the side of the arrow and look back at the camera |
+| 5, printed photo | `Start`, then hold the printed photo in front of the camera |
+| 6, phone screen | `Try again`, then show the phone screen, brightness at maximum |
+| 8, operator in French | Workflow "Operator sign-in", language "Français", `Start`, live face |
+| 4, comparison, if time allows | Tick "Allow a passive pass (0.85)", `Start`, look at the camera, then untick it |
+| Clip of scene 9 | `Stop` if a session runs, then play `scene9_collab.mp4` |
+
 ## Material
 
 Kept outside the repository, in `captures/final_pitch/`, ignored by Git:
@@ -40,7 +52,7 @@ Beside it:
 
 - The full deck, 14 slides, open in a second window for the questions: slide 5 (architecture), 8 (what the user sees), 9 (security and privacy), 10 (stack).
 - The demo video of the submission, 4 min 35 s, as the fallback.
-- A printed photo of the demo operator and a phone showing a photo of them, brightness at maximum.
+- A printed photo of the presenter and a phone showing a photo of the presenter, brightness at maximum.
 
 ## Setup on the day
 
@@ -49,7 +61,7 @@ Times in Cotonou, for a presentation at 14:15.
 | When | Check |
 | --- | --- |
 | 13:15 | Workstation on mains power. Notifications off, mail and chat closed. Face lit from the front. |
-| 13:20 | Simulated device started with JDK 11 ([dev-setup-windows.md](dev-setup-windows.md), section 8) and checked with `python mock-sbi\scripts\check_device.py`. Demo started with `.\run_demo.ps1` ([../demo/README.md](../demo/README.md)), window maximised. |
+| 13:20 | Simulated device started with JDK 11 ([dev-setup-windows.md](dev-setup-windows.md), section 8) and checked with `python mock-sbi\scripts\check_device.py`. Demo started with `.\run_demo.ps1` ([../demo/README.md](../demo/README.md)) in a terminal where JDK 11 is selected, window maximised. |
 | 13:30 | Scenes 3 and 5 played once. "Challenges per attempt" set to 1. |
 | 13:45 | Final deck, full deck, clip and video opened. Screen sharing tested in the meeting tool: share the whole screen, so that the switches between deck, demo and clip show. |
 | 14:00 | Session link joined, microphone and camera checked. |
