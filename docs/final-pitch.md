@@ -2,8 +2,9 @@
 
 Plan of the live presentation of Level 2, the final round of MOSIP Decode 2026, after the team cleared Level 1. A panel of MOSIP experts and industry professionals evaluates it: ten minutes of presentation, then five minutes of questions. MOSIP prefers a working prototype or a demo video to a deck alone.
 
-- Slot: Thursday 12 November 2026, 6:45 PM to 7:00 PM, time zone asked to MOSIP on 10 November. In IST, the zone of the earlier deadlines, it is 13:15 to 13:30 UTC, 14:15 to 14:30 in Cotonou.
-- Session link: sent by MOSIP to the members listed in the reply of 10 November.
+- Slot: Thursday 12 November 2026, 6:45 PM to 7:00 PM IST, confirmed by MOSIP on 11 November: 13:15 to 13:30 UTC, 14:15 to 14:30 in Cotonou.
+- Session: a Zoom meeting of the panel, which starts at 5:30 PM IST (13:00 in Cotonou); each team joins at its slot. The link was sent by email to the members listed in the reply of 10 November and stays out of this repository.
+- Camera: the reference workstation has one camera, and Windows gives it to one application at a time. Zoom keeps its video off while the demo runs, so that the simulated device can open the camera; the panel sees the presenter in the preview of the demo. Video can be turned on for the questions, once the demo is stopped.
 - Presenter: Temitayo Gbolahan, at the reference workstation, who also runs the demo with their own face. Elisée Atonde, coordinator, prepares the workstation and stays in support.
 - The deck, the demo and the scenes are those of [pitch-outline.md](pitch-outline.md) and [demo-script.md](demo-script.md).
 
@@ -63,8 +64,8 @@ Times in Cotonou, for a presentation at 14:15.
 | 13:15 | Workstation on mains power. Notifications off, mail and chat closed. Face lit from the front. |
 | 13:20 | Simulated device started with JDK 11 ([dev-setup-windows.md](dev-setup-windows.md), section 8) and checked with `python mock-sbi\scripts\check_device.py`. Demo started with `.\run_demo.ps1` ([../demo/README.md](../demo/README.md)) in a terminal where JDK 11 is selected, window maximised. |
 | 13:30 | Scenes 3 and 5 played once. "Challenges per attempt" set to 1. |
-| 13:45 | Final deck, full deck, clip and video opened. Screen sharing tested in the meeting tool: share the whole screen, so that the switches between deck, demo and clip show. |
-| 14:00 | Session link joined, microphone and camera checked. |
+| 13:45 | Final deck, full deck, clip and video opened. Screen sharing tested in Zoom with its video off: share the whole screen, so that the switches between deck, demo and clip show, then run scene 3 once while sharing, to check that the device gets the camera. |
+| 14:05 | Zoom meeting joined with the video off, display name with the team name, microphone checked. |
 | 14:15 | Presentation. |
 
 After the presentation, stop the demo and close the terminal of the simulated device without saving its output, which holds the captured face records.
